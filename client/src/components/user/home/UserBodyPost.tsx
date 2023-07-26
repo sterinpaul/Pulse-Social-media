@@ -10,7 +10,7 @@ const UserBodyPost = ({...post})=>{
     
     const userId:string = "1"
     const userName:string = "Sterin Paul"
-    const themeDark:Boolean = useSelector((store:{theme:{darkMode:Boolean}})=>store.theme.darkMode)
+    const themeDark:Boolean = useSelector((store:{user:{darkMode:Boolean}})=>store.user.darkMode)
     const likeStatus = post.liked.some((person:{id:string})=>person.id===userId)
     const [like,setLike] = useState(likeStatus)
 

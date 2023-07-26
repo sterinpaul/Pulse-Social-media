@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
+import { useNavigate } from "react-router-dom";
+import {toast} from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { signIn } from "../../../api/apiConnections/authConnection";
+import { setToken, setUser } from '../../../redux/userRedux/userSlice';
 
 import {
-    Card,
     CardHeader,
     CardBody,
     CardFooter,
@@ -14,6 +17,8 @@ import {
   } from "@material-tailwind/react";
 
 const SignInForm = ()=>{
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const formik = useFormik({
     initialValues:{
       userName:'',
@@ -24,17 +29,33 @@ const SignInForm = ()=>{
         .max(20, 'Must be 20 characters or less')
         .required('Required'),
       password: Yup.string()
-        .min(8,'Must be 8 characters or more')
+        .min(1,'Must be 8 characters or more')
         .required('Required')
     }),
-    onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async(values) => {
+      interface resp{
+        status?:string,
+        message?:string,
+        token?:string,
+        user?:{userName:string}
+      }
+      const response:resp = await signIn(values)
+      
+      if(response?.status === 'success'){
+        dispatch(setToken(response?.token))
+        dispatch(setUser(response?.user?.userName))
+        navigate('/')
+        toast.success(response?.message)
+      }else{
+        toast.error(response?.message)
+      }
+      // alert(JSON.stringify(values, null, 2));
     }
   })
 
     return(
       <form onSubmit={formik.handleSubmit}>
-        <Card className="w-96 shadow-2xl shadow-blue-gray-500">
+
               <CardHeader
                 variant="gradient"
                 color="blue"
@@ -47,12 +68,12 @@ const SignInForm = ()=>{
 
               </CardHeader>
               <CardBody className="flex flex-col gap-2">
-                <Input type="string" label="User Name" size="lg"
+                <Input type="text" label="User Name" size="lg" id="userName"
                 {...formik.getFieldProps('userName')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.userName && formik.errors.userName ? 
                 formik.errors.userName : null}</p>
 
-                <Input type="password" label="Password" size="lg"
+                <Input type="password" label="Password" size="lg" id="password"
                 {...formik.getFieldProps('password')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.password && formik.errors.password ?
                   formik.errors.password : null}</p>
@@ -61,7 +82,7 @@ const SignInForm = ()=>{
                 {/* </div> */}
               </CardBody>
               <CardFooter className="pt-0">
-                <Button color="blue" variant="gradient" fullWidth>
+                <Button type="submit" color="blue" variant="gradient" fullWidth>
                   Sign In
                 </Button>
 
@@ -83,12 +104,8 @@ const SignInForm = ()=>{
                     </Button>
                 </div>
 
-                <Typography variant="small" className="mt-6 flex justify-center">
-                  Don't have an account ?
-                  <Link to="/signup" className="ml-1 text-blue-500 transition-colors hover:text-blue-700">Sign up</Link>
-                </Typography>
               </CardFooter>
-            </Card>
+            
         </form>
     )
 }

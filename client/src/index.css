@@ -5,6 +5,7 @@
 :root{
   padding:0;
   margin:0;
+  --toastify-color-success: #54beff !important;
 }
 
 .font-kaushan {

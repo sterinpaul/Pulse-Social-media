@@ -1,7 +1,8 @@
-import { changeMode } from "../../../redux/userRedux/themeSlice";
+import { changeMode, setToken } from "../../../redux/userRedux/userSlice";
 import React from "react";
 import {useSelector,useDispatch} from 'react-redux'
-
+import { useNavigate } from "react-router-dom";
+import {toast} from 'react-toastify';
 
 import {
   Navbar,
@@ -28,26 +29,27 @@ import {
 } from "@heroicons/react/24/outline";
 
 
-// profile menu component
-const profileMenuItems = [
-  {
-    label: "My Profile",
-    icon: UserCircleIcon,
-  },
-  {
-    label: "Sign Out",
-    icon: PowerIcon,
-  },
-];
-
 interface theme{
     props:Boolean
 }
  
 function ProfileMenu(themeMode:theme) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const closeMenu = () => setIsMenuOpen(false);
-    
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  // const closeMenu = () => setIsMenuOpen(false);
+  
+  const signOut = ()=>{
+    localStorage.removeItem("token")
+    dispatch(setToken(""))
+    toast.success("Signout success")
+    navigate('/')
+  }
+
+  const profile = ()=>{
+    console.log("profile page")
+  }
+
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -71,33 +73,32 @@ function ProfileMenu(themeMode:theme) {
         </Button>
       </MenuHandler>
       <MenuList className={themeMode.props ? "bg-blue-gray-200" : ""}>
-        {profileMenuItems.map(({ label, icon }, key) => {
-          const isLastItem = key === profileMenuItems.length - 1;
-          return (
             <MenuItem
-              key={label}
-              onClick={closeMenu}
-              className={`flex items-center gap-2 rounded ${
-                isLastItem
-                  ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-                  : ""
-              }`}
-            >
-              {React.createElement(icon, {
-                className: `h-4 w-4 ${isLastItem ? "text-red-500" : ""}`,
-                strokeWidth: 2,
-              })}
+              onClick={()=>profile()}
+              className="flex items-center gap-2 rounded">
+              <UserCircleIcon className="h-4 w-4" strokeWidth="2"/>
               <Typography
                 as="span"
                 variant="small"
                 className="font-normal"
-                color={isLastItem ? "red" : "inherit"}
-              >
-                {label}
+                color="inherit">
+                My Profile
               </Typography>
             </MenuItem>
-          );
-        })}
+
+            <MenuItem
+              onClick={()=>signOut()}
+              className="flex items-center gap-2 rounded">
+              <PowerIcon className="h-4 w-4 text-red-500" strokeWidth="2"/>
+              <Typography
+                as="span"
+                variant="small"
+                className="font-normal"
+                color="red">
+                Sign Out
+              </Typography>
+            </MenuItem>
+        
       </MenuList>
     </Menu>
   );
@@ -193,7 +194,7 @@ function NavListMenu() {
  
 // nav list component
 interface list{
-    isOpen:Boolean
+  isOpen:Boolean
 }
  
 function NavList(open: list) {
@@ -226,7 +227,7 @@ function NavList(open: list) {
 export default function UserNavBar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false);
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
-  const themeDark:Boolean = useSelector((store:any)=>store.theme.darkMode)
+  const themeDark:Boolean = useSelector((store:{user:{darkMode:boolean}})=>store.user.darkMode)
   const dispatch = useDispatch()
 
   const changeTheme = ()=>{

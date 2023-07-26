@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
+import {toast} from 'react-toastify';
+import { signUp } from "../../../api/apiConnections/authConnection";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../../redux/userRedux/userSlice";
 
 import {
-    Card,
     Input,
     Checkbox,
     Button,
@@ -11,6 +14,9 @@ import {
   } from "@material-tailwind/react";
 
 const SignUpForm = ()=>{
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const formik = useFormik({
     initialValues:{
       firstName:'',
@@ -34,20 +40,37 @@ const SignUpForm = ()=>{
         .email('Invalid email address')
         .required('Required'),
       password: Yup.string()
-        .min(8,'Must be 8 characters or more')
+        .min(1,'Must be 8 characters or more')
         .required('Required'),
       rePassword: Yup.string()
         .oneOf([Yup.ref('password'), ''], 'Password not match')
         .required('Required')
     }),
-    onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async(values) => {
+      interface resp{
+        status?:string,
+        message?:string,
+        token?:string,
+        user?:object
+      }
+
+      const response:resp = await signUp(values)
+
+      
+      if(response?.status === 'success'){
+        dispatch(setToken(response?.token))
+        navigate('/')
+        toast.success(response?.message)
+      }else{
+        toast.error(response?.message)
+      }
+      // alert(JSON.stringify(values, null, 2));
     }
   })
 
     return(
       <form onSubmit={formik.handleSubmit}>
-        <Card className="w-100 p-4 shadow-2xl shadow-blue-gray-500">
+        
             <Typography variant="h3" color="blue" className="text-center pt-4">
               Sign Up
             </Typography>
@@ -56,33 +79,33 @@ const SignUpForm = ()=>{
               <div className="flex flex-col gap-2">
                 <div className="flex gap-1">
                     <div>
-                      <Input type="text" size="lg" label="First Name"
+                      <Input type="text" id="firstName" size="lg" label="First Name"
                       {...formik.getFieldProps('firstName')} />
                       <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.firstName && formik.errors.firstName ?
                         formik.errors.firstName : null}</p>
                     </div>
 
                     <div>
-                      <Input type="text" size="lg" label="Last Name"
+                      <Input type="text" id="lastName" size="lg" label="Last Name"
                       {...formik.getFieldProps('lastName')} />
                       <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.lastName && formik.errors.lastName ?
                         formik.errors.lastName : null}</p>
                     </div>
                 </div>
-                <Input type="text" size="lg" label="User Name" 
+                <Input type="text" id="userName" size="lg" label="User Name" 
                 {...formik.getFieldProps('userName')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.userName && formik.errors.userName ? 
                 formik.errors.userName : null}</p>
 
-                <Input type="email" size="lg" label="E-mail"
+                <Input type="email" id="email" size="lg" label="E-mail"
                 {...formik.getFieldProps('email')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.email && formik.errors.email ? 
                   formik.errors.email : null}</p>
-                <Input type="password" size="lg" label="Password"
+                <Input type="password" id="password" size="lg" label="Password"
                 {...formik.getFieldProps('password')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.password && formik.errors.password ?
                   formik.errors.password : null}</p>
-                <Input type="password" size="lg" label="Re-type Password"
+                <Input type="password" id="rePassword" size="lg" label="Re-type Password"
                 {...formik.getFieldProps('rePassword')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.rePassword && formik.errors.rePassword ?
                   formik.errors.rePassword : null}</p>
@@ -107,15 +130,11 @@ const SignUpForm = ()=>{
                 }
                 containerProps={{ className: "-ml-2.5" }}
               />
-              <Button color="blue" variant="gradient" fullWidth>
-                Sign In
+              <Button type="submit" color="blue" variant="gradient" fullWidth>
+                Submit
               </Button>
-              <Typography variant="small" color="gray" className="mt-4 text-center font-normal">
-                Already have an account ?
-                <Link to="/signin" className="ml-1 text-blue-500 transition-colors hover:text-blue-700">Sign in</Link>
-              </Typography>
+              
             </div>
-        </Card>
       </form>
     )
 }

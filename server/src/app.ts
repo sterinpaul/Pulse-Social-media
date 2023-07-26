@@ -1,6 +1,7 @@
 import express,{Application} from 'express';
 import path from 'path';
 import http from 'http';
+import routes from './framework/webServer/routes';
 import connectDB from './framework/database/mongoDB/connection/connection';
 import serverConfig from './framework/webServer/server';
 import expressConfig from './framework/webServer/express';
@@ -15,13 +16,15 @@ connectDB()
 // Middleware configuration
 expressConfig(app)
 
+routes(app)
+
 // adding public folder as static file
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 
-app.get('/',(req,res)=>{
-    res.send("Hai Sterin...")
-})
+// app.get('/',(req,res)=>{
+//     res.send("Hai Sterin...")
+// })
 
 // Start the server
 serverConfig(server)

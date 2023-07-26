@@ -1,19 +1,19 @@
 import axios from 'axios';
-import dotENV from 'dotenv';
-
-dotENV.config()
+import { BASEURL } from './baseURL';
 
 const baseURL = axios.create({
-    baseURL : process.env.BASE_URL
+    baseURL : BASEURL
 })
 
 baseURL.interceptors.request.use(
     config=>{
-        console.log("Entered into Interceptor")
         const state = localStorage.getItem("token")
+        
         if(state){
             const {token} = JSON.parse(state)
             config.headers["Authorization"] = `Bearer ${token}`
+        }else{
+            delete config.headers["Authorization"]
         }
 
         return config
