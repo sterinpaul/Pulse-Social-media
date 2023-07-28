@@ -1,5 +1,4 @@
 import express,{Application} from 'express';
-import path from 'path';
 import http from 'http';
 import routes from './framework/webServer/routes';
 import connectDB from './framework/database/mongoDB/connection/connection';
