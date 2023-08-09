@@ -1,4 +1,4 @@
-import mongoose,{Schema,model} from 'mongoose';
+import {Schema,model} from 'mongoose';
 
 // Schema of User
 const userSchema = new Schema(
@@ -27,7 +27,13 @@ const userSchema = new Schema(
         minlength:8
     },
     profilePic:{
-        type:String
+        type:String,
+        default:''
+    },
+    mobile:{
+        type:String,
+        required:true,
+        unique:true
     },
     bio:{
         type:String
@@ -42,10 +48,11 @@ const userSchema = new Schema(
         type:Boolean,
         default:false
     },
-    isBlock:{
+    isBlocked:{
         type:Boolean,
         default:false
     },
+    savedPosts:[],
     blockedUsers:[],
     blockedByUsers:[],
     followers:[],

@@ -1,17 +1,25 @@
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
 import Home from './pages/user/Home';
+import Profile from './pages/user/Profile';
+import EditProfile from './pages/user/EditProfile';
 import SignInAndSignUp from './pages/user/SignInAndSignUp';
 import { useSelector } from 'react-redux';
 
 function App() {
-
-  const tokenRedux = useSelector((store:{user:{token:boolean}})=>store.user.token)
-  const token = localStorage.getItem("token")
+  const reduxToken = useSelector((store:{user:{reduxUser:{token:string}}})=>store.user.reduxUser.token)
   
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={token ?? tokenRedux ? <Home/> : <SignInAndSignUp/>}></Route>
+        <Route path='/' element={reduxToken ? <Home/> : <SignInAndSignUp/>}></Route>
+      </Routes>
+
+      <Routes>
+        <Route path='/:user' element={<Profile/>}></Route>
+      </Routes>
+
+      <Routes>
+        <Route path='/:user/edit' element={<EditProfile/>}></Route>
       </Routes>
     </BrowserRouter>
   )

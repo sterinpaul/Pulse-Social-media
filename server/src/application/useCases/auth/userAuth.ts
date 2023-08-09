@@ -7,7 +7,8 @@ export const userSignUp = async(
         lastName:string,
         userName:string,
         email:string,
-        password:string
+        password:string,
+        mobile:string
     },
     userRepository:ReturnType<UserDbInterface>,
     authService:ReturnType<AuthServiceInterface>
@@ -28,7 +29,7 @@ export const userSignUp = async(
     if(isUserNameExist){
         const userData = {
             status:"failed",
-            message:"User name already exists",
+            message:"Username already exists",
             user:{},
             token:''
         }
@@ -39,8 +40,7 @@ export const userSignUp = async(
     let encryptPassword = await authService.encryptPassword(user.password)
     user.password = encryptPassword
     const data = await userRepository.addUser(user)
-    
-    const jwtToken = await authService.generateToken(data._id.toString())
+    const jwtToken = await authService.generateToken(data._id?.toString())
     const userData = {
         status:"success",
         message:"Registration Success",
@@ -57,7 +57,7 @@ export const userSignIn = async(
     userRepository:ReturnType<UserDbInterface>,
     authService:ReturnType<AuthServiceInterface>
 )=>{
-    const data = await userRepository.getUserByUsername(userName)
+    const data = await userRepository.getUser(userName)
     if(!data){
         const userData = {
             status:"failed",
@@ -67,7 +67,7 @@ export const userSignIn = async(
         }
         return userData
     }
-    if(data.isBlock){
+    if(data.isBlocked){
         const userData = {
             status:"failed",
             message:"User is blocked",
@@ -76,7 +76,7 @@ export const userSignIn = async(
         }
         return userData
     }
-    const isPassword = await authService.comparePassword(password,data.password)
+    const isPassword = await authService.comparePassword(password,data?.password)
     if(!isPassword){
         const userData = {
             status:"failed",
@@ -86,8 +86,8 @@ export const userSignIn = async(
         }
         return userData
     }
-    const jwtToken = await authService.generateToken(data._id.toString())
-    
+    const jwtToken = await authService.generateToken(data?._id?.toString())
+    data.password = ""
     const userData = {
         status:"success",
         message:"Sign in Success",

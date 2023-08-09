@@ -6,11 +6,12 @@ interface SignupFormValues{
     lastName:string,
     userName:string,
     email:string,
-    password:string
+    password:string,
+    mobile:string
 }
 
 interface SignupFormResponse{
-    message?:string,
+    message:string,
     status:string,
     user:object,
     token:string
@@ -22,7 +23,7 @@ interface SigninFormValues{
 }
 
 interface SigninFormResponse{
-    message?:string,
+    message:string,
     status:string,
     user:object,
     token:string
@@ -31,7 +32,6 @@ interface SigninFormResponse{
 export const signUp = async (values:SignupFormValues):Promise<object> =>{
     try{
         const response =  await baseURL.post<SignupFormResponse>('/auth/signup',values)
-        localStorage.setItem('token',response?.data?.token)
         return response?.data
        
     // Handling error
@@ -43,11 +43,10 @@ export const signUp = async (values:SignupFormValues):Promise<object> =>{
 export const signIn = async (values:SigninFormValues):Promise<object> =>{
     try{
         const response = await baseURL.post<SigninFormResponse>('/auth/signin',values)
-        localStorage.setItem('token',response?.data?.token)
         return response?.data
         
     // Handling error
     }catch(error:any){
-        throw new Error(error)
+        throw new Error(`Error while signing in : ${error}`)
     }
 }

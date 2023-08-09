@@ -8,6 +8,10 @@
   --toastify-color-success: #54beff !important;
 }
 
+/* *{
+  outline:1px solid red;
+} */
+
 .font-kaushan {
   font-family: 'Kaushan Script', cursive;
 }

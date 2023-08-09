@@ -2,7 +2,7 @@ import express,{Application} from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { configKeys } from '../../config';
+import helmet from 'helmet'
 
 const expressConfig = (app:Application)=>{
 
@@ -18,5 +18,6 @@ const expressConfig = (app:Application)=>{
     app.use(express.json())
     app.use(express.urlencoded({extended:true}))
     app.use(cookieParser())
+    app.use(helmet())
 }
 export default expressConfig

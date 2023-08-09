@@ -3,23 +3,23 @@ import { useSelector } from "react-redux";
 const friendsList = [
     {
         fName:"Sunny",
-        lName:"Leon"
+        lName:"Lane"
     },
     {
         fName:"Mia",
-        lName:"Khalifa"
+        lName:"Khan"
     },
     {
-        fName:"Ava",
+        fName:"Avana",
         lName:"Adam"
     },
     {
         fName:"Ana",
-        lName:"D Armas"
+        lName:"Armas"
     },
     {
         fName:"Samantha",
-        lName:""
+        lName:"Sunil"
     }
 ]
 
@@ -31,11 +31,10 @@ import {
   } from "@material-tailwind/react";
 
 
-
    const UserRightSideBar = ()=>{
-    const themeDark:Boolean = useSelector((store:{user:{darkMode:boolean}})=>store.user.darkMode)
+    const {darkMode} = useSelector((store:{user:{reduxUser:{userName:string,userId:string,darkMode:boolean}}})=>store.user.reduxUser)
     return (
-      <Card className={`${themeDark ? "bg-blue-gray-200" : ""} fixed top-[5.6rem] h-[60vh] right-2 overflow-y-scroll max-w-[20rem] p-1 pb-1.5 rounded shadow-xl shadow-blue-gray hidden lg:block`}>
+      <Card className={`${darkMode ? "bg-blue-gray-200" : ""} fixed top-[5.6rem] h-[60vh] right-2 overflow-y-scroll max-w-[20rem] p-1 pb-1.5 rounded shadow-xl shadow-blue-gray hidden lg:block`}>
         <div className="text-center p-2">
           <Typography variant="h5" color="blue-gray">
             Recent Chat

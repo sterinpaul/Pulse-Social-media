@@ -23,8 +23,8 @@ export const authServices = ()=>{
     }
     const verifyToken = (token:string)=>{
         if(configKeys.JWT_SECRET_KEY){
-            const isValid = jwt.verify(token,configKeys.JWT_SECRET_KEY)
-            return isValid
+            const userId = jwt.verify(token,configKeys.JWT_SECRET_KEY)
+            return userId
         }
         return undefined
     }

@@ -3,8 +3,7 @@ import SignInForm from "../../components/user/signIn/SignInForn";
 import SignUpForm from "../../components/user/signUp/SignUpForm";
 
 import {
-  Card,
-  Typography,
+  Card
 } from "@material-tailwind/react";
    
   const SignInAndSignUp = ()=>{
@@ -16,18 +15,18 @@ import {
           {signIn ? 
             <>
             <SignInForm/>
-            <Typography variant="small" className="mt-2 flex justify-center">
+            <button className="mt-2">
               Don't have an account ?
-              <span onClick={()=>setSignIn(!signIn)} className="ml-1 text-blue-500 transition-colors hover:text-blue-700 cursor-pointer">Sign up</span>
-            </Typography>
+              <span onClick={()=>setSignIn(!signIn)} className="ml-1 text-blue-500 transition-colors hover:text-blue-700">Sign up</span>
+            </button>
             </>
              : 
             <>
             <SignUpForm/>
-            <Typography variant="small" className="mt-2 flex justify-center">
+            <button className="mt-2">
               Already have an account ?
-              <span onClick={()=>setSignIn(!signIn)} className="ml-1 text-blue-500 transition-colors hover:text-blue-700 cursor-pointer">Sign in</span>
-            </Typography>
+              <span onClick={()=>setSignIn(!signIn)} className="ml-1 text-blue-500 transition-colors hover:text-blue-700">Sign in</span>
+            </button>
             </>
             }
             </Card>

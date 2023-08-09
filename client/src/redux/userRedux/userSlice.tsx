@@ -1,14 +1,75 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-interface initial{
-    userName:string,
-    darkMode:boolean,
-    token:null
+const getTokenFromLocal = ()=>{
+    const userData = localStorage.getItem("user")
+    if(userData){
+        const user = JSON.parse(userData)
+        return user
+    }else{
+        const user = {
+            _id:"",
+            token:"",
+            userName: "",
+            darkMode: false,
+            profilePic: ""
+        }
+        return user
+    }
 }
+
+interface initial{
+    reduxUser : {
+        _id?:string,
+        token?:string,
+        userName?: string,
+        darkMode?: boolean,
+        profilePic?: string,
+        // firstName?: string,
+        // lastName?: string,
+        // email?: string,
+        // mobile?: string,
+        // isBlocked?: boolean,
+        // gender?: string,
+        // city?: string,
+        // bio?:string,
+        // savedPosts?:object[],
+        // blockedByUsers?: object[],
+        // blockedUsers?: object[],
+        // followRequested?: object[],
+        // followRequests?: object[],
+        // followers?: object[],
+        // following?: object[],
+        // createdAt?: string,
+        // updatedAt?: string
+    }
+}
+
 const initialState:initial = {
-    userName:"",
-    darkMode:false,
-    token:null
+    reduxUser:getTokenFromLocal()
+    // reduxUser : {
+        // _id:"",
+        // token:"",
+        // userName: "",
+        // darkMode: false,
+        // profilePic: "",
+        // firstName: "",
+        // lastName: "",
+        // email: "",
+        // mobile?: "",
+        // isBlocked: false,
+        // gender: "",
+        // city: "",
+        // bio:"",
+        // savedPosts: [],
+        // blockedByUsers: [],
+        // blockedUsers: [],
+        // followRequested: [],
+        // followRequests: [],
+        // followers: [],
+        // following: [],
+        // createdAt: "",
+        // updatedAt: ""
+    // }
 }
 
 const userSlice = createSlice({
@@ -16,19 +77,20 @@ const userSlice = createSlice({
     initialState,
     reducers:{
         changeMode:(state)=>{
-            state.darkMode = !state.darkMode
-        },
-        setUserTheme:(state,action)=>{
-            state.darkMode = action.payload
+            state.reduxUser.darkMode = !state.reduxUser.darkMode
         },
         setUser:(state,action)=>{
-            state.userName = action.payload
+            state.reduxUser = action.payload
         },
-        setToken:(state,action)=>{
-            state.token = action.payload
+        changePhoto:(state,action)=>{
+            state.reduxUser.profilePic = action.payload
+        },
+        userSignOut:(state)=>{
+            localStorage.removeItem("user")
+            state.reduxUser = {...initialState.reduxUser}
         }
     }
 })
 
-export const {changeMode,setUserTheme,setUser,setToken} = userSlice.actions
+export const {changeMode,setUser,changePhoto,userSignOut} = userSlice.actions
 export default userSlice.reducer

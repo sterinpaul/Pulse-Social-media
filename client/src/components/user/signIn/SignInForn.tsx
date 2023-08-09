@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {toast} from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { signIn } from "../../../api/apiConnections/authConnection";
-import { setToken, setUser } from '../../../redux/userRedux/userSlice';
+import { setUser } from '../../../redux/userRedux/userSlice';
 
 import {
     CardHeader,
@@ -26,9 +26,10 @@ const SignInForm = ()=>{
     },
     validationSchema: Yup.object({
       userName: Yup.string()
-        .max(20, 'Must be 20 characters or less')
+        .max(20, 'Must be less than 20 characters')
         .required('Required'),
       password: Yup.string()
+        .max(20, 'Must be less than 20 characters')
         .min(1,'Must be 8 characters or more')
         .required('Required')
     }),
@@ -37,19 +38,28 @@ const SignInForm = ()=>{
         status?:string,
         message?:string,
         token?:string,
-        user?:{userName:string}
+        user?:{userName:string,_id:string,darkMode:boolean,profilePic:string}
       }
+      
       const response:resp = await signIn(values)
       
       if(response?.status === 'success'){
-        dispatch(setToken(response?.token))
-        dispatch(setUser(response?.user?.userName))
+        if(response?.token){
+          const user = {
+            _id:response?.user?._id,
+            token:response?.token,
+            userName:response?.user?.userName,
+            darkMode:response?.user?.darkMode,
+            profilePic:response?.user?.profilePic
+          }
+          localStorage.setItem("user",JSON.stringify(user))
+          dispatch(setUser(user))
+        }
         navigate('/')
         toast.success(response?.message)
       }else{
         toast.error(response?.message)
       }
-      // alert(JSON.stringify(values, null, 2));
     }
   })
 
@@ -68,7 +78,8 @@ const SignInForm = ()=>{
 
               </CardHeader>
               <CardBody className="flex flex-col gap-2">
-                <Input type="text" label="User Name" size="lg" id="userName"
+                {/* <Input type="text" label="User Name" size="lg" id="userName" */}
+                <input className='border-[.1rem] border-gray-400 rounded-md p-2 placeholder:text-sm focus:border-blue-600' placeholder='User Name/E-mail/Mobile' id="userName"
                 {...formik.getFieldProps('userName')} />
                 <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.userName && formik.errors.userName ? 
                 formik.errors.userName : null}</p>

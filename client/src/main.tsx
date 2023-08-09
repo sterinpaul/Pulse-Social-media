@@ -8,14 +8,13 @@ import { ThemeProvider } from "@material-tailwind/react";
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider>
-      <ToastContainer position="top-right" hideProgressBar={true} autoClose={2000} />
-        <App />
-      </ThemeProvider>
+        <ThemeProvider>
+          <ToastContainer position="top-right" hideProgressBar={true} autoClose={2000} />
+            <App />
+        </ThemeProvider>
     </Provider>
   </React.StrictMode>,
 )

@@ -8,7 +8,9 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         email:string,
         password:string
     })=>{
-        return await repository.addUser(user)
+        const addedUser = await repository.addUser(user)
+        addedUser.password = ""
+        return addedUser
     }
 
     const getUserByEmail = async(email:string)=>{
@@ -19,10 +21,25 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         return await repository.getUserByUserName(userName)
     }
 
+    const getUserByMobile = async(mobile:string)=>{
+        return await repository.getUserByMobile(mobile)
+    }
+
+    const getUser = async(userData:string)=>{
+        return await repository.getUserByNameMailMobile(userData)
+    }
+
+    const postProfilePicture = async(userName:string,profilePic:string)=>{
+        return await repository.postProfilePicture(userName,profilePic)
+    }
+
     return {
         addUser,
+        getUser,
         getUserByEmail,
-        getUserByUsername
+        getUserByUsername,
+        getUserByMobile,
+        postProfilePicture
     }
 }
 export type UserDbInterface = typeof userDbRepository
