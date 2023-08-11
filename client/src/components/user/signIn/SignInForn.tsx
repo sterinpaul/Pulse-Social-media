@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {toast} from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { signIn } from "../../../api/apiConnections/authConnection";
-import { setUser } from '../../../redux/userRedux/userSlice';
+import { setToken,setUser } from '../../../redux/userRedux/userSlice';
 
 import {
     CardHeader,
@@ -46,13 +46,11 @@ const SignInForm = ()=>{
       if(response?.status === 'success'){
         if(response?.token){
           const user = {
-            _id:response?.user?._id,
-            token:response?.token,
             userName:response?.user?.userName,
             darkMode:response?.user?.darkMode,
             profilePic:response?.user?.profilePic
           }
-          localStorage.setItem("user",JSON.stringify(user))
+          dispatch(setToken(response?.token))
           dispatch(setUser(user))
         }
         navigate('/')

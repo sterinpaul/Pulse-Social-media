@@ -1,6 +1,7 @@
 import { UserDbInterface } from "../../repositories/userDbRepository"
 import { AuthServiceInterface } from "../../services/authServiceInterfaces"
 
+
 export const userSignUp = async(
     user:{
         firstName:string,
@@ -87,7 +88,7 @@ export const userSignIn = async(
         return userData
     }
     const jwtToken = await authService.generateToken(data?._id?.toString())
-    data.password = ""
+    data.password = '';
     const userData = {
         status:"success",
         message:"Sign in Success",

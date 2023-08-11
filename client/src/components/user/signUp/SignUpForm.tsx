@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import {toast} from 'react-toastify';
 import { signUp } from "../../../api/apiConnections/authConnection";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../../redux/userRedux/userSlice";
+import { setToken,setUser } from "../../../redux/userRedux/userSlice";
 import lodash from 'lodash'
 import { auth } from "../../../api/services/firebaseConfig";
 import { RecaptchaVerifier,signInWithPhoneNumber } from "firebase/auth";
@@ -131,17 +131,15 @@ import {
       
       const data = lodash.omit(values,'rePassword')
       const response:resp = await signUp(data)
-
+      
       if(response?.status === 'success'){
         if(response?.token){
           const user = {
-            _id:response?.user?._id,
-            token:response?.token,
             userName:response?.user?.userName,
             darkMode:response?.user?.darkMode,
             profilePic:response?.user?.profilePic
           }
-          localStorage.setItem("user",JSON.stringify(user))
+          dispatch(setToken(response?.token))
           dispatch(setUser(user))
         }
         navigate('/')

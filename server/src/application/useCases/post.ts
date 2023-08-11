@@ -16,10 +16,18 @@ export const getAllPosts = async(
 }
 
 export const addNewPost = async(
-    postData:Post,
+    postedUser: string,
+    description: string,
+    imgVideoURL: string,
     postRepository:ReturnType<postDbInterface>,
 )=>{
-    const data = await postRepository.addPost(postData)
+    const post = {
+        postedUser,
+        description,
+        imgVideoURL
+    }
+
+    const data = await postRepository.addPost(post)
     if(data){
         return data
     }

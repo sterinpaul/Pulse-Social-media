@@ -9,7 +9,7 @@ interface postInterface{
 export const postRepositoryMongoDB = ()=>{
 
     const getPost = async()=>{
-        return await Post.find()
+        return await Post.find({isBlocked:false}).sort({createdAt:-1})
     }
 
     const addPost = async(post:postInterface)=>{

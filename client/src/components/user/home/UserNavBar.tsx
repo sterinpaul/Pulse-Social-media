@@ -1,10 +1,10 @@
 import { changeMode,userSignOut } from "../../../redux/userRedux/userSlice";
 import React from "react";
 import { Link } from "react-router-dom";
-import {useSelector,useDispatch} from 'react-redux'
+import {useDispatch,useSelector} from 'react-redux'
 import { useNavigate } from "react-router-dom";
 import {toast} from 'react-toastify';
-import { CLOUDINARY_URL,PROFILE_PHOTO } from "../../../api/baseURL";
+import { CLOUDINARY_PROFILE_PHOTO_URL,PROFILE_PHOTO } from "../../../api/baseURL";
 
 import {
   Navbar,
@@ -32,13 +32,12 @@ import {
 
 
 interface Data{
-  userId?:string,
-  userName?:string,
-  darkMode?:boolean,
-  profilePic?:string
+  userName:string,
+  darkMode:boolean,
+  profilePic:string
 }
  
-function ProfileMenu({darkMode,userName,profilePic}:Data): JSX.Element {
+function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
   
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const dispatch = useDispatch()
@@ -63,7 +62,7 @@ function ProfileMenu({darkMode,userName,profilePic}:Data): JSX.Element {
             size="sm"
             alt="Profile photo"
             className="border border-blue-500 p-0.5"
-            src={profilePic ? (CLOUDINARY_URL+profilePic) : PROFILE_PHOTO}
+            src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+profilePic) : PROFILE_PHOTO}
           />
           <ChevronDownIcon
             strokeWidth={2.5}
@@ -142,8 +141,9 @@ function NavList(open: list) {
 export default function UserNavBar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false);
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
-  const {userName,userId,darkMode,profilePic} = useSelector((store:{user:{reduxUser:{userName:string,userId:string,darkMode:boolean,profilePic:string}}})=>store.user.reduxUser)
+  const {...reduxData} = useSelector((store:{user:{userName:string,darkMode:boolean,profilePic:string}})=>store.user)
   const dispatch = useDispatch()
+  
 
   const changeTheme = ()=>{
     dispatch(changeMode())
@@ -158,8 +158,8 @@ export default function UserNavBar() {
  
   return (
     <div className='flex justify-center z-50'>
-      <div className={`${darkMode ? " bg-blue-gray-100" : "bg-gray-200"} z-10 fixed w-screen h-3`}></div>
-      <Navbar className={`${darkMode ? "bg-blue-gray-400" : ""} fixed mt-2 lg:w-5/6 lg:rounded-full lg:pl-6 z-50`} >
+      <div className={`${reduxData.darkMode ? " bg-blue-gray-100" : "bg-gray-200"} z-10 fixed w-screen h-3`}></div>
+      <Navbar className={`${reduxData.darkMode ? "bg-blue-gray-400" : ""} fixed mt-2 lg:w-5/6 lg:rounded-full lg:pl-6 z-50`} >
         <div className="relative mx-auto flex justify-between items-center text-blue-gray-900">
 
           {/* <Typography as="a" href="/" className="mr-4 ml-2 cursor-pointer py-1.5"> */}
@@ -178,27 +178,25 @@ export default function UserNavBar() {
 
                   <Typography as="span" onClick={()=>changeTheme()} variant="small" color="blue-gray" className="font-normal px-2">
                     <MenuItem className="flex items-center gap-2 rounded-full">
-                      {darkMode ? <SunIcon className="h-[18px] w-[18px]"/> : <MoonIcon className="h-[18px] w-[18px]"/>}
+                      {reduxData.darkMode ? <SunIcon className="h-[18px] w-[18px]"/> : <MoonIcon className="h-[18px] w-[18px]"/>}
                     </MenuItem>
                   </Typography>
 
-                  <ProfileMenu userId={userId} darkMode={darkMode} userName={userName} profilePic={profilePic}/>
-
+                  <ProfileMenu darkMode={reduxData.darkMode} userName={reduxData.userName} profilePic={reduxData.profilePic}/>
+                  
                   <IconButton size="sm" variant="text" onClick={toggleIsNavOpen} className="ml-auto mr-2 hover:bg-gray-300 lg:hidden">
                     <Bars2Icon className="h-6 w-6 text-black" />
                   </IconButton>
 
               </div>
-
           </div>
-
         </div>
         <Collapse open={isNavOpen} className="overflow-scroll">
           <NavList  isOpen={isNavOpen}/>
         </Collapse>
       </Navbar>
     </div>
-  );
+  )
 }
 
 

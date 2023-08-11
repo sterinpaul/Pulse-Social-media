@@ -1,11 +1,13 @@
 import { UserDbInterface } from "../repositories/userDbRepository";
 
+
 export const getUserProfile = async(
     userName:string,
     userRepository:ReturnType<UserDbInterface>
 )=>{
     const data = await userRepository.getUserByUsername(userName)
     if(data){
+        data.password = ''
         return data
     }
 }

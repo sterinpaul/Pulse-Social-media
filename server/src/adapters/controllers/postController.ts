@@ -9,14 +9,15 @@ const postControllers = (
     postDbService:postRepositoryMongoDB
 )=>{
     const postDbRepository = postDbInterface(postDbService())
-
     const getPost = asyncHandler(async(req:Request,res:Response)=>{
         const response = await getAllPosts(postDbRepository)
         res.json(response)
     })
 
     const addPost = asyncHandler(async(req:Request,res:Response)=>{
-        const postResponse = await addNewPost(req.body,postDbRepository)
+        const postedUser = req.headers['x-user'] as string
+        const cloudinaryPost = req?.file?.path?.split("/post-")[1] as string
+        const postResponse = await addNewPost(postedUser,req.body?.description,cloudinaryPost,postDbRepository)
         res.json(postResponse)
     })
 

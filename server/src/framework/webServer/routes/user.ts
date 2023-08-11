@@ -7,8 +7,11 @@ import { uploadProfilePic } from '../middlewares/cloudinaryConfig'
 const userRouter = ()=>{
     const router = express.Router()
     const controllers = userControllers(userDbRepository,userRepositoryMongoDB)
+    router.get('/',controllers.getHome)
     router.get('/:user',controllers.getProfile)
     router.post('/updatephoto',uploadProfilePic,controllers.updateProfilePic)
+
+
     return router
 }
 

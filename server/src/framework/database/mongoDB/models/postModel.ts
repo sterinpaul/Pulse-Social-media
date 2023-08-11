@@ -11,8 +11,7 @@ const postSchema = new Schema(
             type:String,
         },
         imgVideoURL:{
-            type:String,
-            required:true
+            type:String
         },
         isBlocked:{
             type:Boolean,

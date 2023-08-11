@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { getProfile } from "../../api/apiConnections/userConnection"
 
+
 interface profile{
     _id?: string,
     userName?: string,

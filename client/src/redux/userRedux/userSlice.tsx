@@ -1,25 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const getTokenFromLocal = ()=>{
-    const userData = localStorage.getItem("user")
-    if(userData){
-        const user = JSON.parse(userData)
-        return user
-    }else{
-        const user = {
-            _id:"",
-            token:"",
-            userName: "",
-            darkMode: false,
-            profilePic: ""
-        }
-        return user
+    const token = localStorage.getItem("token")
+    if(token){
+        return token
+    }
+}
+const getUserNameFromLocal = ()=>{
+    const userName = localStorage.getItem("userName")
+    if(userName){
+        return userName
+    }
+}
+const getDarkModeFromLocal = ()=>{
+    const darkMode = localStorage.getItem("darkMode")
+    if(darkMode){
+        return JSON.parse(darkMode)
+    }
+}
+const getProfilePicFromLocal = ()=>{
+    const profilePic = localStorage.getItem("profilePic")
+    if(profilePic){
+        return profilePic
     }
 }
 
 interface initial{
-    reduxUser : {
-        _id?:string,
+    
         token?:string,
         userName?: string,
         darkMode?: boolean,
@@ -41,17 +48,14 @@ interface initial{
         // following?: object[],
         // createdAt?: string,
         // updatedAt?: string
-    }
+
 }
 
 const initialState:initial = {
-    reduxUser:getTokenFromLocal()
-    // reduxUser : {
-        // _id:"",
-        // token:"",
-        // userName: "",
-        // darkMode: false,
-        // profilePic: "",
+        token: getTokenFromLocal(),
+        userName: getUserNameFromLocal(),
+        darkMode: getDarkModeFromLocal(),
+        profilePic: getProfilePicFromLocal(),
         // firstName: "",
         // lastName: "",
         // email: "",
@@ -77,20 +81,36 @@ const userSlice = createSlice({
     initialState,
     reducers:{
         changeMode:(state)=>{
-            state.reduxUser.darkMode = !state.reduxUser.darkMode
+            state.darkMode = !state.darkMode
+        },
+        setToken:(state,action)=>{
+            state.token = action.payload
+            localStorage.setItem('token',action.payload)
         },
         setUser:(state,action)=>{
-            state.reduxUser = action.payload
+            state.userName = action.payload.userName,
+            state.darkMode = action.payload.darkMode,
+            state.profilePic = action.payload.profilePic
+            localStorage.setItem('userName',action.payload.userName)
+            localStorage.setItem('darkMode',action.payload.darkMode)
+            localStorage.setItem('profilePic',action.payload.profilePic)
         },
         changePhoto:(state,action)=>{
-            state.reduxUser.profilePic = action.payload
+            state.profilePic = action.payload
+            localStorage.setItem('profilePic',action.payload)
         },
         userSignOut:(state)=>{
-            localStorage.removeItem("user")
-            state.reduxUser = {...initialState.reduxUser}
+            state.token = '',
+            state.userName = '',
+            state.darkMode = false,
+            state.profilePic = ''
+            localStorage.removeItem('token')
+            localStorage.removeItem('userName')
+            localStorage.removeItem('darkMode')
+            localStorage.removeItem('profilePic')
         }
     }
 })
 
-export const {changeMode,setUser,changePhoto,userSignOut} = userSlice.actions
+export const {changeMode,setToken,setUser,changePhoto,userSignOut} = userSlice.actions
 export default userSlice.reducer

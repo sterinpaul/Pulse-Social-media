@@ -10,10 +10,14 @@ export const getAllPosts = async():Promise<object>=>{
         throw error
     }
 }
-export const publishNewPost = async(postData:object):Promise<object>=>{
+export const publishNewPost = async(description:string,imgVideo:File | string = ''):Promise<object>=>{
     try{
-        const response = await baseURL.post(`/post/addpost`,postData)
-        console.log("publishNewPost response",response)
+        const formData = new FormData()
+        formData.append('description',description)
+        formData.append('postImgVideo',imgVideo)
+        const response = await baseURL.post(`/post/addpost`,formData,{
+            headers:{'Content-Type' : 'multipart/form-data'}
+        })
         return response?.data
     }catch(error){
         throw error

@@ -17,7 +17,7 @@ import {
  
 
    const UserLeftSideBar = ()=>{
-    const {darkMode} = useSelector((store:{user:{reduxUser:{userName:string,userId:string,darkMode:boolean}}})=>store.user.reduxUser)
+    const darkMode = useSelector((store:{user:{userName:string,darkMode:boolean}})=>store.user.darkMode)
     return (
       <Card className={`${darkMode ? "bg-blue-gray-200" : ""} fixed top-[5.6rem] left-2 h-[calc(100vh-6rem)] overflow-y-scroll max-w-[20rem] p-1 rounded shadow-xl shadow-blue-gray hidden lg:block`}>
         <div className="mb-2 p-4"></div>

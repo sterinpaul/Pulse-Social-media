@@ -6,7 +6,7 @@ import SignInAndSignUp from './pages/user/SignInAndSignUp';
 import { useSelector } from 'react-redux';
 
 function App() {
-  const reduxToken = useSelector((store:{user:{reduxUser:{token:string}}})=>store.user.reduxUser.token)
+  const reduxToken = useSelector((store:{user:{token:string}})=>store.user.token)
   
   return (
     <BrowserRouter>

@@ -10,6 +10,14 @@ const userControllers = (
     userDbService:userRepositoryMongoDB
 )=>{
     const userDbRepository = userDbInterface(userDbService())
+
+    const getHome = asyncHandler(async(req:Request,res:Response)=>{
+        
+        const userName = req.headers['x-user'] as string
+        const profileData = await getUserProfile(userName,userDbRepository)
+        res.json(profileData)
+    })
+    
     const getProfile = asyncHandler(async(req:Request,res:Response)=>{
         const userName = req.params.user
         const profileData = await getUserProfile(userName,userDbRepository)
@@ -19,11 +27,9 @@ const userControllers = (
     const updateProfilePic = asyncHandler(async(req:Request,res:Response)=>{
         
         if(req.file){
-            const userName = req.body.userName
-            const userId = req.params._id
-            console.log('userId in userControllers',userId)
+            const userName = req.headers['x-user'] as string
+            const cloudinaryImgName = req?.file?.path?.split("/image-")[1] as string
             
-            const cloudinaryImgName = req?.file?.path?.split("/image-")[1]
             await postProfilePic(userName,cloudinaryImgName,userDbRepository).then(()=>{
                 res.status(200).json({ status: 'Success',data: cloudinaryImgName })
             })
@@ -33,6 +39,7 @@ const userControllers = (
     })
 
     return {
+        getHome,
         getProfile,
         updateProfilePic
     }

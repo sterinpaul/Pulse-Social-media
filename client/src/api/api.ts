@@ -7,27 +7,17 @@ const baseURL = axios.create({
 
 baseURL.interceptors.request.use(
     config=>{
-        const user = localStorage?.getItem("user")
-        if(user){
-            const {token} = JSON.parse(user)
-            if(token?.length){
+        const token = localStorage.getItem("token")
+        const userName = localStorage.getItem("userName")
+        if(token){
+            if(token){
                 config.headers["Authorization"] = `Bearer ${token}`
+                config.headers["x-user"] = userName
             }else{
                 delete config.headers["Authorization"]
+                delete config.headers["x-user"]
             }
         }
-        // Check if the request contains an image file
-        // if (config.data instanceof FormData) {
-            
-        //     for (const value of config.data.values()) {
-        //         if (value instanceof File) {
-                // Add the "Content-Type" header only for image files
-        //         config.headers['Content-Type'] = 'multipart/form-data';
-        //         break;
-        //       }
-        //     }
-        // }
-
         return config
     },
     error=>{

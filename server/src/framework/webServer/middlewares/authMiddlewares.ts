@@ -9,8 +9,13 @@ const userMiddleware = (req:Request,res:Response,next:NextFunction)=>{
     try{
         if(typeof token === "string"){
             const {payload}:any = authServices()?.verifyToken(token)
-            req.params._id = payload
-            if(payload) next()
+            if(payload){
+                next()
+            } else {
+                res.status(401).json({ message: "Unauthorized" });
+            }
+        } else {
+            res.status(401).json({ message: "Unauthorized" });
         }
     }catch(error){
         console.log(error);
