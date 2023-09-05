@@ -124,7 +124,8 @@ export const userRepositoryMongoDB = ()=>{
         },
         {
           $match: {
-            "result.isBlocked": false
+            "result.isBlocked": false,
+            "result.listed":true
           }
         },
         {
@@ -215,6 +216,11 @@ export const userRepositoryMongoDB = ()=>{
           {
             $unwind: {
               path: "$response"
+            }
+          },
+          {
+            $match: {
+              "result.listed": true
             }
           },
           {

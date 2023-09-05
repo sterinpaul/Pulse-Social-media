@@ -17,6 +17,7 @@ export const postRepositoryMongoDB = ()=>{
             {
               $match: {
                 isBlocked: false,
+                listed:true
               }
             },
             {
@@ -67,7 +68,8 @@ export const postRepositoryMongoDB = ()=>{
       const commentWithoutReply:any = await Comment.aggregate([
         {
           $match: {
-            postId
+            postId,
+            listed:true
           }
         },
         {
@@ -104,7 +106,8 @@ export const postRepositoryMongoDB = ()=>{
         return await Comment.aggregate([
           {
             $match: {
-              postId
+              postId,
+              listed:true
             }
           },
           {
@@ -196,6 +199,7 @@ export const postRepositoryMongoDB = ()=>{
           comment:comment,
           commentedUser,
           liked:[],
+          listed:true,
           createdAt:new Date()
         }
         const reply = await Comment.updateOne({_id:commentId},{$push:{reply:replyData}})
@@ -244,7 +248,7 @@ export const postRepositoryMongoDB = ()=>{
         const operations = []
         operations.push(
           Comment.updateMany({postId:postID},{$set:{listed:false}}),
-          Post.deleteOne({_id:postID}),
+          Post.updateOne({_id:postID},{$set:{listed:false}}),
           User.updateMany({savedPosts:postID},{$pull:{savedPosts:postID}})
         )
         const results = await Promise.allSettled(operations)
