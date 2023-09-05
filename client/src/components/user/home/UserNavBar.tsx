@@ -49,6 +49,10 @@ function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
     navigate('/')
   }
 
+  const getProfile = ()=>{
+    navigate(`/${userName}`)
+  }
+
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -72,9 +76,9 @@ function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
         </Button>
       </MenuHandler>
       <MenuList className={darkMode ? "bg-blue-gray-200" : ""}>
-            <Link to={`/${userName}`}>
+            
               <MenuItem
-              className="flex items-center gap-2 rounded">
+              onClick={getProfile} className="flex items-center gap-2 rounded">
               <UserCircleIcon className="h-4 w-4" strokeWidth="2"/>
               <Typography
                 as="span"
@@ -84,7 +88,7 @@ function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
                 My Profile
               </Typography>
               </MenuItem>
-            </Link>
+            
 
             <MenuItem
               onClick={signOut}

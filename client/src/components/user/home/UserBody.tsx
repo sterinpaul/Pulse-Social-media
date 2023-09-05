@@ -1,45 +1,25 @@
-import { useState,useRef, useEffect } from "react";
+import { useState,useRef} from "react";
 import { useSelector } from "react-redux";
 import UserBodyPost from "./UserBodyPost";
 import { Button } from "@material-tailwind/react";
 import {PhotoIcon,PencilSquareIcon,NoSymbolIcon} from "@heroicons/react/24/outline";
 import { CLOUDINARY_PROFILE_PHOTO_URL,PROFILE_PHOTO } from "../../../api/baseURL";
-import { publishNewPost,getAllPosts } from "../../../api/apiConnections/postConnection";
+import { publishNewPost } from "../../../api/apiConnections/postConnection";
+import { postData } from "../../../interfaces/postInterface";
+import { userInterface } from "../../../interfaces/userInterface";
 
-
-interface postResponseData {
-    _id: string,
-    postedUser: string,
-    description: string,
-    imgVideoURL: string,
-    liked: [],
-    // comments: [],
-    createdAt: Date
+interface UserBodyProps {
+    userData: userInterface,
+    allPosts:postData[],
+    setAllPosts:React.Dispatch<React.SetStateAction<postData[]>>
 }
 
-const UserBody = ()=>{
+const UserBody:React.FC<UserBodyProps> = ({userData,allPosts,setAllPosts})=>{
     const {...reduxData} = useSelector((store:{user:{userName:string,userId:string,darkMode:boolean,profilePic:string}})=>store.user)
     const [textData,setTextData] = useState("")
     const [upload,setUpload] = useState<File | null>()
-    const [allPosts,setAllPosts] = useState<postResponseData[]>([])
     const fileInput = useRef<HTMLInputElement | null>(null)
     
-    useEffect(()=>{
-        getPosts()
-    },[])
-
-    const getPosts = async()=>{
-        try{
-            const postResponse = await getAllPosts()
-            if(Array.isArray(postResponse)){
-                setAllPosts(postResponse)
-            }else{
-                console.error("Invalid response format")
-            }
-        }catch(error){
-            console.log("Error fetching data",error)
-        }
-    }
     
     const uploadFunction = ()=>{
         fileInput.current?.click()
@@ -49,14 +29,21 @@ const UserBody = ()=>{
         if(textData.trim().length || upload){
             if(upload){
                 const response:any = await publishNewPost(textData,upload)
+                response.profilePic = reduxData.profilePic
                 setAllPosts([response,...allPosts])
             }else{
                 const response:any = await publishNewPost(textData)
+                response.profilePic = reduxData.profilePic
                 setAllPosts([response,...allPosts])
             }
             setTextData("")
             setUpload(null)
         }
+    }
+
+    const deletePost = (postId:string)=>{
+        const postsAfterDelete = allPosts.filter((post) => post._id !== postId)
+        setAllPosts(postsAfterDelete)
     }
 
 
@@ -65,7 +52,9 @@ const UserBody = ()=>{
             <div className={`${reduxData?.darkMode ? "bg-blue-gray-200" : "bg-white"} h-41 shadow-xl w-[calc(100vw-1rem)] p-3 shadow-blue-gray mt-[5.6rem] rounded overflow-y-hidden lg:w-[calc(100vw-33rem)]`}>
                 <div className="flex gap-2 overflow-scroll p-1">
                     
-                    <img className="w-10 h-10 rounded-full outline outline-1 outline-gray-600" src={reduxData?.profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+reduxData?.profilePic) : PROFILE_PHOTO}/>
+                    <div className="w-10 h-10">
+                        <img className="w-full h-full rounded-full outline outline-1 outline-gray-600 object-cover" src={reduxData?.profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+reduxData.profilePic) : PROFILE_PHOTO}/>
+                    </div>
                     
                     <div className="flex flex-col w-full gap-3">
                         
@@ -86,8 +75,8 @@ const UserBody = ()=>{
             </div>
 
 
-            {allPosts.map((post:postResponseData)=>{
-                return (<UserBodyPost {...post} key={post._id}/>)
+            {allPosts.map((post:postData)=>{
+                return (<UserBodyPost post={post} userData={userData!} deletePost={deletePost} key={post?._id}/>)
                 })
             }
 

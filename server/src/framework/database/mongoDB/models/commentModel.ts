@@ -3,6 +3,14 @@ import Post from './postModel';
 
 const commentSchema = new Schema(
     {
+        commentedUser:{
+            type:String,
+            required:true
+        },
+        listed:{
+            type:Boolean,
+            default:true
+        },
         postId:{
             type:Schema.Types.ObjectId,
             ref:Post,

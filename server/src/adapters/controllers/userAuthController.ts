@@ -14,6 +14,7 @@ const authControllers = (
 )=>{
     const userDbRepository = userDbInterface(userDbService())
     const authService = authServiceInterface(authServices())
+    
     const signUpUser = asyncHandler(async(req:Request,res:Response)=>{
         const {firstName,lastName,userName,email,password,mobile} = req.body
         

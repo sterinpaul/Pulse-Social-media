@@ -4,28 +4,36 @@ import UserLeftSideBar from "../../components/user/home/UserLeftSideBar"
 import UserRightSideBar from "../../components/user/home/UserRightSideBar"
 import { getUserHome } from "../../api/apiConnections/userConnection"
 import { useState,useEffect } from "react"
+import { userInterface } from "../../interfaces/userInterface"
+import { getAllPosts } from "../../api/apiConnections/userConnection"
+import { postData } from "../../interfaces/postInterface"
 import { useDispatch } from "react-redux"
-import { setUser } from "../../redux/userRedux/userSlice"
+import { userSignOut } from "../../redux/userRedux/userSlice"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 const Home = ()=>{
     // const {userName} = useSelector((store:{user:{userName:string,_id:string,darkMode:boolean,profilePic:string}})=>store.user.userName)
+    // const dispatch = useDispatch()
+    const [userData,setUserData] = useState<userInterface | null>(null)
+    const [allPosts,setAllPosts] = useState<postData[]>([])
     const dispatch = useDispatch()
-    const [userData,setUserData] = useState({})
-
-
+    const navigate = useNavigate()
     useEffect(()=>{
         homePageData()
     },[])
 
     const homePageData = async()=>{
-        const response:any= await getUserHome()
-        const reduxData = {
-            userName: response?.userName,
-            darkMode: response?.darkMode,
-            profilePic:response?.profilePic,
-        }
-        dispatch(setUser(reduxData))
+        const response:userInterface= await getUserHome()
         setUserData(response)
+        const postResponse = await getAllPosts()
+        if(Array.isArray(postResponse)){
+            setAllPosts(postResponse)
+        }else if(postResponse?.message === 'Token expired'){
+            dispatch(userSignOut())
+            navigate('/')
+            toast.error(postResponse.message)
+        }
     }
 
     return(
@@ -33,7 +41,7 @@ const Home = ()=>{
             <UserNavBar/>
             <UserLeftSideBar/>
             <UserRightSideBar/>
-            <UserBody/>
+            <UserBody userData={userData || {} as userInterface} allPosts={allPosts} setAllPosts={setAllPosts} />
         </>
     )
 }

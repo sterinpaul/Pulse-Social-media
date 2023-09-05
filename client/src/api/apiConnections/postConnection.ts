@@ -1,13 +1,12 @@
 import baseURL from "../api";
 
 
-export const getAllPosts = async():Promise<object>=>{
+export const getAllPosts = async()=>{
     try{
         const response = await baseURL.get(`/post/getpost`)
-        console.log("getAllPosts response",response.data)
         return response?.data
-    }catch(error){
-        throw error
+    }catch(error:any){
+        return error.response.data
     }
 }
 export const publishNewPost = async(description:string,imgVideo:File | string = ''):Promise<object>=>{
@@ -21,5 +20,75 @@ export const publishNewPost = async(description:string,imgVideo:File | string = 
         return response?.data
     }catch(error){
         throw error
+    }
+}
+export const unlikePost = async(postId:string)=>{
+    try{
+        return await baseURL.put('/post/unlike',{postId:postId})
+    }catch(error){
+        throw error
+    }
+}
+export const likePost = async(postId:string)=>{
+    try{
+        return await baseURL.put('/post/like',{postId:postId})
+    }catch(error){
+        throw error
+    }
+}
+export const getPostComments = async(postId:string)=>{
+    try{
+        const response = await baseURL.get(`/post/comment/${postId}`)
+        return response?.data
+    }catch(error){
+        throw error
+    }
+}
+export const postComment = async(comment:string,postId:string,commentId:string)=>{
+    try{
+        const formData = {
+            'comment':comment,
+            'postId':postId,
+            'commentId':commentId
+        }
+        const response = await baseURL.post('/post/addcomment',formData)
+        return response?.data
+    }catch(error){
+        throw error
+    }
+}
+export const likeComment = async(commentId:string)=>{
+    try{
+        const response = await baseURL.put('/post/comment/likeunlike',{commentId})
+        return response?.data
+    }catch(error){
+        throw error
+    }
+}
+
+export const likeReply = async(commentId:string)=>{
+    try{
+        const response = await baseURL.put('/post/reply/likeunlike',{commentId})
+        return response?.data
+    }catch(error){
+        throw error
+    }
+}
+
+export const deleteThePost = async(postId:string)=>{
+    try{
+        const response = await baseURL.delete(`/post/delete/${postId}`)
+        return response?.data
+    }catch(error:any){
+        return error.response.data
+    }
+}
+
+export const reportThePost = async(postId:string)=>{
+    try{
+        const response = await baseURL.put('/post/report',{postId})
+        return response?.data
+    }catch(error:any){
+        return error.response.data
     }
 }

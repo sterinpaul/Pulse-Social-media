@@ -2,7 +2,7 @@ import { Request,Response } from "express";
 import asyncHandler from 'express-async-handler';
 import { UserDbInterface } from "../../application/repositories/userDbRepository";
 import { userRepositoryMongoDB } from "../../framework/database/mongoDB/repositories/userHelperRepositories";
-import { getUserProfile,postProfilePic } from "../../application/useCases/user";
+import { getAllPosts,followUnfollowUser, getUserProfile,postProfilePic,postSaveHandler,getSavedPosts,searchUser } from "../../application/useCases/user";
 
 
 const userControllers = (
@@ -16,6 +16,12 @@ const userControllers = (
         const userName = req.headers['x-user'] as string
         const profileData = await getUserProfile(userName,userDbRepository)
         res.json(profileData)
+    })
+
+    const getPost = asyncHandler(async(req:Request,res:Response)=>{
+        const userName = req.headers['x-user'] as string
+        const response = await getAllPosts(userName,userDbRepository)
+        res.json(response)
     })
     
     const getProfile = asyncHandler(async(req:Request,res:Response)=>{
@@ -38,10 +44,42 @@ const userControllers = (
         }
     })
 
+    const followUnfollow = asyncHandler(async(req:Request,res:Response)=>{
+        const userName = req.headers['x-user'] as string
+        const followUser = req.body.user
+        const response = await followUnfollowUser(userName,followUser,userDbRepository)
+        res.json(response)
+        
+    })
+
+    const saveThePost = asyncHandler(async(req:Request,res:Response)=>{
+        const userName = req.headers['x-user'] as string
+        const postId = req.body.postId
+        await postSaveHandler(userName,postId,userDbRepository)
+        res.json({status:true})
+    })
+
+    const getUserSavedPosts = asyncHandler(async(req:Request,res:Response)=>{
+        const userName = req.headers['x-user'] as string
+        const savedPosts:[] = await getSavedPosts(userName,userDbRepository)
+        res.json(savedPosts)
+    })
+
+    const getUserBySearch = asyncHandler(async(req:Request,res:Response)=>{
+        const searchText = req.body.searchText
+        const userData = await searchUser(searchText,userDbRepository)
+        res.json(userData)
+    })
+
     return {
         getHome,
+        getPost,
         getProfile,
-        updateProfilePic
+        updateProfilePic,
+        followUnfollow,
+        saveThePost,
+        getUserSavedPosts,
+        getUserBySearch
     }
 }
 

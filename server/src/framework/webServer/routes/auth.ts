@@ -14,7 +14,6 @@ const authRouter = ()=>{
         userRepositoryMongoDB
         )
         router.post('/signup',controllers.signUpUser)
-
         router.post('/signin',controllers.signInUser)
 
     return router

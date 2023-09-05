@@ -8,17 +8,17 @@ const userMiddleware = (req:Request,res:Response,next:NextFunction)=>{
     }
     try{
         if(typeof token === "string"){
-            const {payload}:any = authServices()?.verifyToken(token)
-            if(payload){
+            const response = authServices()?.verifyToken(token)
+            if(response){
                 next()
             } else {
-                res.status(401).json({ message: "Unauthorized" });
+                res.status(401).json({ message: "Token expired" })
             }
         } else {
             res.status(401).json({ message: "Unauthorized" });
         }
     }catch(error){
-        console.log(error);
+        res.status(401).json({ message: "Token expired" })
     }
 }
 

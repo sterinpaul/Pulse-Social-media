@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt,{JwtPayload} from 'jsonwebtoken';
 import { configKeys } from '../../config';
 
 export const authServices = ()=>{
@@ -23,8 +23,15 @@ export const authServices = ()=>{
     }
     const verifyToken = (token:string)=>{
         if(configKeys.JWT_SECRET_KEY){
-            const userId = jwt.verify(token,configKeys.JWT_SECRET_KEY)
-            return userId
+            const userData = jwt.verify(token,configKeys.JWT_SECRET_KEY) as JwtPayload
+            if(userData.exp !== undefined){
+                const currentTimeInSeconds = Math.floor(Date.now() / 1000)
+                if(userData.exp >= currentTimeInSeconds){
+                    return true
+                }else{
+                    return false
+                }
+            }
         }
         return undefined
     }

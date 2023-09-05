@@ -7,6 +7,10 @@ const postSchema = new Schema(
             type:String,
             required:true
         },
+        listed:{
+            type:Boolean,
+            default:true
+        },
         description:{
             type:String,
         },

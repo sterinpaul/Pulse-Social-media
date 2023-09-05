@@ -9,6 +9,14 @@ const postRouter = ()=>{
     const controllers = postControllers(postDbRepository,postRepositoryMongoDB)
     router.get('/getpost',controllers.getPost)
     router.post('/addpost',uploadPostImgVideo,controllers.addPost)
+    router.put('/unlike',controllers.unlikePost)
+    router.put('/like',controllers.likePost)
+    router.get('/comment/:postId',controllers.getPostComments)
+    router.post('/addcomment',controllers.addComment)
+    router.put('/comment/likeunlike',controllers.likeUnlike)
+    router.put('/reply/likeunlike',controllers.likeUnlike)
+    router.delete('/delete/:id',controllers.deletePost)
+    router.put('/report',controllers.reportPost)
     
     return router
 }

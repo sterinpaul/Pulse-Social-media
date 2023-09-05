@@ -1,6 +1,6 @@
 import { UserDbInterface } from "../../repositories/userDbRepository"
 import { AuthServiceInterface } from "../../services/authServiceInterfaces"
-
+import { createUser } from "../../../entity/userEntity"
 
 export const userSignUp = async(
     user:{
@@ -23,32 +23,33 @@ export const userSignUp = async(
             user:{},
             token:''
         }
-
         return userData
     }
+
     const isUserNameExist = await userRepository.getUserByUsername(user.userName)
-    if(isUserNameExist){
+    
+    if(isUserNameExist.length){
         const userData = {
             status:"failed",
             message:"Username already exists",
             user:{},
             token:''
         }
-
         return userData
-        
     }
+
     let encryptPassword = await authService.encryptPassword(user.password)
     user.password = encryptPassword
+    // const UserEntity = createUser(...user)
     const data = await userRepository.addUser(user)
     const jwtToken = await authService.generateToken(data._id?.toString())
+
     const userData = {
         status:"success",
         message:"Registration Success",
         user:data,
         token:jwtToken
     }
-    
     return userData
 }
 

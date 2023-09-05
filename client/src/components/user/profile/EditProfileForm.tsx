@@ -1,14 +1,12 @@
 import { useDispatch, useSelector } from "react-redux"
 import { changePhoto } from "../../../redux/userRedux/userSlice";
-import { PROFILE_PHOTO } from "../../../api/baseURL"
+// import { PROFILE_PHOTO } from "../../../api/baseURL"
 import React,{ useState } from "react"
-import cloudinaryConfig from "../../../api/services/cloudinaryConfig";
+// import cloudinaryConfig from "../../../api/services/cloudinaryConfig";
 import {
     Card,
     CardHeader,
-    CardBody,
     CardFooter,
-    Typography,
     Button,
   } from "@material-tailwind/react";
 
@@ -26,16 +24,10 @@ interface userData{
 }
 
 const EditProfileForm:React.FC = ()=>{
-    const {userId,
-        userName,
-        firstName,
-        lastName,
-        email,
+    const {
         darkMode,
         profilePic,
-        gender,
-        city,
-        bio
+        
     } = useSelector((store:{user:{reduxUser:userData}})=>store.user.reduxUser)
     const dispatch = useDispatch()
     // const [profilePhoto,setProfilePhoto] = useState<File | null >(null)
@@ -48,7 +40,6 @@ const EditProfileForm:React.FC = ()=>{
         const file = e.target.files?.[0]
         if(file){
             setProfilePhoto(file)
-            console.log(file)
             
             // const reader = new FileReader();
             // reader.onload = () => {
@@ -61,8 +52,7 @@ const EditProfileForm:React.FC = ()=>{
  
     const submitProfilePhoto = async()=>{
         if(profileImg){
-            const response = changePhoto(profileImg)
-            console.log(response)
+            changePhoto(profileImg)
             
             dispatch(changePhoto(profileImg))
         }
