@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 import User from "../models/userModel"
+import Post from "../models/postModel"
 
 interface userInterface{
   firstName:string,
@@ -21,22 +22,88 @@ export const userRepositoryMongoDB = ()=>{
     }
 
     const getUserByUserName = async(userName:string)=>{
-        return await User.aggregate([
-            {
-              $match: {
-                userName
-              }
-            },
-            {
-              $lookup: {
-                from: "posts",
-                localField: "userName",
-                foreignField: "postedUser",
-                as: "posts",
+        const userProfile =  await User.aggregate([
+          {
+            $match: {
+              userName
+            }
+          },
+          {
+            $lookup: {
+              from: "posts",
+              localField: "userName",
+              foreignField: "postedUser",
+              as: "posts"
+            }
+          },
+          {
+            $unwind: {
+              path: "$posts"
+            }
+          },
+          {
+            $match: {
+              "posts.listed": true
+            }
+          },
+          {
+            $group: {
+              _id: "$_id",
+              firstName: {
+                $first: "$firstName"
+              },
+              lastName: {
+                $first: "$lastName"
+              },
+              userName: {
+                $first: "$userName"
+              },
+              email: {
+                $first: "$email"
+              },
+              profilePic: {
+                $first: "$profilePic"
+              },
+              mobile: {
+                $first: "$mobile"
+              },
+              savedPosts: {
+                $first: "$savedPosts"
+              },
+              blockedUsers: {
+                $first: "$blockedUsers"
+              },
+              blockedByUsers: {
+                $first: "$blockedByUsers"
+              },
+              followers: {
+                $first: "$followers"
+              },
+              following: {
+                $first: "$following"
+              },
+              followRequests: {
+                $first: "$followRequests"
+              },
+              followRequested: {
+                $first: "$followRequested"
+              },
+              createdAt: {
+                $first: "$createdAt"
+              },
+              posts: {
+                $push: "$posts"
               }
             }
-          ]
-        )
+          }
+        ]
+      )
+      if(userProfile.length){
+        return userProfile[0]
+      }else{
+        const user = await User.findOne({userName})
+        return user
+      }
     }
 
     const getUserByMobile = async(mobile:string)=>{
@@ -88,7 +155,7 @@ export const userRepositoryMongoDB = ()=>{
     }
 
     const getPost = async(userName:string)=>{
-      return await User.aggregate([
+      const allPosts = await User.aggregate([
         {
           $match: {
             userName
@@ -124,7 +191,6 @@ export const userRepositoryMongoDB = ()=>{
         },
         {
           $match: {
-            "result.isBlocked": false,
             "result.listed":true
           }
         },
@@ -163,6 +229,51 @@ export const userRepositoryMongoDB = ()=>{
           $limit: 10
         }]
       )
+      if(allPosts.length){
+        return allPosts
+      }else{
+        return await Post.aggregate([
+          {
+            $match: {
+              listed: true
+            }
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "postedUser",
+              foreignField: "userName",
+              as: "result"
+            }
+          },
+          {
+            $unwind: {
+              path: "$result"
+            }
+          },
+          {
+            $project: {
+              _id: "$_id",
+              postedUser: "$postedUser",
+              profilePic: "$result.profilePic",
+              description: "$description",
+              imgVideoURL: "$imgVideoURL",
+              liked: "$liked",
+              reports: "$reports",
+              createdAt: "$createdAt",
+              updatedAt: "$updatedAt"
+            }
+          },
+          {
+            $sort: {
+              createdAt: -1
+            }
+          },
+          {
+            $limit: 10
+          }
+        ])
+      }
     }
 
     const postSave = async(userName:string,postId:string)=>{

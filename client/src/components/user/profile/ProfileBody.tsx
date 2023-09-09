@@ -52,7 +52,11 @@ import {
     posts: postData[];
 }
 
-const ProfileBody = ({profileData}:{profileData:UserProfile})=>{
+interface ProfileBodyProps {
+    profileData: UserProfile
+  }
+
+const ProfileBody:React.FC<ProfileBodyProps> = ({profileData})=>{
     const [open, setOpen] = useState(false)
     const [followOpen,setFollowOpen] = useState(false)
     const [openProfile, setOpenProfile] = useState(false)
@@ -241,7 +245,7 @@ const ProfileBody = ({profileData}:{profileData:UserProfile})=>{
                                 </Tab>) : null}
                             </TabsHeader>
                             {/* <TabsBody className="grid grid-cols-3 grid-rows-auto m-1 gap-1"> */}
-                            <TabsBody style={{display:'grid', gridTemplateColumns : 'repeat(auto-fill, minmax(250px,1fr))',gridGap:'5px',gridAutoFlow: 'dense'}}>
+                            {profileData.posts ? <TabsBody style={{display:'grid', gridTemplateColumns : 'repeat(auto-fill, minmax(250px,1fr))',gridGap:'5px',gridAutoFlow: 'dense'}}>
                                 {profileData?.posts?.map((post:postData) =>{
                                     post.profilePic = profilePic
                                     return post.imgVideoURL ? (
@@ -249,7 +253,7 @@ const ProfileBody = ({profileData}:{profileData:UserProfile})=>{
                                         <SinglePostPhoto post={post} />
                                     </TabPanel>) : null})
                                 }
-                            </TabsBody>
+                            </TabsBody> : null}
                             <TabsBody style={{display:'grid', gridTemplateColumns : 'repeat(auto-fill, minmax(250px,1fr))',gridGap:'5px',gridAutoFlow: 'dense'}}>
                                 <TabPanel value='Videos'>
                                     Videos

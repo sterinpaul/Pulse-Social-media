@@ -5,19 +5,17 @@ export const getAllPosts = async(
     userRepository:ReturnType<UserDbInterface>
 )=>{
     const data = await userRepository.getAllPost(userName)
-    if(data){
-        return data
-    }
+    if(data)return data
 }
 
 export const getUserProfile = async(
     userName:string,
     userRepository:ReturnType<UserDbInterface>
 )=>{
-    const data = await userRepository.getUserByUsername(userName)
-    if(data[0]){
-        data[0].password = ''
-        return data[0]
+    const data:{password:string} = await userRepository.getUserByUsername(userName)
+    if(data){
+        data.password = ''
+        return data
     }
 }
 

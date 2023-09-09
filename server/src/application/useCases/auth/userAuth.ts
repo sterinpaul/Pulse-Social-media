@@ -1,6 +1,6 @@
 import { UserDbInterface } from "../../repositories/userDbRepository"
 import { AuthServiceInterface } from "../../services/authServiceInterfaces"
-import { createUser } from "../../../entity/userEntity"
+// import { createUser } from "../../../entity/userEntity"
 
 export const userSignUp = async(
     user:{
@@ -28,7 +28,7 @@ export const userSignUp = async(
 
     const isUserNameExist = await userRepository.getUserByUsername(user.userName)
     
-    if(isUserNameExist.length){
+    if(isUserNameExist){
         const userData = {
             status:"failed",
             message:"Username already exists",
@@ -98,3 +98,63 @@ export const userSignIn = async(
     }
     return userData
 }
+
+export const userGoogleSignIn = async(
+    email:string,
+    userRepository:ReturnType<UserDbInterface>,
+    authService:ReturnType<AuthServiceInterface>
+)=>{
+    const userByEmail = await userRepository.getUserByEmail(email)
+
+    if(userByEmail){
+        const jwtToken = await authService.generateToken(userByEmail._id?.toString())
+        userByEmail.password = '';
+        const userData = {
+            status:"success",
+            message:"Sign in Success",
+            user:userByEmail,
+            token:jwtToken
+        }
+        return userData
+    }else{
+        const userData = {
+            status:"failed",
+            message:"Add User name to proceed"
+        }
+        return userData
+    }
+    
+}
+
+export const userGoogleRegistration = async(
+    user:{
+        firstName:string,
+        lastName:string,
+        userName:string,
+        email:string,
+        password:string,
+        mobile:string,
+    },
+    userRepository:ReturnType<UserDbInterface>,
+    authService:ReturnType<AuthServiceInterface>
+    )=>{
+        const isUserNameExist = await userRepository.getUserByUsername(user.userName)
+    
+        if(isUserNameExist){
+            const userData = {
+                status:"failed",
+                message:"Username already exists"
+            }
+            return userData
+        }
+        const data = await userRepository.addUser(user)
+        const jwtToken = await authService.generateToken(data._id?.toString())
+        const userData = {
+            status:"success",
+            message:"Sign in Success",
+            user:data,
+            token:jwtToken
+        }
+        
+        return userData
+    }

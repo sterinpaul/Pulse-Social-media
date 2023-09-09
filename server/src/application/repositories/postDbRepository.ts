@@ -48,8 +48,8 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
         return await repository.postDelete(postId)
     }
 
-    const reportThePost = async(userName:string,postId:string)=>{
-        return await repository.postReport(userName,postId)
+    const reportThePost = async(userName:string,postId:string,reason:string)=>{
+        return await repository.postReport(userName,postId,reason)
     }
 
     return {

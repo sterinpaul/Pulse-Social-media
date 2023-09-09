@@ -13,13 +13,10 @@ const postSchema = new Schema(
         },
         description:{
             type:String,
+            required:true
         },
         imgVideoURL:{
             type:String
-        },
-        isBlocked:{
-            type:Boolean,
-            default:false
         },
         liked:[],
         reports:[],

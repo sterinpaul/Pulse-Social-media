@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth} from 'firebase/auth'
+import {getAuth,GoogleAuthProvider} from 'firebase/auth'
 // import { getAnalytics } from "firebase/analytics";
 
 
@@ -14,9 +14,11 @@ const firebaseConfig = {
   messagingSenderId: "560626830691",
   appId: "1:560626830691:web:2213c8f7a09c78bff3d756",
   measurementId: "G-SF8QBTTL8V"
-};
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider()
+export {auth,provider}
 // const analytics = getAnalytics(app);

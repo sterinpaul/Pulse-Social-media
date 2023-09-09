@@ -9,13 +9,14 @@ import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO } from "
 import { useState,useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { postComment } from "../../../api/apiConnections/postConnection";
+import { postComment,updateSinglePost } from "../../../api/apiConnections/postConnection";
 import moment from "moment";
 import { commentData } from "../../../interfaces/commentInterface";
 import SingleComment from "./SingleComment";
 
 
 interface CommentsContainerProps {
+    editStatus: boolean,
     open: boolean,
     handleOpen: () => void,
     comments:commentData[],
@@ -24,11 +25,12 @@ interface CommentsContainerProps {
 }
 
 
-const CommentsContainer:React.FC<CommentsContainerProps> = ({open,handleOpen,comments,setComments,post})=>{
+const CommentsContainer:React.FC<CommentsContainerProps> = ({editStatus,open,handleOpen,comments,setComments,post})=>{
     const {profilePic,darkMode} = useSelector((store:{user:{userName:string,darkMode:boolean,profilePic:string}})=>store.user)
     const [commentText,setCommentText] = useState('')
     const [commentId,setCommentId] = useState('')
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
+    const [description,setDescription] = useState(post.description)
     
     const focusTextAreaReply = (commentedUser:string,commentID:string)=>{
         if(textAreaRef.current){
@@ -47,7 +49,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({open,handleOpen,com
                 setComments((prevComments:[])=>[commentResponse.response,...prevComments])
             }else{
                 const replyData = comments.map(data=>{
-                    if(data._id===commentId){
+                    if(data._id === commentId){
                         return{
                             ...data,reply:[...data.reply,commentResponse.response]
                         }
@@ -57,6 +59,13 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({open,handleOpen,com
                 setComments(replyData)
             }
             setCommentText('')
+        }
+    }
+
+    const updatePost = async()=>{
+        const response = await updateSinglePost(post._id,description)
+        if(response){
+            handleOpen()
         }
     }
 
@@ -92,29 +101,29 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({open,handleOpen,com
                     </div>
                     <div className="overflow-scroll h-44">
                         
-                        <p className="m-2">{post?.description}</p>
+                        {editStatus ? (<textarea onChange={(e)=>setDescription(e.target.value)} className={`${darkMode ? "bg-blue-gray-100" : "bg-gray-200"} text-black p-1 focus:outline-none resize-none rounded-md outline-gray-400 w-full h-28 mt-4`} value={description}/>) : (<p className="m-2">{post.description}</p>)}
 
                         {/* Single Comment */}
                         {/* <div className="overflow-scroll p-2 h-[calc(100vh-38rem)] lg:h-[calc(100vh-20rem)]"> */}
                             
-                        {comments?.map((comment)=>{
+                        {editStatus ? comments?.map((comment)=>{
                             return (
                                 <SingleComment comment={comment} key={comment._id} focusTextAreaReply={focusTextAreaReply}/>
                             )
-                        })}
+                        }) : <></>}
                         
                     </div>
-                    <div className="flex items-center justify-center gap-2">
+                    {editStatus ? (<div className="text-center"><Button onClick={updatePost} className="mb-2 capitalize w-28">Update</Button></div>) : (<div className="flex items-center justify-center gap-2 mb-2">
                         <div className="w-10 h-10">
                             <img className="w-full h-full rounded-full outline outline-1 outline-gray-600 object-cover" src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+profilePic) : PROFILE_PHOTO}/>
                         </div>
 
-                        <textarea ref={textAreaRef} onChange={(e)=>setCommentText(e?.target?.value)} value={commentText} className={`${darkMode ? "bg-blue-gray-100" : "bg-gray-200"} text-black p-1 focus:outline-none resize-none rounded-md outline-gray-400 placeholder:text-brown-200`} placeholder="Write a comment" />
+                        <textarea ref={textAreaRef} onChange={(e)=>setCommentText(e.target.value)} value={commentText} className={`${darkMode ? "bg-blue-gray-100" : "bg-gray-200"} text-black p-1 focus:outline-none resize-none rounded-md outline-gray-400 placeholder:text-brown-200`} placeholder="Write a comment" />
 
                         <div>
                             <Button variant="text" size="sm" className="rounded-full p-2" onClick={publishComment}><PaperAirplaneIcon className="w-6 h-6 text-light-blue-800"/></Button>
                         </div>
-                    </div>
+                    </div>)}
                 </div>
             </div>
         {/* </Card> */}

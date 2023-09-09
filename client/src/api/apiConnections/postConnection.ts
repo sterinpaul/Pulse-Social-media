@@ -77,16 +77,25 @@ export const likeReply = async(commentId:string)=>{
 
 export const deleteThePost = async(postId:string)=>{
     try{
-        const response = await baseURL.delete(`/post/delete/${postId}`)
+        const response = await baseURL.patch(`/post/delete/${postId}`)
         return response?.data
     }catch(error:any){
         return error.response.data
     }
 }
 
-export const reportThePost = async(postId:string)=>{
+export const reportThePost = async(postId:string,selectedReason:string)=>{
     try{
-        const response = await baseURL.put('/post/report',{postId})
+        const response = await baseURL.put('/post/report',{postId,selectedReason})
+        return response?.data
+    }catch(error:any){
+        return error.response.data
+    }
+}
+
+export const updateSinglePost = async(postId:string,description:string)=>{
+    try{
+        const response = await baseURL.patch('/post/editpost',{postId,description})
         return response?.data
     }catch(error:any){
         return error.response.data

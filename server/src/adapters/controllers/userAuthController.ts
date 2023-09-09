@@ -4,7 +4,7 @@ import { AuthServices } from "../../framework/services/authServices";
 import { AuthServiceInterface } from "../../application/services/authServiceInterfaces";
 import { UserDbInterface } from "../../application/repositories/userDbRepository";
 import { userRepositoryMongoDB } from "../../framework/database/mongoDB/repositories/userHelperRepositories";
-import { userSignUp,userSignIn } from "../../application/useCases/auth/userAuth";
+import { userSignUp,userSignIn,userGoogleSignIn,userGoogleRegistration } from "../../application/useCases/auth/userAuth";
 
 const authControllers = (
     authServiceInterface:AuthServiceInterface,
@@ -37,9 +37,33 @@ const authControllers = (
         res.json(userData)
     })
 
+    const googleSignIn = asyncHandler(async(req:Request,res:Response)=>{
+        const email = req.query.email
+        const userDetails = await userGoogleSignIn(email as string,userDbRepository,authService)
+        res.json(userDetails)
+    })
+
+    const googleRegister = asyncHandler(async(req:Request,res:Response)=>{
+        const {firstName,lastName,userName,email,password,mobile} = req.body
+
+        const user = {
+            firstName,
+            lastName,
+            userName,
+            email,
+            password,
+            mobile
+        }
+        
+        const userData = await userGoogleRegistration(user,userDbRepository,authService)
+        res.json(userData)
+    })
+
     return {
         signUpUser,
-        signInUser
+        signInUser,
+        googleSignIn,
+        googleRegister
     }
 }
 

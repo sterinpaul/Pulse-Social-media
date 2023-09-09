@@ -45,6 +45,7 @@ const Profile = ()=>{
 
     const getUserDetails = async()=>{
     const response:any = await getProfile(user!)
+    
         if(response){
             setProfileData(response)
         }else if(response?.message === 'Token expired'){
@@ -58,7 +59,7 @@ const Profile = ()=>{
         <>
             <UserNavBar/>
             <UserLeftSideBar/>
-            {profileData ? <ProfileBody profileData={profileData}/> : null}
+            {profileData ? <ProfileBody profileData={profileData}/> : <></>}
         </>
     )
 }

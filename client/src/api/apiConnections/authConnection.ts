@@ -23,10 +23,18 @@ interface SigninFormValues{
 }
 
 interface SigninFormResponse{
-    message:string,
-    status:string,
-    user:object,
-    token:string
+    message?:string,
+    status?:string,
+    user?:object,
+    token?:string
+}
+
+interface GoogleSignInValues{
+    firstName? : string,
+    lastName? : string,
+    userName? : string,
+    email? : string,
+    mobile? : string
 }
 
 export const signUp = async (values:SignupFormValues):Promise<object> =>{
@@ -48,5 +56,23 @@ export const signIn = async (values:SigninFormValues):Promise<object> =>{
     // Handling error
     }catch(error:any){
         throw new Error(`Error while signing in : ${error}`)
+    }
+}
+
+export const signInWithGoogle = async(email:string) =>{
+    try{
+        const response = await baseURL.get(`/auth/googlesignin?email=${email}`)
+        return response?.data
+    }catch(error){
+        console.log(error)
+    }
+}
+
+export const updateUserNameForGoogle = async(userData:GoogleSignInValues)=>{
+    try{
+        const response = await baseURL.post('/auth/googlereg',userData)
+        return response?.data
+    }catch(error){
+        console.log(error)
     }
 }

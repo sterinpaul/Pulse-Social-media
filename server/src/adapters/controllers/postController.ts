@@ -29,7 +29,7 @@ const postControllers = (
     const addPost = asyncHandler(async(req:Request,res:Response)=>{
         const postedUser = req.headers['x-user'] as string
         const cloudinaryPost = req.file?.path?.split("/post-")[1] as string
-        const postResponse = await addNewPost(postedUser,req.body?.description,cloudinaryPost,postDbRepository)
+        const postResponse = await addNewPost(postedUser,req.body.description,cloudinaryPost,postDbRepository)
         res.json(postResponse)
     })
 
@@ -86,8 +86,9 @@ const postControllers = (
 
     const reportPost = asyncHandler(async(req:Request,res:Response)=>{
         const userName = req.headers['x-user'] as string
-        const postId = req.params.id
-        await postReport(userName,postId,postDbRepository)
+        const postId = req.body.postId
+        const reason = req.body.selectedReason
+        await postReport(userName,postId,reason,postDbRepository)
         res.json({status:true})
     })
 

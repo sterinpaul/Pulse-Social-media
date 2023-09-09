@@ -16,7 +16,6 @@ export const postRepositoryMongoDB = ()=>{
         return await Post.aggregate([
             {
               $match: {
-                isBlocked: false,
                 listed:true
               }
             },
@@ -261,10 +260,13 @@ export const postRepositoryMongoDB = ()=>{
       }
     }
 
-    const postReport = async(userName:string,postId:string)=>{
+    const postReport = async(userName:string,postId:string,reason:string)=>{
       try{
         const postID = new mongoose.Types.ObjectId(postId)
-        return await Post.updateOne({_id:postID},{$addToSet:{reports:userName}})
+        const data = {
+          userName,reason
+        }
+        return await Post.updateOne({_id:postID},{$addToSet:{reports:data}})
       }catch(error){
         console.log(error)
       }

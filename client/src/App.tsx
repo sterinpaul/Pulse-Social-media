@@ -12,13 +12,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={reduxToken ? <Home/> : <SignInAndSignUp/>}></Route>
-      </Routes>
-
-      <Routes>
         <Route path='/:user' element={<Profile/>}></Route>
-      </Routes>
-
-      <Routes>
         <Route path='/:user/edit' element={<EditProfile/>}></Route>
       </Routes>
     </BrowserRouter>

@@ -26,16 +26,10 @@ const UserBody:React.FC<UserBodyProps> = ({userData,allPosts,setAllPosts})=>{
     }
 
     const publishPost = async()=>{
-        if(textData.trim().length || upload){
-            if(upload){
-                const response:any = await publishNewPost(textData,upload)
-                response.profilePic = reduxData.profilePic
-                setAllPosts([response,...allPosts])
-            }else{
-                const response:any = await publishNewPost(textData)
-                response.profilePic = reduxData.profilePic
-                setAllPosts([response,...allPosts])
-            }
+        if(textData.trim().length && upload){
+            const response:any = await publishNewPost(textData,upload)
+            response.profilePic = reduxData.profilePic
+            setAllPosts([response,...allPosts])
             setTextData("")
             setUpload(null)
         }

@@ -7,7 +7,7 @@ export interface userInterface{
 }
 
 export interface userProfile{
-    _id: Key | null | undefined
+    _id: string | null | undefined
     userName: string,
     firstName?: string,
     lastName?: string,

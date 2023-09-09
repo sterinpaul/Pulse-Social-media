@@ -13,7 +13,7 @@ const userSchema = new Schema(
     },
     userName:{
         type:String,
-        required:true,
+        required:false,
         unique:true
     },
     email:{
@@ -23,8 +23,7 @@ const userSchema = new Schema(
     },
     password:{
         type:String,
-        required:true,
-        minlength:8
+        required:false
     },
     profilePic:{
         type:String,
@@ -32,8 +31,7 @@ const userSchema = new Schema(
     },
     mobile:{
         type:String,
-        required:true,
-        unique:true
+        required:false
     },
     bio:{
         type:String

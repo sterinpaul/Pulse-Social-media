@@ -19,8 +19,7 @@ import {
     DialogBody,
   } from "@material-tailwind/react";
 
-  
-  
+
   const SignUpForm : React.FC = ()=>{
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -28,7 +27,11 @@ import {
     const [otpVerificationContainer,setOtpVerificationContainer] = useState(true)
     const [open,setOpen] = useState(false)
     const [otp,setOtp] = useState('')
+    const [time,setTime] = useState(60)
+    const [resend,setResend] = useState(false)
+    const [recaptchaInstance, setRecaptchaInstance] = useState<RecaptchaVerifier | null>(null)
     
+
     useEffect(()=>{
       recaptchaRender()
     },[])
@@ -40,14 +43,38 @@ import {
           'size': 'invisible',
           'callback': () => {}
         })
+        setRecaptchaInstance(window.recaptchaVerifier)
       }catch(error){
         console.log('Error in captcha',error)
       }
     }
+
     
-    const handleOpen = ()=>{
+    const startTimer = ()=>{
+      if (!recaptchaInstance){
+        recaptchaRender()
+      }
+      const timerHandle = setInterval(()=>{
+        setTime((prevTime)=>prevTime-1)
+      },1000)
+      setTimeout(()=>{
+        clearInterval(timerHandle)
+        setResend(true)
+        recaptchaInstance?.render().then(() => {
+          console.log("ReCAPTCHA re-rendered")
+        })
+      },60000)
+    }
+
+    const handleOpen =()=>setOpen(!open)
+    
+    const sendOTP = ()=>{
       if(formik?.values?.mobile?.length === 10){
-        setOpen(!open)
+        setOpen(true)
+        setTime(60)
+        startTimer()
+        setResend(false)
+        setOtpError(false)
         const phoneNumber = `+91${formik?.values?.mobile}`
         const appVerifier = window.recaptchaVerifier
         
@@ -62,12 +89,12 @@ import {
     
     const handleVerifyOTP = () => {
       if(otp.length===6){
-        confirmationResult
+        window.confirmationResult
         .confirm(otp)
         .then(()=>{
           setOtpVerificationContainer(false)
           setTimeout(() => {
-            setOpen(!open)
+            setOpen(false)
           }, 2000);
         })
         .catch(()=>{
@@ -152,7 +179,6 @@ import {
 
     return(
       <form onSubmit={formik.handleSubmit}>
-        
             <Typography variant="h3" color="blue" className="text-center pt-4">
               Sign Up
             </Typography>
@@ -211,11 +237,11 @@ import {
                 </div>
                 <div id="captchaContainer"></div>
 
-                {otpVerificationContainer ? <Button onClick={handleOpen} className="p-2 rounded-full w-28 ml-auto mr-auto capitalize"  variant="outlined" >Send OTP</Button> : <></>}
+                {otpVerificationContainer ? <Button onClick={sendOTP} className="p-2 rounded-full w-28 ml-auto mr-auto capitalize"  variant="outlined" >Send OTP</Button> : <></>}
               </div>
 
 
-              <Dialog open={open} handler={handleOpen} className="w-1/2" size="xs">
+              <Dialog open={open} handler={handleOpen} className="w-1/2 h-56" size="xs">
                 <div className="flex items-center justify-end">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -239,11 +265,16 @@ import {
                   <h1 className="text-lg text-black font-bold mb-1">OTP Sent</h1>
                   <div>
                     <Input type="text" className="" value={otp} onChange={otpHandler} label="Enter otp"/>
+                    <p className="text-center h-4 mt-1 text-black">{!resend ? (`Remaining time 0:${time}`) : null}</p>
                   </div>
-                  <p className="text-red-900 text-xs h-4">{otpError ? 'Invalid OTP' : ''}</p>
-                  <Button className=" m-2 capitalize" size='sm' variant="gradient" color="green" onClick={handleVerifyOTP}>
+                  <p className="text-red-900 mt-1 text-xs h-4">{otpError ? 'Invalid OTP' : ''}</p>
+
+                  {resend ? (<Button className="w-28 m-2 capitalize" size='sm' variant="gradient" color="green" onClick={sendOTP}>
+                    Resend OTP
+                  </Button>) : (<Button className="w-28 m-2 capitalize" size='sm' variant="gradient" color="green" onClick={handleVerifyOTP}>
                     Verify
-                  </Button>
+                  </Button>)}
+
                 </DialogBody>) : <div className="flex flex-col items-center justify-center pt-4">
                   <div className="w-16 h-16 bg-blue-400 rounded-full text-white text-4xl text-center flex justify-center items-center">✔</div>
                   <p className="p-2">OTP Verified</p>
