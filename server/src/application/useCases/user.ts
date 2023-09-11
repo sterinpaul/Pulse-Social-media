@@ -59,3 +59,10 @@ export const searchUser = async(
 )=>{
     return await userRepository.getUserBySearch(searchText)
 }
+
+export const userNameUpdate = async(
+    userName:string,
+    userRepository:ReturnType<UserDbInterface>
+)=>{
+    return await userRepository.updateUserName(userName)
+}

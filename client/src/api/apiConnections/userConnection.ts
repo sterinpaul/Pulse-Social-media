@@ -69,9 +69,24 @@ export const getSavedPosts = async()=>{
 
 export const getUserbySearch = async(searchText:string)=>{
     try{
-        const response = await baseURL.post(`/user/search/searchText`,{searchText})
+        const response = await baseURL.get(`/user/search/user?searchText=${searchText}`)
         return response?.data
     }catch(error:any){
         return error.response.data
     }
 }
+
+export const userNameChange = async(userName:string)=>{
+    try{
+        const response = await baseURL.patch('/user/updateusername',{userName})
+        return response?.data
+    }catch(error:any){
+        return error.response.data
+    }
+}
+
+// export const updateProfileData = async(userData:)=>{
+//     try{
+//         const response = baseURL.put('/user/')
+//     }
+// }

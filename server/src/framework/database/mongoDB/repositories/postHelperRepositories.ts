@@ -272,18 +272,29 @@ export const postRepositoryMongoDB = ()=>{
       }
     }
 
+    const updateThePost = async(postId:string,description:string)=>{
+      try{
+        const postID = new mongoose.Types.ObjectId(postId)
+        const updatedPost = await Post.updateOne({_id:postID},{$set:{description}})
+        if(updatedPost.modifiedCount===1) return true
+      }catch(error){
+        console.log(error)
+      }
+    }
+
 
     return {
-        getPost,
-        addPost,
-        unlikePost,
-        likePost,
-        getComments,
-        addComment,
-        commentLikeUnlike,
-        replyLikeUnlike,
-        postDelete,
-        postReport
+      getPost,
+      addPost,
+      unlikePost,
+      likePost,
+      getComments,
+      addComment,
+      commentLikeUnlike,
+      replyLikeUnlike,
+      postDelete,
+      postReport,
+      updateThePost
     }
 }
 

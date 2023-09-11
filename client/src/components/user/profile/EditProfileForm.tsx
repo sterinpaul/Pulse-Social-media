@@ -53,7 +53,6 @@ const EditProfileForm:React.FC = ()=>{
     const submitProfilePhoto = async()=>{
         if(profileImg){
             changePhoto(profileImg)
-            
             dispatch(changePhoto(profileImg))
         }
         // setProfilePhoto(null)

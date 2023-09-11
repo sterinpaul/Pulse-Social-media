@@ -102,3 +102,7 @@ export const postDelete = async(postId:string,postRepository:ReturnType<postDbIn
 export const postReport = async(userName:string,postId:string,reason:string,postRepository:ReturnType<postDbInterface>)=>{
     return await postRepository.reportThePost(userName,postId,reason)
 }
+
+export const updatePost = async(postId:string,description:string,postRepository:ReturnType<postDbInterface>)=>{
+    return await postRepository.singlePostUpdate(postId,description)
+}

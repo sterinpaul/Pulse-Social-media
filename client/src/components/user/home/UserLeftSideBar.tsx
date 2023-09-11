@@ -99,7 +99,7 @@ interface userProfile{
                   return
                 }else{
                     return <FollowList user={user} handleOpen={handleOpen} key={user._id}/>
-                  }
+                }
               })}
             </DialogBody>
           </Dialog>

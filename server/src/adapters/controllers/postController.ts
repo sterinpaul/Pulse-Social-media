@@ -11,7 +11,8 @@ import { getAllPosts,
     likeHandleComment,
     likeHandleReply,
     postDelete,
-    postReport
+    postReport,
+    updatePost
 } from "../../application/useCases/post";
 
 
@@ -92,6 +93,13 @@ const postControllers = (
         res.json({status:true})
     })
 
+    const editThePost = asyncHandler(async(req:Request,res:Response)=>{
+        const postId = req.body.postId
+        const description = req.body.description
+        const data = await updatePost(postId,description,postDbRepository)
+        res.json({status:data})
+    })
+
     return {
         getPost,
         addPost,
@@ -102,7 +110,8 @@ const postControllers = (
         likeUnlike,
         replyLikeUnlike,
         deletePost,
-        reportPost
+        reportPost,
+        editThePost
     }
 }
 

@@ -21,7 +21,7 @@ const FollowList = ({user,handleOpen}:{user:{userName:string,firstName:string,la
 
     const goToProfile = ()=>{
         handleOpen(false)
-        navigate(`/${user?.userName}`)
+        navigate(`/${user.userName}`)
     }
 
     const followUnfollowHandler = async()=>{

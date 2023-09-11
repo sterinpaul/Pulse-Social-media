@@ -3,13 +3,14 @@ import UserLeftSideBar from "../../components/user/home/UserLeftSideBar"
 import UserNavBar from "../../components/user/home/UserNavBar"
 import { useEffect, useState } from "react"
 import { useParams,useNavigate } from "react-router-dom"
-import { getProfile } from "../../api/apiConnections/userConnection"
+import { getProfile, getSavedPosts } from "../../api/apiConnections/userConnection"
 import { userSignOut } from "../../redux/userRedux/userSlice"
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 import { postData } from "../../interfaces/postInterface"
 
 interface profile{
+    _id:string,
     userName: string,
     firstName?: string,
     lastName?: string,
@@ -33,9 +34,12 @@ interface profile{
     posts: postData[]
 }
 
+
+
 const Profile = ()=>{
-    const {user} = useParams()    
+    const {user} = useParams()
     const [profileData,setProfileData] = useState<profile>()
+    const [saved,setSaved] = useState<postData[] | []>([])
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -44,14 +48,16 @@ const Profile = ()=>{
     },[user])
 
     const getUserDetails = async()=>{
-    const response:any = await getProfile(user!)
-    
-        if(response){
-            setProfileData(response)
-        }else if(response?.message === 'Token expired'){
+        const response:any = await getProfile(user as string)
+        const savedPosts:any = await getSavedPosts()
+
+        if(response?.message === 'Token expired' || savedPosts?.message === 'Token expired'){
             dispatch(userSignOut())
             navigate('/')
             toast.error(response.message)
+        }else{
+            setSaved(savedPosts)
+            setProfileData(response)
         }
     }
     
@@ -59,7 +65,7 @@ const Profile = ()=>{
         <>
             <UserNavBar/>
             <UserLeftSideBar/>
-            {profileData ? <ProfileBody profileData={profileData}/> : <></>}
+            <ProfileBody profileData={profileData} saved={saved} />
         </>
     )
 }

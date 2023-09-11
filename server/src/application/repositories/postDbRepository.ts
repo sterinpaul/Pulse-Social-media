@@ -52,6 +52,10 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
         return await repository.postReport(userName,postId,reason)
     }
 
+    const singlePostUpdate = async(postId:string,description:string)=>{
+        return await repository.updateThePost(postId,description)
+    }
+
     return {
         getAllPost,
         addPost,
@@ -62,7 +66,8 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
         likeComment,
         likeReply,
         deleteSinglePost,
-        reportThePost
+        reportThePost,
+        singlePostUpdate
     }
 }
 export type postDbInterface = typeof postDbRepository

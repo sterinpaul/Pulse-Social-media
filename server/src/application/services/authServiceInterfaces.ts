@@ -23,10 +23,3 @@ export const authServiceInterface = (service:AuthServiceReturn)=>{
 }
 
 export type AuthServiceInterface = typeof authServiceInterface
-
-// export interface authServiceInterface {
-//     encryptPassword: (password: string) => Promise<string>;
-//     comparePassword: (password: string, hashedPassword: string) => Promise<boolean>;
-//     generateToken: (payload: string) => Promise<string>;
-//     verifyToken: (token: string) => Promise<string | undefined>;
-// }

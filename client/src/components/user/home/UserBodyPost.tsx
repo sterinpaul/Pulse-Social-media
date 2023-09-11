@@ -16,11 +16,7 @@ import {
     Menu,
     MenuHandler,
     MenuList,
-    MenuItem,
-    Dialog,
-    Button,
-    Radio,
-    Typography
+    MenuItem
   } from "@material-tailwind/react";
 
 
@@ -39,11 +35,10 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
     const [comments,setComments] = useState<commentData[]>([])
     const savedStatus = userData?.savedPosts?.includes(post._id)
     const [savedPost,setSavedPost] = useState(savedStatus)
-    const [optionOpenDialog,setOptionOpenDialog] = useState(false)
-    const [statusToggle,setStatusToggle] = useState('')
     const reportedStatus = post?.reports?.some((user)=>user.userName === userName)
     const [reportStatus,setReportStatus] = useState(reportedStatus)
-    const [selectedReason,setSelectedReason] = useState('')
+    const [optionOpenDialog,setOptionOpenDialog] = useState(false)
+    const [statusToggle,setStatusToggle] = useState('')
     const [editStatus,setEditStatus] = useState(false)
 
     const likeHandler = async()=>{
@@ -73,8 +68,7 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
 
     const editPostHandle = ()=>{
         setEditStatus(true)
-        handleOpen()
-
+        setOpen(true)
     }
 
     const handleOpenOptionDialog = (value:string)=>{
@@ -89,15 +83,11 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
         }
     }
 
-    const handleRadioChange = (event:any)=>{
-        setSelectedReason(event.target.value)
-    }
 
-
-    const reportSinglePost = async()=>{
+    const reportSinglePost = async(selectedReason:string)=>{
         setReportStatus(!reportStatus)
         const response = await reportThePost(post._id,selectedReason)
-        if(response.status){
+        if(response?.status){
             setOptionOpenDialog(false)
         }
     }
@@ -121,7 +111,7 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                         <MenuHandler className="ml-auto mb-auto">
                             <button><EllipsisHorizontalIcon className='w-8 h-8'/></button>
                         </MenuHandler>
-                        <MenuList className="flex flex-col gap-1 p-1 -z-1">
+                        <MenuList className="flex flex-col gap-1 p-1 z-0">
                             {userName === post?.postedUser ? <>
                                 <MenuItem onClick={editPostHandle}>Edit</MenuItem>
                                 <MenuItem onClick={()=>handleOpenOptionDialog('Delete')} className="text-red-900">Delete</MenuItem>
@@ -129,54 +119,6 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                         </MenuList>
                     </Menu>
                     
-                    <Dialog open={optionOpenDialog} size='xs' handler={handleOpenOptionDialog} className="flex justify-center items-center flex-col p-4">
-                        {statusToggle === 'Delete' ? <>
-                            <p>Do you really want to delete the post ?</p>
-                            <div className="flex gap-4 mt-8">
-                                <Button onClick={()=>handleOpenOptionDialog('')} size='sm' className="capitalize">Cancel</Button>
-                                <Button onClick={deleteSinglePost} size='sm' className="capitalize">Delete</Button>
-                            </div>
-                        </> : <>
-                            <p>Please mention the reason to report the post ?</p>
-                            <div className="flex flex-col gap-1">
-                                <Radio value='False information' onChange={handleRadioChange} name='reason' defaultChecked label={
-                                    <Typography color="blue-gray" className="flex font-medium">
-                                        False information
-                                    </Typography>}>
-                                </Radio>
-                                <Radio value="It's spam" onChange={handleRadioChange} name='reason' label={
-                                    <Typography color="blue-gray" className="flex font-medium">
-                                        It's spam
-                                    </Typography>}>
-                                </Radio>
-                                <Radio value='Scam or fraud' onChange={handleRadioChange} name='reason' label={
-                                    <Typography color="blue-gray" className="flex font-medium">
-                                        Scam or fraud
-                                    </Typography>}>
-                                </Radio>
-                                <Radio value='Nudity or sexual activity' onChange={handleRadioChange} name='reason' label={
-                                    <Typography color="blue-gray" className="flex font-medium">
-                                        Nudity or sexual activity
-                                    </Typography>}>
-                                </Radio>
-                                <Radio value='Hate speech or Symbol' onChange={handleRadioChange} name='reason' label={
-                                    <Typography color="blue-gray" className="flex font-medium">
-                                        Hate speech or Symbol
-                                    </Typography>}>
-                                </Radio>
-                                <Radio value='Bullying or Harassment' onChange={handleRadioChange} name='reason' label={
-                                    <Typography color="blue-gray" className="flex font-medium">
-                                        Bullying or Harassment
-                                    </Typography>}>
-                                </Radio>
-                                    
-                                <div className="flex gap-4 mt-4 m-auto">
-                                    <Button onClick={()=>handleOpenOptionDialog('')} size='sm' className="capitalize">Cancel</Button>
-                                    <Button onClick={reportSinglePost} disabled={reportStatus} size='sm' className="capitalize">Report</Button>
-                                </div>
-                            </div>
-                        </>}
-                    </Dialog>
                 </div>
                 <div>
                     <img className="m-auto" src={CLOUDINARY_POST_URL+(post?.imgVideoURL)} alt="post"/>
@@ -190,7 +132,21 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                 
                 <p>{post.description}</p>
                 
-                <CommentsContainer editStatus={editStatus} open={open} handleOpen={handleOpen} post={post} comments={comments} setComments={setComments} />
+                <CommentsContainer 
+                open={open}
+                handleOpen={handleOpen}
+                post={post}
+                comments={comments}
+                setComments={setComments}
+                editStatus={editStatus}
+                editPostHandle={editPostHandle}
+                handleOpenOptionDialog={handleOpenOptionDialog}
+                optionOpenDialog={optionOpenDialog}
+                reportStatus={reportStatus}
+                reportSinglePost={reportSinglePost}
+                deleteSinglePost={deleteSinglePost}
+                statusToggle={statusToggle}
+                setOptionOpenDialog={setOptionOpenDialog} />
             </div>
         </div>
     )

@@ -213,6 +213,7 @@ export const userRepositoryMongoDB = ()=>{
             postedUser: "$result.postedUser",
             profilePic: "$userData.profilePic",
             description: "$result.description",
+            listed: "$result.listed",
             imgVideoURL: "$result.imgVideoURL",
             liked: "$result.liked",
             reports: "$result.reports",
@@ -257,6 +258,7 @@ export const userRepositoryMongoDB = ()=>{
               postedUser: "$postedUser",
               profilePic: "$result.profilePic",
               description: "$description",
+              listed:"$listed",
               imgVideoURL: "$imgVideoURL",
               liked: "$liked",
               reports: "$reports",
@@ -357,7 +359,7 @@ export const userRepositoryMongoDB = ()=>{
         ])
         
         if(savedPosts){
-          return savedPosts[0].savedPosts
+          return savedPosts[0]?.savedPosts
         }
       }catch(error){
         console.log(error)
@@ -367,6 +369,18 @@ export const userRepositoryMongoDB = ()=>{
     const userSearch = async(searchText:string)=>{
       const regex = new RegExp(searchText,'i')
       return await User.find({$or:[{firstName:{$regex:regex}},{lastName:{$regex:regex}},{userName:{$regex:regex}}]},{firstName:1,lastName:1,userName:1,profilePic:1,followers:1}).limit(10)
+    }
+
+    const userNameUpdate = async(userName:string)=>{
+      const userExist = await User.findOne({userName})
+      if(userExist){
+        return false
+      }else{
+        const updated = await User.updateOne({userName},{$set:{userName}})
+        console.log(updated)
+        
+        if(updated) return true
+      }
     }
 
     return {
@@ -380,7 +394,8 @@ export const userRepositoryMongoDB = ()=>{
         followHandler,
         postSave,
         userSavedPosts,
-        userSearch
+        userSearch,
+        userNameUpdate
     }
 }
 

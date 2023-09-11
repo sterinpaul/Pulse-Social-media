@@ -2,7 +2,7 @@ import { Request,Response } from "express";
 import asyncHandler from 'express-async-handler';
 import { UserDbInterface } from "../../application/repositories/userDbRepository";
 import { userRepositoryMongoDB } from "../../framework/database/mongoDB/repositories/userHelperRepositories";
-import { getAllPosts,followUnfollowUser, getUserProfile,postProfilePic,postSaveHandler,getSavedPosts,searchUser } from "../../application/useCases/user";
+import { getAllPosts,followUnfollowUser, getUserProfile,postProfilePic,postSaveHandler,getSavedPosts,searchUser,userNameUpdate } from "../../application/useCases/user";
 
 
 const userControllers = (
@@ -66,9 +66,17 @@ const userControllers = (
     })
 
     const getUserBySearch = asyncHandler(async(req:Request,res:Response)=>{
-        const searchText = req.body.searchText
-        const userData = await searchUser(searchText,userDbRepository)
+        const searchText = req.query.searchText
+        const userData = await searchUser(searchText as string,userDbRepository)
         res.json(userData)
+    })
+
+    const updateUserName = asyncHandler(async(req:Request,res:Response)=>{
+        const userName = req.body.userName
+        const data = await userNameUpdate(userName,userDbRepository)
+        if(data){
+            res.json({status:data})
+        }
     })
 
     return {
@@ -79,7 +87,8 @@ const userControllers = (
         followUnfollow,
         saveThePost,
         getUserSavedPosts,
-        getUserBySearch
+        getUserBySearch,
+        updateUserName
     }
 }
 

@@ -54,6 +54,10 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         return await repository.userSearch(searchText)
     }
 
+    const updateUserName = async(userName:string)=>{
+        return await repository.userNameUpdate(userName)
+    }
+
     return {
         addUser,
         getUser,
@@ -65,7 +69,8 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         followUnfollowHandler,
         saveThePost,
         getSavedPosts,
-        getUserBySearch
+        getUserBySearch,
+        updateUserName
     }
 }
 export type UserDbInterface = typeof userDbRepository

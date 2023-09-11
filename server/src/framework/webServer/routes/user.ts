@@ -14,7 +14,8 @@ const userRouter = ()=>{
     router.put('/followunfollow',controllers.followUnfollow)
     router.put('/savepost',controllers.saveThePost)
     router.get('/post/savedposts',controllers.getUserSavedPosts)
-    router.post('/search/searchText',controllers.getUserBySearch)
+    router.get('/search/user',controllers.getUserBySearch)
+    router.patch('updateusername',controllers.updateUserName)
 
     return router
 }

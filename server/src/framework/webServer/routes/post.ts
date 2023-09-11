@@ -17,6 +17,7 @@ const postRouter = ()=>{
     router.put('/reply/likeunlike',controllers.likeUnlike)
     router.patch('/delete/:id',controllers.deletePost)
     router.put('/report',controllers.reportPost)
+    router.patch('/editpost',controllers.editThePost)
     
     return router
 }
