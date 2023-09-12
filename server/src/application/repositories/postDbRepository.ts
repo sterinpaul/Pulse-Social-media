@@ -31,9 +31,10 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
         comment:string,
         commentedUser:string,
         postId:string,
-        commentId:string
+        commentId:string,
+        replyToUser:string
     )=>{
-        return await repository.addComment(comment,commentedUser,postId,commentId)
+        return await repository.addComment(comment,commentedUser,postId,commentId,replyToUser)
     }
 
     const likeComment = async(userName:string,commentId:mongoose.Types.ObjectId)=>{

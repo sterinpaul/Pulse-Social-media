@@ -191,12 +191,15 @@ export const postRepositoryMongoDB = ()=>{
       }
     }
 
-    const addComment = async(comment:string,commentedUser:string,postId:string,commentId:string)=>{
+    const addComment = async(comment:string,commentedUser:string,postId:string,commentId:string,replyToUser:string)=>{
       if(commentId.length){
+        const comments = comment.replace(`@${replyToUser}`,'')
+        
         const replyData = {
           _id: new mongoose.Types.ObjectId(),
-          comment:comment,
+          comment:comments,
           commentedUser,
+          replyToUser,
           liked:[],
           listed:true,
           createdAt:new Date()
@@ -252,9 +255,7 @@ export const postRepositoryMongoDB = ()=>{
         )
         const results = await Promise.allSettled(operations)
         const isSuccess = results.every((result) => result.status === 'fulfilled')
-        if(isSuccess){
-          return true
-        }
+        if(isSuccess) return true
       }catch(error){
         console.log(error)
       }

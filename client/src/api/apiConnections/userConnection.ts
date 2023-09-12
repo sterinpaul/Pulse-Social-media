@@ -76,17 +76,20 @@ export const getUserbySearch = async(searchText:string)=>{
     }
 }
 
-export const userNameChange = async(userName:string)=>{
+export const userNameChange = async(newUserName:string)=>{
     try{
-        const response = await baseURL.patch('/user/updateusername',{userName})
+        const response = await baseURL.patch('/user/updateusername',{newUserName})
         return response?.data
     }catch(error:any){
         return error.response.data
     }
 }
 
-// export const updateProfileData = async(userData:)=>{
-//     try{
-//         const response = baseURL.put('/user/')
-//     }
-// }
+export const updateProfileData = async(userData:object)=>{
+    try{
+        const response = await baseURL.post('/user/updateprofile',userData)
+        return response?.data
+    }catch(error:any){
+        return error.response.data
+    }
+}

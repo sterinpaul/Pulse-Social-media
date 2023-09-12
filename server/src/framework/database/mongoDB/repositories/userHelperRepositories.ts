@@ -1,6 +1,7 @@
 import mongoose from "mongoose"
 import User from "../models/userModel"
 import Post from "../models/postModel"
+import Comment from "../models/commentModel"
 
 interface userInterface{
   firstName:string,
@@ -66,6 +67,12 @@ export const userRepositoryMongoDB = ()=>{
               },
               mobile: {
                 $first: "$mobile"
+              },
+              bio: {
+                $first: "$bio"
+              },
+              city: {
+                $first: "$city"
               },
               savedPosts: {
                 $first: "$savedPosts"
@@ -371,15 +378,38 @@ export const userRepositoryMongoDB = ()=>{
       return await User.find({$or:[{firstName:{$regex:regex}},{lastName:{$regex:regex}},{userName:{$regex:regex}}]},{firstName:1,lastName:1,userName:1,profilePic:1,followers:1}).limit(10)
     }
 
-    const userNameUpdate = async(userName:string)=>{
-      const userExist = await User.findOne({userName})
+    const userNameUpdate = async(userName:string,newUserName:string)=>{
+      const userExist = await User.findOne({userName:newUserName})
       if(userExist){
         return false
       }else{
-        const updated = await User.updateOne({userName},{$set:{userName}})
-        console.log(updated)
+        const operations = [
+          User.updateOne({userName},{$set:{userName:newUserName}}),
+          Post.updateMany({postedUser:userName},{$set:{postedUser:newUserName}}),
+          Comment.updateMany({commentedUser:userName},{$set:{commentedUser:newUserName}}),
+          Comment.updateMany({"reply":{$elemMatch:{"commentedUser":userName}}},{$set:{"reply.$[].commentedUser":newUserName}}),
+          Comment.updateMany({"reply":{$elemMatch:{"replyToUser":userName}}},{$set:{"reply.$[].replyToUser":newUserName}})
+        ]
+        const results = await Promise.allSettled(operations)
+        const isSuccess = results.every((result) => result.status === 'fulfilled')
+        if(isSuccess) return true
         
-        if(updated) return true
+      }
+    }
+
+    const userProfileUpdate = async(
+      userName:string,
+      firstName:string,
+      lastName:string,
+      gender:string,
+      city:string,
+      bio:string
+    )=>{
+      const response = await User.updateOne({userName},{$set:{firstName,lastName,gender,city,bio}})
+      if(response.modifiedCount){
+        return true
+      }else{
+        return false
       }
     }
 
@@ -395,7 +425,8 @@ export const userRepositoryMongoDB = ()=>{
         postSave,
         userSavedPosts,
         userSearch,
-        userNameUpdate
+        userNameUpdate,
+        userProfileUpdate
     }
 }
 

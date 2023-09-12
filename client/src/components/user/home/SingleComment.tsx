@@ -35,6 +35,7 @@ const SingleComment:React.FC<singleCommentContainer> = ({comment,focusTextAreaRe
             setLike(!like)
         }
     }
+    
     const handleReplyClick = ()=>{
         focusTextAreaReply(comment?.commentedUser,comment?._id)
     }

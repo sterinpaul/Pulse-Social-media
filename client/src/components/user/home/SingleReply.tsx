@@ -47,7 +47,7 @@ const SingleReply:React.FC<singleReplyContainer> = ({reply,focusTextAreaReply})=
             <div className="flex flex-col">
                 <div className="flex flex-col justify-center rounded bg-blue-gray-100 p-1">
                     <Link to={`/${reply?.commentedUser}`} className="text-black font-body" >{reply?.commentedUser}</Link>
-                    <p className="text-sm text-black">{reply?.comment}</p>
+                    <p className="text-sm text-black">@{reply?.replyToUser} {reply?.comment}</p>
                 </div>
                 <div className="flex gap-4 items-center">
                     <button onClick={commentLikeHandler} className="relative">

@@ -1,12 +1,15 @@
 import { useSelector,useDispatch } from "react-redux";
-import { changePhoto } from "../../../redux/userRedux/userSlice";
-import { updateProfilePhoto, userNameChange } from "../../../api/apiConnections/userConnection";
+import { changePhoto, setUserName } from "../../../redux/userRedux/userSlice";
+import { updateProfilePhoto, userNameChange,updateProfileData } from "../../../api/apiConnections/userConnection";
 import { PROFILE_PHOTO,CLOUDINARY_PROFILE_PHOTO_URL } from "../../../api/baseURL";
 import { useState } from "react";
 import { followHandler } from "../../../api/apiConnections/userConnection";
 import { postData } from "../../../interfaces/postInterface";
 import SinglePostPhoto from "./SinglePostPhoto";
 import FollowersList from "./FollowersList";
+import {toast} from 'react-toastify';
+import {useFormik} from 'formik';
+import * as Yup from 'yup';
 
 import {
     Tabs,
@@ -31,6 +34,7 @@ import {
     PencilSquareIcon,
     ArrowPathIcon
   } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 //   interface profile{
 //     _id:string,
@@ -59,14 +63,13 @@ import {
 
 interface ProfileBodyProps {
     profileData: any,
-    saved:postData[],
-    
+    saved:postData[]
   }
 
 const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
     const [open, setOpen] = useState(false)
     const [followOpen,setFollowOpen] = useState(false)
-    const [openProfile, setOpenProfile] = useState(false)
+    // const [openProfile, setOpenProfile] = useState(false)
     const {userName,profilePic,darkMode} = useSelector((store:{user:{userName:string,profilePic:string,darkMode:boolean}})=>store.user)
     const dispatch = useDispatch()
     const [profilePhoto,setProfilePhoto] = useState<File | null>(null)
@@ -79,13 +82,14 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
     const [userChangeStatus,setUserChangeStatus] = useState(false)
     const [updatedUserName,setUpdatedUserName] = useState('')
     const [userNameError,setUserNameError] = useState('')
+    const navigate = useNavigate()
 
     const handleProfileEditOpen = () => {
         setUserChangeStatus(false)
         setOpenProfileEdit((cur) => !cur)
     }
     
-    const handleOpenProfile = () => setOpenProfile(!openProfile)
+    // const handleOpenProfile = () => setOpenProfile(!openProfile)
 
     const handleOpenImg = () => {
         setProfilePhoto(null)
@@ -133,20 +137,68 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
         setFolowFollowing(value)
     }
 
-    const updateUserName = async()=>{
+    const updateUserName = async(event: { preventDefault: () => void; })=>{
+        event.preventDefault()
         if(updatedUserName.trim().length){
-            console.log(updatedUserName)
             const response = await userNameChange(updatedUserName)
-            console.log(response)
-            if(response){
+            if(response?.status){
                 profileData.userName = updatedUserName
+                dispatch(setUserName(updatedUserName))
                 setUserChangeStatus(!userChangeStatus)
+                setUserNameError('success')
+                navigate(`/${updatedUserName}`)
                 setUpdatedUserName('')
             }else{
-                setUserNameError('User Name already')
+                setUserNameError('failed')
             }
+            setTimeout(()=>{
+                setUserNameError('')
+            },3000)
         }
     }
+
+    const genderHandle = (value:string)=>{
+        formik.setFieldValue('gender',value)
+    }
+
+    const formik = useFormik({
+        initialValues:{
+          firstName:'',
+          lastName:'',
+          gender:'Male',
+          city:'',
+          bio:''
+      },
+      validationSchema: Yup.object({
+        firstName: Yup.string()
+            .max(20, 'Must be less than 20 characters')
+            .required('Required'),
+        lastName: Yup.string()
+            .max(20, 'Must be less than 20 characters')
+            .required('Required'),
+        gender: Yup.string()
+            .required('Required'),
+        city: Yup.string()
+            .max(20, 'Must be less than 20 characters')
+            .required('Required'),
+        bio: Yup.string()
+            .max(50, 'Must be less than 50 characters')
+            .required('Required')
+      }),
+      onSubmit: async(values) => {
+        const response = await updateProfileData(values)
+        if(response?.status){
+            profileData.firstName = values.firstName
+            profileData.lastName = values.lastName
+            profileData.city = values.bio
+            profileData.bio = values.city
+            setOpenProfileEdit((cur) => !cur)
+            toast.success("Profile updated successfully")
+        }else{
+          toast.error("Error occured while updating profile")
+        }
+      }
+    })
 
     return(
         <div className={`${darkMode ? "bg-blue-gray-100" : "bg-gray-200"} pb-1.5 min-h-screen flex flex-col items-center`}>
@@ -190,7 +242,7 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
 
 
                             <p className="mt-2">@{profileData?.userName}</p>
-                            <p className="whitespace-pre-line text-blue-gray-800">About me : {profileData?.bio} Enjoying every moment in my life </p>
+                            <p className="whitespace-pre-line text-blue-gray-800">About me : {profileData?.bio} </p>
                             <div><span className="text-blue-gray-800">Total posts : </span><span className="text-light-blue-800">{profileData?.posts?.length}</span></div>
                         </div>
                         <div className="ml-auto mr-auto">
@@ -207,44 +259,53 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
                               <Card className="mx-auto w-full">
                                 <CardHeader
                                   variant="gradient"
-                                  className="h-28 w-28 -top-4 mx-auto cursor-pointer"
+                                  className="h-28 w-28 mx-auto cursor-pointer"
                                   onClick={handleOpenImg}
                                 >
                                     <img className="h-full w-full object-cover" src={profileImg?.length ? (CLOUDINARY_PROFILE_PHOTO_URL+profileImg) : PROFILE_PHOTO}/>
                                 </CardHeader>
                                 <h1 className="text-center text-black text-xl">Update Profile</h1>
+                                <form onSubmit={formik.handleSubmit}>
+                                    <CardBody className="flex flex-col p-0 m-auto gap-1 w-96">
+                                        <div>
+                                            <div className="flex gap-1 justify-between items-center h-12">
+                                                {userChangeStatus ? <Input type="text" maxLength={20} id="userName" onChange={(event)=>setUpdatedUserName(event.target.value)} label="User Name" /> : <p className="pl-4">{profileData?.userName}</p>}
+                                                {userChangeStatus ? <><button onClick={updateUserName} >Update</button><button className="ml-1" onClick={()=>setUserChangeStatus(!userChangeStatus)}><ArrowPathIcon className="w-6 h-6" /></button></> : <button onClick={()=>setUserChangeStatus(!userChangeStatus)}><PencilSquareIcon className="w-6 h-6"/></button>}
+                                            </div>
+                                            {userNameError==='success' ? <p className="text-sm text-center text-green-800 h-6">✓ User Name Changed Successfully</p> : userNameError==='failed' ? <p className="text-sm p-0 text-center text-red-800 h-6">User Name already exists</p> : <p className="h-6"></p>}
+                                        </div>
+                                        <div className="flex flex-wrap gap-1">
+                                            <Input type="text" id="firstName" label="First Name" {...formik.getFieldProps('firstName')} />
+                                            <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.firstName && formik.errors.firstName ?
+                        formik.errors.firstName : null}</p>
+                                            <Input type="text" id="lastName" label="Last Name" {...formik.getFieldProps('lastName')} />
+                                            <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.lastName && formik.errors.lastName ?
+                        formik.errors.lastName : null}</p>
+                                        </div>
 
-                                <CardBody className="flex flex-col m-auto gap-4 w-96">
-                                    <div className="flex gap-1 justify-between items-center h-12">
-                                        {userChangeStatus ? <Input type="text" maxLength={20} id="userName" onChange={(event)=>setUpdatedUserName(event.target.value)} label="User Name" /> : <p className="pl-4">{profileData?.userName}</p>}
-                                        {userChangeStatus ? <><button onClick={updateUserName} >Update</button><button className="ml-1" onClick={()=>setUserChangeStatus(!userChangeStatus)}><ArrowPathIcon className="w-6 h-6" /></button></> : <button onClick={()=>setUserChangeStatus(!userChangeStatus)}><PencilSquareIcon className="w-6 h-6"/></button>}
-                                    </div>
-                                    <p>{userNameError}</p>
-                                    <div className="flex flex-wrap gap-1">
-                                        <Input type="text" id="firstName" label="First Name" />
-                                        <Input type="text" id="lastName" label="Last Name" />
-                                    </div>
+                                        <div className="flex gap-2">
+                                            <Radio id="male" label="Male" name="gender" defaultChecked ></Radio>
+                                            <Radio id="female" label="Female" name="gender" onClick={()=>genderHandle('Female')} ></Radio>
+                                            <Radio id="other" label="Prefer not to say" name="gender" onClick={()=>genderHandle('Prefer not to say')} ></Radio>
+                                        </div>
 
-                                    <div className="flex gap-2">
-                                        <Radio id="male" label="Male" name="gender" defaultChecked></Radio>
-                                        <Radio id="female" label="Female" name="gender" ></Radio>
-                                        <Radio id="other" label="Prefer not to say" name="gender" ></Radio>
-                                    </div>
-                                    
-                                    <Input type="text" id="city" label="City" />
-                                    
-                                    <Input label="Bio" />
-                                  
-                                </CardBody>
+                                        <Input type="text" id="city" label="City" {...formik.getFieldProps('city')} />
+                                        <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.city && formik.errors.city ?
+                        formik.errors.city : null}</p>
+                                        <Input type="text" id="bio" label="Bio" {...formik.getFieldProps('bio')} />
+                                        <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.bio && formik.errors.bio ?
+                        formik.errors.bio : null}</p>
+                                    </CardBody>
 
-                                <CardFooter className="pt-0 flex justify-center gap-4">
-                                    <Button size='sm' className="py-1 capitalize text-lg font-thin" variant="gradient" onClick={handleOpenProfile} >
-                                        Cancel
-                                    </Button>
-                                    <Button size='sm' className="py-1 capitalize text-lg font-thin" variant="gradient" onClick={handleOpenProfile} >
-                                        Update
-                                    </Button>
-                                </CardFooter>
+                                    <CardFooter className="pt-0 flex justify-center gap-4">
+                                        <Button type='submit' size='sm' className="py-1 capitalize text-lg font-thin" variant="gradient">
+                                            Update
+                                        </Button>
+                                        <Button size='sm' className="py-1 capitalize text-lg font-thin" variant="gradient" onClick={handleProfileEditOpen} >
+                                            Cancel
+                                        </Button>
+                                    </CardFooter>
+                                </form>
                               </Card>
                             </Dialog>
 

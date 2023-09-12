@@ -13,6 +13,7 @@ export interface commentData{
 export interface replyData{
     _id:string,
     commentedUser:string,
+    replyToUser:string,
     profilePic:string,
     comment:string,
     liked:string[],

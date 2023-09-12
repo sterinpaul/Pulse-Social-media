@@ -2,7 +2,17 @@ import { Request,Response } from "express";
 import asyncHandler from 'express-async-handler';
 import { UserDbInterface } from "../../application/repositories/userDbRepository";
 import { userRepositoryMongoDB } from "../../framework/database/mongoDB/repositories/userHelperRepositories";
-import { getAllPosts,followUnfollowUser, getUserProfile,postProfilePic,postSaveHandler,getSavedPosts,searchUser,userNameUpdate } from "../../application/useCases/user";
+import { 
+    getAllPosts,
+    followUnfollowUser,
+    getUserProfile,
+    postProfilePic,
+    postSaveHandler,
+    getSavedPosts,
+    searchUser,
+    userNameUpdate,
+    userProfileUpdate
+} from "../../application/useCases/user";
 
 
 const userControllers = (
@@ -72,11 +82,17 @@ const userControllers = (
     })
 
     const updateUserName = asyncHandler(async(req:Request,res:Response)=>{
-        const userName = req.body.userName
-        const data = await userNameUpdate(userName,userDbRepository)
-        if(data){
-            res.json({status:data})
-        }
+        const userName = req.headers['x-user'] as string
+        const newUserName = req.body.newUserName
+        const data = await userNameUpdate(userName,newUserName,userDbRepository)
+        res.json({status:data})
+    })
+
+    const updateUserData = asyncHandler(async(req:Request,res:Response)=>{
+        const userName = req.headers['x-user'] as string
+        const {firstName,lastName,gender,city,bio} = req.body
+        const response = await userProfileUpdate(userName,firstName,lastName,gender,city,bio,userDbRepository)
+        res.json({status:response})
     })
 
     return {
@@ -88,7 +104,8 @@ const userControllers = (
         saveThePost,
         getUserSavedPosts,
         getUserBySearch,
-        updateUserName
+        updateUserName,
+        updateUserData
     }
 }
 

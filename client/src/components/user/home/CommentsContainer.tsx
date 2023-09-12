@@ -53,6 +53,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
 })=>{
     const {userName,profilePic,darkMode} = useSelector((store:{user:{userName:string,darkMode:boolean,profilePic:string}})=>store.user)
     const [commentText,setCommentText] = useState('')
+    const [replyToUser,setReplyToUser] = useState('')
     const [commentId,setCommentId] = useState('')
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
     const [description,setDescription] = useState(post.description)
@@ -63,13 +64,15 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
         if(textAreaRef.current){
             textAreaRef.current.focus()
             setCommentText(`@${commentedUser} `)
+            setReplyToUser(commentedUser)
             setCommentId(commentID)
         }
     }
 
     const publishComment = async()=>{
         if(commentText.trim().length){
-            const commentResponse = await postComment(commentText,post?._id,commentId)
+            
+            const commentResponse = await postComment(commentText,post?._id,commentId,replyToUser)
             commentResponse.response.profilePic = profilePic
             
             if(commentResponse?.comment){

@@ -56,8 +56,10 @@ const postControllers = (
 
     const addComment = asyncHandler(async(req:Request,res:Response)=>{
         const commentedUser = req.headers['x-user'] as string
-        const {comment,postId,commentId} = req.body
-        const response:any = await addCommentToPost(comment,commentedUser,postId,commentId,postDbRepository)
+        const {comment,postId,commentId,replyToUser} = req.body
+        console.log(req.body);
+        
+        const response:any = await addCommentToPost(comment,commentedUser,postId,commentId,replyToUser,postDbRepository)
         if(response?.postId){
             res.json({comment:true,response})
         }else{

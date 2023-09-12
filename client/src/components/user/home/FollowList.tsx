@@ -25,15 +25,16 @@ const FollowList = ({user,handleOpen}:{user:{userName:string,firstName:string,la
     }
 
     const followUnfollowHandler = async()=>{
-        const response = await followHandler(user?.userName)
-        // if(response && follow){
-        //   user?.followers?.splice(user.followers.indexOf(userName),1)
-        // }else{
-        //   user?.followers?.push(userName)
-        // }
-        if(response){
-          setFollow(!follow)
-        }
+      const response = await followHandler(user?.userName)
+      if(response && follow){
+        user?.followers?.splice(user.followers.indexOf(userName),1)
+      }else{
+        user?.followers?.push(userName)
+      }
+      if(response){
+        setFollow(!follow)
+        navigate('/')
+      }
     }
 
     return (

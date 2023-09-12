@@ -44,13 +44,15 @@ export const getPostComments = async(postId:string)=>{
         throw error
     }
 }
-export const postComment = async(comment:string,postId:string,commentId:string)=>{
+export const postComment = async(comment:string,postId:string,commentId:string,replyToUser:string)=>{
     try{
         const formData = {
             'comment':comment,
             'postId':postId,
-            'commentId':commentId
+            'commentId':commentId,
+            'replyToUser':replyToUser
         }
+        
         const response = await baseURL.post('/post/addcomment',formData)
         return response?.data
     }catch(error){

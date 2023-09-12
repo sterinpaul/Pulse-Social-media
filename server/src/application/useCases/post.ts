@@ -71,9 +71,10 @@ export const addCommentToPost = async(
     commentedUser:string,
     postId:string,
     commentId:string,
+    replyToUser:string,
     postRepository:ReturnType<postDbInterface>
 )=>{
-    const data = await postRepository.addCommentToPost(comment,commentedUser,postId,commentId)
+    const data = await postRepository.addCommentToPost(comment,commentedUser,postId,commentId,replyToUser)
     if(data){
         return data
     }

@@ -62,7 +62,20 @@ export const searchUser = async(
 
 export const userNameUpdate = async(
     userName:string,
+    newUserName:string,
     userRepository:ReturnType<UserDbInterface>
 )=>{
-    return await userRepository.updateUserName(userName)
+    return await userRepository.updateUserName(userName,newUserName)
+}
+
+export const userProfileUpdate = async(
+    userName:string,
+    firstName:string,
+    lastName:string,
+    gender:string,
+    city:string,
+    bio:string,
+    userRepository:ReturnType<UserDbInterface>
+)=>{
+    return userRepository.updateUserProfile(userName,firstName,lastName,gender,city,bio)
 }

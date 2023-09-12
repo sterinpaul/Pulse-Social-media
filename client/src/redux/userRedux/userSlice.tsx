@@ -87,9 +87,13 @@ const userSlice = createSlice({
             state.token = action.payload
             localStorage.setItem('token',action.payload)
         },
+        setUserName:(state,action)=>{
+            state.userName = action.payload
+            localStorage.setItem('userName',action.payload)
+        },
         setUser:(state,action)=>{
-            state.userName = action.payload.userName,
-            state.darkMode = action.payload.darkMode,
+            state.userName = action.payload.userName
+            state.darkMode = action.payload.darkMode
             state.profilePic = action.payload.profilePic
             localStorage.setItem('userName',action.payload.userName)
             localStorage.setItem('darkMode',action.payload.darkMode)
@@ -100,9 +104,9 @@ const userSlice = createSlice({
             localStorage.setItem('profilePic',action.payload)
         },
         userSignOut:(state)=>{
-            state.token = '',
-            state.userName = '',
-            state.darkMode = false,
+            state.token = ''
+            state.userName = ''
+            state.darkMode = false
             state.profilePic = ''
             localStorage.removeItem('token')
             localStorage.removeItem('userName')
@@ -112,5 +116,5 @@ const userSlice = createSlice({
     }
 })
 
-export const {changeMode,setToken,setUser,changePhoto,userSignOut} = userSlice.actions
+export const {changeMode,setToken,setUserName,setUser,changePhoto,userSignOut} = userSlice.actions
 export default userSlice.reducer
