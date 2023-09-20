@@ -6,5 +6,8 @@ export default defineConfig({
   plugins: [react()],
   define:{
     
-  }
+  },
+  // optimizeDeps: {
+  //   exclude: ['simple-peer'],
+  // }
 })

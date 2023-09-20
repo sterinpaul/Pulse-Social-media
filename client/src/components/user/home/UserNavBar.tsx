@@ -27,7 +27,9 @@ import {
   PowerIcon,
   Bars2Icon,
   BellIcon,
-  HomeIcon
+  HomeIcon,
+  ChatBubbleLeftRightIcon,
+  MagnifyingGlassIcon
 } from "@heroicons/react/24/outline";
 
 
@@ -35,6 +37,13 @@ interface Data{
   userName:string,
   darkMode:boolean,
   profilePic:string
+}
+
+interface UserLeftBarInterface{
+  searchOpen:boolean,
+  setSearchOpen:(value:boolean)=>void,
+  chatOpen:boolean,
+  setChatOpen:(value:boolean)=>void
 }
  
 function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
@@ -111,10 +120,14 @@ function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
  
 // nav list component
 interface list{
-  isOpen:Boolean
+  isOpen:boolean,
+  searchOpen:boolean,
+  setSearchOpen:(value:boolean)=>void,
+  chatOpen:boolean,
+  setChatOpen:(value:boolean)=>void
 }
  
-function NavList(open: list) {
+function NavList({isOpen,searchOpen,setSearchOpen,chatOpen,setChatOpen}:list) {
     
   return (
     <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
@@ -123,8 +136,8 @@ function NavList(open: list) {
           <Link to='/'>
             <Typography as="span" variant="small" color="blue-gray" className="font-normal">
               <MenuItem className="flex items-center gap-2 lg:rounded-full">
-              <HomeIcon className="h-[18px] w-[18px]"/>
-              {open.isOpen ? "Home" : null}
+              <HomeIcon className="h-5 w-5"/>
+              {isOpen ? "Home" : null}
               </MenuItem>
             </Typography>
           </Link>
@@ -132,17 +145,32 @@ function NavList(open: list) {
           <Link to='#'>
             <Typography as="span" variant="small" color="blue-gray" className="font-normal">
               <MenuItem className="flex items-center gap-2 lg:rounded-full">
-              <BellIcon className="h-[18px] w-[18px]"/>
-              {open.isOpen ? "Notifications" : null}
+              <BellIcon className="h-5 w-5"/>
+              {isOpen ? "Notifications" : null}
               </MenuItem>
             </Typography>
           </Link>
+
+          {isOpen ? <><Typography as="span" variant="small" color="blue-gray" className="font-normal" onClick={()=>setChatOpen(!chatOpen)}>
+              <MenuItem className="flex items-center gap-2 lg:rounded-full">
+              <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                Chat
+              </MenuItem>
+            </Typography>
+
+            <Typography as="span" variant="small" color="blue-gray" className="font-normal" onClick={()=>setSearchOpen(!searchOpen)}>
+              <MenuItem className="flex items-center gap-2 lg:rounded-full">
+              <MagnifyingGlassIcon className="h-5 w-5" />
+                Search
+              </MenuItem>
+            </Typography>
+          </> : null}
     </ul>
   );
 }
 
  
-export default function UserNavBar() {
+export const UserNavBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpen,chatOpen,setChatOpen})=>{
   const [isNavOpen, setIsNavOpen] = React.useState(false);
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
   const {...reduxData} = useSelector((store:{user:{userName:string,darkMode:boolean,profilePic:string}})=>store.user)
@@ -157,9 +185,9 @@ export default function UserNavBar() {
     window.addEventListener(
       "resize",
       () => window.innerWidth >= 960 && setIsNavOpen(false)
-    );
-  }, []);
- 
+    )
+  },[])
+
   return (
     <div className='flex justify-center z-50'>
       <div className={`${reduxData.darkMode ? " bg-blue-gray-100" : "bg-gray-200"} z-10 fixed w-screen h-3`}></div>
@@ -175,7 +203,7 @@ export default function UserNavBar() {
 
           <div className='flex justify-end items-center'>
               <div className="top-2/4 left-2/4 hidden -translate-2/4 lg:flex">
-                <NavList isOpen={isNavOpen}/>
+              <NavList isOpen={isNavOpen} searchOpen={searchOpen} setSearchOpen={setSearchOpen} chatOpen={chatOpen} setChatOpen={setChatOpen}/>
               </div>
 
               <div className='flex items-center justify-around'>
@@ -196,7 +224,7 @@ export default function UserNavBar() {
           </div>
         </div>
         <Collapse open={isNavOpen} className="overflow-scroll">
-          <NavList  isOpen={isNavOpen}/>
+          <NavList isOpen={isNavOpen} searchOpen={searchOpen} setSearchOpen={setSearchOpen} chatOpen={chatOpen} setChatOpen={setChatOpen}/>
         </Collapse>
       </Navbar>
     </div>

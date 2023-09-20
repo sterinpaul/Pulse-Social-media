@@ -24,6 +24,10 @@ const getProfilePicFromLocal = ()=>{
         return profilePic
     }
 }
+const getUserIdFromLocal = ()=>{
+    const _id = localStorage.getItem('id')
+    if(_id) return _id
+}
 
 interface initial{
     
@@ -31,6 +35,8 @@ interface initial{
         userName?: string,
         darkMode?: boolean,
         profilePic?: string,
+        userId?:string,
+        notifications?:[]
         // firstName?: string,
         // lastName?: string,
         // email?: string,
@@ -56,6 +62,8 @@ const initialState:initial = {
         userName: getUserNameFromLocal(),
         darkMode: getDarkModeFromLocal(),
         profilePic: getProfilePicFromLocal(),
+        userId: getUserIdFromLocal(),
+        notifications:[]
         // firstName: "",
         // lastName: "",
         // email: "",
@@ -93,9 +101,11 @@ const userSlice = createSlice({
         },
         setUser:(state,action)=>{
             state.userName = action.payload.userName
+            state.userId = action.payload._id
             state.darkMode = action.payload.darkMode
             state.profilePic = action.payload.profilePic
             localStorage.setItem('userName',action.payload.userName)
+            localStorage.setItem('id',action.payload._id)
             localStorage.setItem('darkMode',action.payload.darkMode)
             localStorage.setItem('profilePic',action.payload.profilePic)
         },
@@ -106,15 +116,23 @@ const userSlice = createSlice({
         userSignOut:(state)=>{
             state.token = ''
             state.userName = ''
+            state.userId = ''
             state.darkMode = false
             state.profilePic = ''
             localStorage.removeItem('token')
             localStorage.removeItem('userName')
+            localStorage.removeItem('id')
             localStorage.removeItem('darkMode')
             localStorage.removeItem('profilePic')
+        },
+        clearOpenedNotification:(state,action)=>{
+            state.notifications?.splice(action.payload.index,1)
+        },
+        clearNotifications:(state)=>{
+            state.notifications = []
         }
     }
 })
 
-export const {changeMode,setToken,setUserName,setUser,changePhoto,userSignOut} = userSlice.actions
+export const {changeMode,setToken,setUserName,setUser,changePhoto,userSignOut,clearOpenedNotification,clearNotifications} = userSlice.actions
 export default userSlice.reducer

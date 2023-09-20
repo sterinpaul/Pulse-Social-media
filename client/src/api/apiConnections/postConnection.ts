@@ -9,7 +9,7 @@ export const getAllPosts = async()=>{
         return error.response.data
     }
 }
-export const publishNewPost = async(description:string,imgVideo:File | string = ''):Promise<object>=>{
+export const publishNewPost = async(description:string,imgVideo:File):Promise<object>=>{
     try{
         const formData = new FormData()
         formData.append('description',description)

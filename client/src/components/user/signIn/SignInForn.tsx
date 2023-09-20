@@ -39,7 +39,8 @@ import {
       password:string,
       profilePic?:string,
       userName?:string,
-      darkMode?:string
+      darkMode?:string,
+      _id?:string
     }
   }
 
@@ -86,7 +87,8 @@ const SignInForm = ()=>{
           const user = {
             userName:response?.user?.userName,
             darkMode:response?.user?.darkMode,
-            profilePic:response?.user?.profilePic
+            profilePic:response?.user?.profilePic,
+            _id:response?.user?._id
           }
           dispatch(setToken(response?.token))
           dispatch(setUser(user))
@@ -118,7 +120,8 @@ const SignInForm = ()=>{
           const user = {
             userName:response?.user?.userName,
             darkMode:response?.user?.darkMode,
-            profilePic:response?.user?.profilePic
+            profilePic:response?.user?.profilePic,
+            _id:response?.user?._id
           }
           dispatch(setToken(response?.token))
           dispatch(setUser(user))
@@ -143,7 +146,8 @@ const SignInForm = ()=>{
           const user = {
             userName:response?.user?.userName,
             darkMode:response?.user?.darkMode,
-            profilePic:response?.user?.profilePic
+            profilePic:response?.user?.profilePic,
+            _id:response?.user?._id
           }
           dispatch(setToken(response?.token))
           dispatch(setUser(user))

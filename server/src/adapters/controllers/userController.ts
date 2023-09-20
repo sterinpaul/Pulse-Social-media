@@ -77,8 +77,9 @@ const userControllers = (
 
     const getUserBySearch = asyncHandler(async(req:Request,res:Response)=>{
         const searchText = req.query.searchText
+        const userName = req.headers['x-user'] as string
         const userData = await searchUser(searchText as string,userDbRepository)
-        res.json(userData)
+        res.json(userData.filter((user)=>user.userName!==userName))
     })
 
     const updateUserName = asyncHandler(async(req:Request,res:Response)=>{

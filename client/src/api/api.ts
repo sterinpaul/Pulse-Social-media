@@ -9,15 +9,15 @@ baseURL.interceptors.request.use(
     config=>{
         const token = localStorage.getItem("token")
         const userName = localStorage.getItem("userName")
+        
         if(token){
-            if(token){
-                config.headers["Authorization"] = `Bearer ${token}`
-                config.headers["x-user"] = userName
-            }else{
-                delete config.headers["Authorization"]
-                delete config.headers["x-user"]
-            }
+            config.headers["Authorization"] = `Bearer ${token}`
+            config.headers["x-user"] = userName
+        }else{
+            delete config.headers["Authorization"]
+            delete config.headers["x-user"]
         }
+        
         return config
     },
     error=>{

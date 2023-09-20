@@ -26,8 +26,7 @@ interface userData{
 const EditProfileForm:React.FC = ()=>{
     const {
         darkMode,
-        profilePic,
-        
+        profilePic
     } = useSelector((store:{user:{reduxUser:userData}})=>store.user.reduxUser)
     const dispatch = useDispatch()
     // const [profilePhoto,setProfilePhoto] = useState<File | null >(null)

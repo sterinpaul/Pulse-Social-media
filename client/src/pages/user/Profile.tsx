@@ -1,6 +1,6 @@
 import ProfileBody from "../../components/user/profile/ProfileBody"
 import UserLeftSideBar from "../../components/user/home/UserLeftSideBar"
-import UserNavBar from "../../components/user/home/UserNavBar"
+import {UserNavBar} from "../../components/user/home/UserNavBar"
 import { useEffect, useState } from "react"
 import { useParams,useNavigate } from "react-router-dom"
 import { getProfile, getSavedPosts } from "../../api/apiConnections/userConnection"
@@ -42,6 +42,8 @@ const Profile = ()=>{
     const [saved,setSaved] = useState<postData[] | []>([])
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const [chatOpen,setChatOpen] = useState(false)
+    const [searchOpen,setSearchOpen] = useState(false)
 
     useEffect(()=>{
         getUserDetails()
@@ -63,8 +65,8 @@ const Profile = ()=>{
     
     return(
         <>
-            <UserNavBar/>
-            <UserLeftSideBar/>
+            <UserNavBar searchOpen={searchOpen} setSearchOpen={setSearchOpen} chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <UserLeftSideBar searchOpen={searchOpen} setSearchOpen={setSearchOpen} chatOpen={chatOpen} setChatOpen={setChatOpen} />
             <ProfileBody profileData={profileData} saved={saved} />
         </>
     )

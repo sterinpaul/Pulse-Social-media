@@ -1,5 +1,13 @@
 import { useSelector } from "react-redux";
 
+
+import {
+  Card,
+  Typography,
+  ListItem,
+  List
+} from "@material-tailwind/react";
+
 const friendsList = [
     {
         fName:"Sunny",
@@ -22,14 +30,6 @@ const friendsList = [
         lName:"Sunil"
     }
 ]
-
-import {
-    Card,
-    Typography,
-    ListItem,
-    List
-  } from "@material-tailwind/react";
-
 
    const UserRightSideBar = ()=>{
     const darkMode = useSelector((store:{user:{userName:string,userId:string,darkMode:boolean}})=>store.user.darkMode)

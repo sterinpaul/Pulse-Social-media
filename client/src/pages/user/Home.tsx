@@ -1,4 +1,4 @@
-import UserNavBar from "../../components/user/home/UserNavBar"
+import {UserNavBar} from "../../components/user/home/UserNavBar"
 import UserBody from "../../components/user/home/UserBody"
 import UserLeftSideBar from "../../components/user/home/UserLeftSideBar"
 import UserRightSideBar from "../../components/user/home/UserRightSideBar"
@@ -19,6 +19,9 @@ const Home = ()=>{
     const [allPosts,setAllPosts] = useState<postData[]>([])
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const [chatOpen,setChatOpen] = useState(false)
+    const [searchOpen,setSearchOpen] = useState(false)
+    
     useEffect(()=>{
         homePageData()
     },[])
@@ -38,8 +41,8 @@ const Home = ()=>{
 
     return(
         <>
-            <UserNavBar/>
-            <UserLeftSideBar/>
+            <UserNavBar searchOpen={searchOpen} setSearchOpen={setSearchOpen} chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <UserLeftSideBar searchOpen={searchOpen} setSearchOpen={setSearchOpen} chatOpen={chatOpen} setChatOpen={setChatOpen} />
             <UserRightSideBar/>
             <UserBody userData={userData || {} as userInterface} allPosts={allPosts} setAllPosts={setAllPosts} />
         </>

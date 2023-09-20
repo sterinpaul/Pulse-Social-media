@@ -157,8 +157,8 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
         }
     }
 
-    const genderHandle = (value:string)=>{
-        formik.setFieldValue('gender',value)
+    const genderHandle = (event:any)=>{
+        formik.setFieldValue('gender',event.target.value)
     }
 
     const formik = useFormik({
@@ -285,8 +285,8 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
 
                                         <div className="flex gap-2">
                                             <Radio id="male" label="Male" name="gender" defaultChecked ></Radio>
-                                            <Radio id="female" label="Female" name="gender" onClick={()=>genderHandle('Female')} ></Radio>
-                                            <Radio id="other" label="Prefer not to say" name="gender" onClick={()=>genderHandle('Prefer not to say')} ></Radio>
+                                            <Radio id="female" label="Female" name="gender" onClick={genderHandle} ></Radio>
+                                            <Radio id="other" label="Prefer not to say" name="gender" onClick={genderHandle} ></Radio>
                                         </div>
 
                                         <Input type="text" id="city" label="City" {...formik.getFieldProps('city')} />

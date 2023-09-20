@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import { postDbInterface } from "../repositories/postDbRepository";
 
 interface Post{
