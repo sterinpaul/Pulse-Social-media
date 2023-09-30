@@ -49,6 +49,10 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
         return await repository.postDelete(postId)
     }
 
+    const commentDelete = async(commentId:string)=>{
+        return await repository.deleteTheComment(commentId)
+    }
+
     const reportThePost = async(userName:string,postId:string,reason:string)=>{
         return await repository.postReport(userName,postId,reason)
     }
@@ -67,6 +71,7 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
         likeComment,
         likeReply,
         deleteSinglePost,
+        commentDelete,
         reportThePost,
         singlePostUpdate
     }

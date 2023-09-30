@@ -20,6 +20,7 @@ const commentSchema = new Schema(
             type:String,
             required:true
         },
+        reports:[],
         liked:[],
         reply:[]
     },

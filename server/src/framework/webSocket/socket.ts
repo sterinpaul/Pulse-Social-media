@@ -35,6 +35,12 @@ const socketConfig = (
             }
         })
 
+        // socket.on('join-room',(roomId,userId)=>{
+        //     console.log('roomId and userId',roomId,userId)
+        //     socket.join(roomId)
+        //     socket.to(roomId).broadcast.emit('user-connected',userId)
+        // })
+
         socket.on('call-user',(data)=>{
             io.to(data.userToCall).emit('call-user',{signal:data.signalData,from:data.from,name:data.name})
         })

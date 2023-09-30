@@ -11,6 +11,7 @@ import { getAllPosts,
     likeHandleComment,
     likeHandleReply,
     postDelete,
+    deleteTheComment,
     postReport,
     updatePost
 } from "../../application/useCases/post";
@@ -74,6 +75,14 @@ const postControllers = (
         res.json({status:true})
     })
 
+    const commentDelete = asyncHandler(async(req:Request,res:Response)=>{
+        const commentId = req.body.commentId
+        const response = await deleteTheComment(commentId,postDbRepository)
+        if(response){
+            res.json({status:true})
+        }
+    })
+
     const replyLikeUnlike = asyncHandler(async(req:Request,res:Response)=>{
         const userName = req.headers['x-user'] as string
         const commentId = req.body.commentId
@@ -112,6 +121,7 @@ const postControllers = (
         likeUnlike,
         replyLikeUnlike,
         deletePost,
+        commentDelete,
         reportPost,
         editThePost
     }

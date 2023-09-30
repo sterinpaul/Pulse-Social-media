@@ -10,6 +10,14 @@ export const createSingleMessage = async(chatId:string,senderId:string,message:s
     }
 }
 
+export const getAllChats = async(userId:string)=>{
+    try{
+        const chats = await baseURL.get(`/message/chat/${userId}`)
+        return chats.data
+    }catch(error){
+        console.log(error)
+    }
+}
 
 export const getUserMessages = async(chatId:string)=>{
     try{

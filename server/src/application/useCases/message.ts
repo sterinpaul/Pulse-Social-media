@@ -9,6 +9,16 @@ export const createMessage = async(
     return await messageRepository.createSingleMessage(chatId,senderId,message)
 }
 
+export const getAllChats = async(
+    userId:string,
+    chatRepository:ReturnType<messageDbInterface>
+)=>{
+    const data = await chatRepository.getChats(userId)
+    if(data){
+        return data
+    }
+}
+
 export const getMessages = async(
     chatId:string,
     messageRepository:ReturnType<messageDbInterface>

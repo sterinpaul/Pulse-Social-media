@@ -5,49 +5,50 @@ import User from "../models/userModel"
 
 
 interface postInterface{
-    postedUser: string,
-    description: string,
-    imgVideoURL: string
+  postedUser: string,
+  description: string,
+  imgVideoURL: string
 }
 
 export const postRepositoryMongoDB = ()=>{
 
     const getPost = async()=>{
         return await Post.aggregate([
-            {
-              $match: {
-                listed:true
-              }
-            },
-            {
-              $sort: {
-                createdAt: -1
-              }
-            },
-            {
-              $lookup: {
-                from: "users",
-                localField: "postedUser",
-                foreignField: "userName",
-                as: "userData"
-              }
-            },
-            {
-              $unwind: {
-                path: "$userData"
-              }
-            },
-            {
-              $project: {
-                postedUser: 1,
-                description: 1,
-                imgVideoURL: 1,
-                profilePic: "$userData.profilePic",
-                liked: 1,
-                createdAt: 1
-              }
+          {
+            $match: {
+              listed:true
             }
-          ])
+          },
+          {
+            $sort: {
+              createdAt: -1
+            }
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "postedUser",
+              foreignField: "userName",
+              as: "userData"
+            }
+          },
+          {
+            $unwind: {
+              path: "$userData"
+            }
+          },
+          {
+            $project: {
+              postedUser: 1,
+              description: 1,
+              imgVideoURL: 1,
+              profilePic: "$userData.profilePic",
+              liked: 1,
+              createdAt: 1
+            }
+          }
+        ]
+      )
     }
 
     const addPost = async(post:postInterface)=>{
@@ -229,6 +230,15 @@ export const postRepositoryMongoDB = ()=>{
       }
     }
 
+    const deleteTheComment = async(commentId:string)=>{
+      try{
+        const response = await Comment.updateOne({_id:commentId},{$set:{listed:false}})
+        if(response.modifiedCount===1) return true
+      }catch(error){
+        console.log(error)
+      }
+    }
+
     const replyLikeUnlike = async(userName:string,commentId:string)=>{
       try{
         const commentID = new mongoose.Types.ObjectId(commentId)
@@ -292,6 +302,7 @@ export const postRepositoryMongoDB = ()=>{
       getComments,
       addComment,
       commentLikeUnlike,
+      deleteTheComment,
       replyLikeUnlike,
       postDelete,
       postReport,

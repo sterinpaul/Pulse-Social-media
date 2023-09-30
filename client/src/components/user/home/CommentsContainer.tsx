@@ -11,7 +11,7 @@ import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO } from "
 import { useState,useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { postComment,updateSinglePost } from "../../../api/apiConnections/postConnection";
+import { commentDelete, postComment,updateSinglePost } from "../../../api/apiConnections/postConnection";
 import moment from "moment";
 import { commentData } from "../../../interfaces/commentInterface";
 import SingleComment from "./SingleComment";
@@ -58,6 +58,8 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
     const [description,setDescription] = useState(post.description)
     const [selectedReason,setSelectedReason] = useState('')
+    const [commentOptionToggle,setCommentOptionToggle] = useState('')
+    const [commentOptionDialog,setCommentOptionDialog] = useState(false)
     const navigate = useNavigate()
 
     const focusTextAreaReply = (commentedUser:string,commentID:string)=>{
@@ -76,7 +78,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
             commentResponse.response.profilePic = profilePic
             
             if(commentResponse?.comment){
-                setComments((prevComments:[])=>[commentResponse.response,...prevComments])
+                setComments((prevComments:[])=>[...prevComments,commentResponse.response])
             }else{
                 const replyData = comments.map(data=>{
                     if(data._id === commentId){
@@ -90,6 +92,10 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
             }
             setCommentText('')
         }
+        
+        if(textAreaRef?.current){
+            textAreaRef.current.focus()
+        }
     }
 
     const updatePost = async()=>{
@@ -102,6 +108,29 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
 
     const handleRadioChange = (event:any)=>{
         setSelectedReason(event.target.value)
+    }
+
+    const handleOpenCommentOptionDialog =(option:string,commentId:string)=>{
+        setCommentOptionDialog(true)
+        setCommentOptionToggle(option)
+        setCommentId(commentId)
+    }
+
+    const closeCommentOptionDialog = ()=>{
+        handleOpen()
+        setCommentOptionDialog(false)
+        setCommentId('')
+    }
+
+    const deleteComment = async()=>{
+        handleOpen()
+        const response = await commentDelete(commentId)
+        if(response.status){
+            const commentsAfterDelete = comments.filter(comment=>comment._id !==commentId)
+            setComments(commentsAfterDelete)
+            setCommentOptionDialog(false)
+            setCommentId('')
+        }
     }
 
 
@@ -140,7 +169,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
                                     <button onClick={()=>handleOpenOptionDialog('Delete')} className="text-red-900 text-left rounded hover:bg-gray-100 px-1 w-full">Delete</button>
                                 </> : reportStatus ? <button className="text-left px-1 w-full" disabled={true}>Reported</button> : <button onClick={()=>handleOpenOptionDialog('Report')} className="text-red-900 rounded hover:bg-gray-100 px-1 w-full">Report</button>}
                             </div>
-                        </div> : <></>}
+                        </div> : null}
                         
                         
                     </div>
@@ -161,7 +190,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
                             <p>{post.description}</p>
                             {comments?.map((comment)=>{
                             return (
-                                <SingleComment comment={comment} key={comment._id} focusTextAreaReply={focusTextAreaReply} handleOpen={handleOpen} />
+                                <SingleComment key={comment._id} comment={comment} postedUser={post.postedUser} focusTextAreaReply={focusTextAreaReply} handleOpen={handleOpen} handleOpenCommentOptionDialog={handleOpenCommentOptionDialog} />
                                 )
                             })}
                         </div>
@@ -228,6 +257,57 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
                         <Button onClick={()=>reportSinglePost(selectedReason)} disabled={reportStatus} size='sm' className="capitalize">Report</Button>
                     </div>
                 </div>
+            </>}
+        </Dialog>
+
+
+
+        <Dialog open={commentOptionDialog} size='xs' handler={setCommentOptionDialog} className="flex justify-center items-center flex-col p-4">
+            {commentOptionToggle === 'Delete' ? <>
+                <p>Do you really want to delete the comment ?</p>
+                <div className="flex gap-4 mt-8">
+                    <Button onClick={closeCommentOptionDialog} size='sm' className="capitalize">Cancel</Button>
+                    <Button onClick={deleteComment} size='sm' className="capitalize">Delete</Button>
+                </div>
+            </> : <>
+                <p>Please mention the reason to report the comment ?</p>
+                {/* <div className="flex flex-col gap-1">
+                    <Radio id="false" value='False information' onChange={handleRadioChange} name='reason' defaultChecked label={
+                        <Typography color="blue-gray" className="flex font-medium">
+                            False information
+                        </Typography>}>
+                    </Radio>
+                    <Radio id="spam" value="It's spam" onChange={handleRadioChange} name='reason' label={
+                        <Typography color="blue-gray" className="flex font-medium">
+                            It's spam
+                        </Typography>}>
+                    </Radio>
+                    <Radio id="scam" value='Scam or fraud' onChange={handleRadioChange} name='reason' label={
+                        <Typography color="blue-gray" className="flex font-medium">
+                            Scam or fraud
+                        </Typography>}>
+                    </Radio>
+                    <Radio id="sexual" value='Nudity or sexual activity' onChange={handleRadioChange} name='reason' label={
+                        <Typography color="blue-gray" className="flex font-medium">
+                            Nudity or sexual activity
+                        </Typography>}>
+                    </Radio>
+                    <Radio id="hateSpeech" value='Hate speech or Symbol' onChange={handleRadioChange} name='reason' label={
+                        <Typography color="blue-gray" className="flex font-medium">
+                            Hate speech or Symbol
+                        </Typography>}>
+                    </Radio>
+                    <Radio id="bullying" value='Bullying or Harassment' onChange={handleRadioChange} name='reason' label={
+                        <Typography color="blue-gray" className="flex font-medium">
+                            Bullying or Harassment
+                        </Typography>}>
+                    </Radio>
+                        
+                    <div className="flex gap-4 mt-4 m-auto">
+                        <Button onClick={()=>setOptionOpenDialog(false)} size='sm' className="capitalize">Cancel</Button>
+                        <Button onClick={()=>reportSinglePost(selectedReason)} disabled={reportStatus} size='sm' className="capitalize">Report</Button>
+                    </div>
+                </div> */}
             </>}
         </Dialog>
     </>

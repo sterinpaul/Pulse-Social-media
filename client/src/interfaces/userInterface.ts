@@ -29,3 +29,17 @@ export interface userProfile{
     updatedAt?: string,
     posts?: object[]
 }
+
+export interface chattedUsers{
+    _id:string,
+    userName:string,
+    chatId?:string,
+    firstName:string,
+    lastName:string,
+    profilePic:string
+}
+
+export interface onlineUsersInterface{
+    userId:string,
+    socketId:string
+}

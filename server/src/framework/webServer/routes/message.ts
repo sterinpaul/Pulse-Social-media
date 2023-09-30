@@ -10,7 +10,7 @@ const messageRouter = ()=>{
 
     router.post('/',controllers.createSingleMessage)
     router.get('/:chatId',controllers.getUserMessages)
-    
+    router.get('/chat/:userId',controllers.getChats)
     return router
 }
 

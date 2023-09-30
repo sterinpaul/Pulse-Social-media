@@ -68,6 +68,15 @@ export const likeComment = async(commentId:string)=>{
     }
 }
 
+export const commentDelete = async(commentId:string)=>{
+    try{
+        const response = await baseURL.patch('/post/comment/delete',{commentId})
+        return response?.data
+    }catch(error){
+        throw error
+    }
+}
+
 export const likeReply = async(commentId:string)=>{
     try{
         const response = await baseURL.put('/post/reply/likeunlike',{commentId})

@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import moment from 'moment'
-import {HandThumbUpIcon,ChatBubbleLeftRightIcon,ShareIcon,BookmarkIcon,EllipsisHorizontalIcon} from "@heroicons/react/24/outline";
+import {HandThumbUpIcon,ChatBubbleLeftRightIcon,BookmarkIcon,EllipsisHorizontalIcon} from "@heroicons/react/24/outline";
 import {HandThumbUpIcon as HandThumbUpSolidIcon,BookmarkIcon as BookmarkIconSolid} from "@heroicons/react/20/solid";
 import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO } from "../../../api/baseURL";
 import { likePost,unlikePost } from "../../../api/apiConnections/postConnection";
@@ -71,8 +71,8 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
         setOpen(true)
     }
 
-    const handleOpenOptionDialog = (value:string)=>{
-        setStatusToggle(value)
+    const handleOpenOptionDialog = (option:string)=>{
+        setStatusToggle(option)
         setOptionOpenDialog(!optionOpenDialog)
     }
 
@@ -91,6 +91,14 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
             setOptionOpenDialog(false)
         }
     }
+
+    // const deleteComment = async(commentId:string)=>{
+    //     const response = await commentDelete(commentId)
+    //     if(response.status){
+    //         const commentsAfterDelete = comments.filter(comment=>comment._id !==commentId)
+    //         setComments(commentsAfterDelete)
+    //     }
+    // }
 
 
     return (
@@ -126,27 +134,28 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                 <div className="flex gap-5 w-fill h-16">
                     <button className="relative" onClick={()=>likeHandler()}>{like ? <HandThumbUpSolidIcon className="h-8 w-8"/> : <HandThumbUpIcon className="h-8 w-8"/>}{post.liked.length ? <span className="absolute top-1 left-6 text-xs text-white bg-blue-gray-800 w-4 rounded-full">{post.liked.length}</span> : null}</button>
                     <button onClick={getComments}><ChatBubbleLeftRightIcon className="h-8 w-8"/></button>
-                    <button><ShareIcon className="h-8 w-8"/></button>
+                    {/* <button><ShareIcon className="h-8 w-8"/></button> */}
                     <button onClick={savePostHandler}>{savedPost ? <BookmarkIconSolid className="h-8 w-8"/> : <BookmarkIcon className="h-8 w-8"/>}</button>
                 </div>
                 
                 <p>{post.description}</p>
                 
                 <CommentsContainer 
-                open={open}
-                handleOpen={handleOpen}
-                post={post}
-                comments={comments}
-                setComments={setComments}
-                editStatus={editStatus}
-                editPostHandle={editPostHandle}
-                handleOpenOptionDialog={handleOpenOptionDialog}
-                optionOpenDialog={optionOpenDialog}
-                reportStatus={reportStatus}
-                reportSinglePost={reportSinglePost}
-                deleteSinglePost={deleteSinglePost}
-                statusToggle={statusToggle}
-                setOptionOpenDialog={setOptionOpenDialog} />
+                    open={open}
+                    handleOpen={handleOpen}
+                    post={post}
+                    comments={comments}
+                    setComments={setComments}
+                    editStatus={editStatus}
+                    editPostHandle={editPostHandle}
+                    handleOpenOptionDialog={handleOpenOptionDialog}
+                    optionOpenDialog={optionOpenDialog}
+                    reportStatus={reportStatus}
+                    reportSinglePost={reportSinglePost}
+                    deleteSinglePost={deleteSinglePost}
+                    statusToggle={statusToggle}
+                    setOptionOpenDialog={setOptionOpenDialog} 
+                />
             </div>
         </div>
     )

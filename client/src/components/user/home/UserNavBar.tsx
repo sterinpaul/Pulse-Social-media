@@ -195,7 +195,7 @@ export const UserNavBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchO
         <div className="relative mx-auto flex justify-between items-center text-blue-gray-900">
 
           {/* <Typography as="a" href="/" className="mr-4 ml-2 cursor-pointer py-1.5"> */}
-            <Link to='/'><h1 className='font-kaushan text-4xl'>Pulse</h1></Link>
+            <Link to='/'><h1 className='font-kaushan text-4xl'>Pulz</h1></Link>
             {/* <div className='w-20'>
               <img src={img} alt="Logo"/>
             </div> */}

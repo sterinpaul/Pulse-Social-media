@@ -26,14 +26,16 @@ import {
     CardBody,
     CardFooter,
     Radio
-  } from "@material-tailwind/react";
+} from "@material-tailwind/react";
+
 import {
     PhotoIcon,
     FilmIcon,
     BookmarkIcon,
     PencilSquareIcon,
     ArrowPathIcon
-  } from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/solid";
+
 import { useNavigate } from "react-router-dom";
 
 //   interface profile{
@@ -190,8 +192,8 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
         if(response?.status){
             profileData.firstName = values.firstName
             profileData.lastName = values.lastName
-            profileData.city = values.bio
-            profileData.bio = values.city
+            profileData.city = values.city
+            profileData.bio = values.bio
             setOpenProfileEdit((cur) => !cur)
             toast.success("Profile updated successfully")
         }else{
@@ -275,6 +277,7 @@ const ProfileBody:React.FC<ProfileBodyProps> = ({profileData,saved})=>{
                                             {userNameError==='success' ? <p className="text-sm text-center text-green-800 h-6">✓ User Name Changed Successfully</p> : userNameError==='failed' ? <p className="text-sm p-0 text-center text-red-800 h-6">User Name already exists</p> : <p className="h-6"></p>}
                                         </div>
                                         <div className="flex flex-wrap gap-1">
+                                            {/* <Input type="text" id="firstName" label="First Name" value={profileData?.firstName} onChange={formik.handleChange} onBlur={formik.handleBlur} /> */}
                                             <Input type="text" id="firstName" label="First Name" {...formik.getFieldProps('firstName')} />
                                             <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.firstName && formik.errors.firstName ?
                         formik.errors.firstName : null}</p>

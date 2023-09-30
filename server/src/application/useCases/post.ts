@@ -88,6 +88,13 @@ export const likeHandleComment = async(
     return await postRepository.likeComment(userName,new mongoose.Types.ObjectId(commentId))
 }
 
+export const deleteTheComment = async(
+    commentId:string,
+    postRepository:ReturnType<postDbInterface>
+)=>{
+    return await postRepository.commentDelete(commentId)
+}
+
 export const likeHandleReply = async(
     userName:string,
     commentId:string,

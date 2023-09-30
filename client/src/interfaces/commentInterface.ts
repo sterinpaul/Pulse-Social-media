@@ -5,6 +5,7 @@ export interface commentData{
     postId:string,
     comment:string,
     liked:string[],
+    reports:string[],
     reply:object[],
     createdAt:string,
     updatedAt:string
