@@ -8,10 +8,11 @@ const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const helmet_1 = __importDefault(require("helmet"));
+const config_1 = require("../../config");
 const expressConfig = (app) => {
     // Enabling CORS
     const enableCors = {
-        origin: '*',
+        origin: [config_1.configKeys.CLIENT_URL],
         exposeHeaders: ['Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy']
     };
     // Express middlewares configuration

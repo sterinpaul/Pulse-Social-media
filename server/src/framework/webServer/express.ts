@@ -3,12 +3,13 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet'
+import { configKeys } from '../../config';
 
 const expressConfig = (app:Application)=>{
 
     // Enabling CORS
     const enableCors = {
-        origin: '*',
+        origin: [configKeys.CLIENT_URL],
         exposeHeaders: ['Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy']
     }
 
