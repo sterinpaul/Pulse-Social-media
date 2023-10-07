@@ -31,7 +31,7 @@ import {
             }
             </Card>
         </div>
-    );
+    )
   }
 
 export default SignInAndSignUp;

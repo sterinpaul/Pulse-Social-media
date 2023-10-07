@@ -27,7 +27,7 @@ const UserRightSideBar = ()=>{
 
         {chatList?.map((user:userProfile)=>{
             return(
-                <ListItem key={user.firstName} className={`flex items-center justify-center p-2 w-52"`}>
+                <ListItem key={user.chatId} className={`flex items-center justify-center p-2 w-52"`}>
                     <img
                       className="h-10 w-10 rounded-full"
                       src={user.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO}

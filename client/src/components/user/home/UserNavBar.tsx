@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import {toast} from 'react-toastify';
 import { CLOUDINARY_PROFILE_PHOTO_URL,PROFILE_PHOTO } from "../../../api/baseURL";
 
+
+
 import {
   Navbar,
   Collapse,
@@ -17,6 +19,8 @@ import {
   MenuItem,
   Avatar,
   IconButton,
+  // ListItemSuffix,
+  Chip,
 } from "@material-tailwind/react";
 
 import {
@@ -51,6 +55,7 @@ function ProfileMenu({userName,profilePic,darkMode}:Data): JSX.Element {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
   
   const signOut = ()=>{
     dispatch(userSignOut())
@@ -128,7 +133,19 @@ interface list{
 }
  
 function NavList({isOpen,searchOpen,setSearchOpen,chatOpen,setChatOpen}:list) {
-    
+  const receivedMessages = useSelector((store:{chat:{receivedMessages:[]}})=>store.chat.receivedMessages)
+  const uniqueArray = receivedMessages.reduce((accumulator:any, currentObject:any) => {
+
+    // Check if the current object's "id" property already exists in the accumulator
+    const exists = accumulator.some((obj:any) => obj.id === currentObject.id)
+  
+    // If it doesn't exist, add it to the accumulator
+    if (!exists) {
+      accumulator.push(currentObject)
+    }
+    return accumulator
+  }, [])
+
   return (
     <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
       {/* <NavListMenu /> */}
@@ -155,6 +172,12 @@ function NavList({isOpen,searchOpen,setSearchOpen,chatOpen,setChatOpen}:list) {
               <MenuItem className="flex items-center gap-2 lg:rounded-full">
               <ChatBubbleLeftRightIcon className="h-5 w-5" />
                 Chat
+              {/* <ListItemSuffix> */}
+                {uniqueArray?.length ? (
+                  <Chip value={uniqueArray?.length} size="sm" variant="ghost" color="blue-gray" className="rounded-full h-6 ml-4" />
+                  ) : <div className='h-6'></div>
+                }
+              {/* </ListItemSuffix> */}
               </MenuItem>
             </Typography>
 

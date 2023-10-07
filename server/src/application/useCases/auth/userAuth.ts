@@ -59,7 +59,7 @@ export const userSignIn = async(
     userRepository:ReturnType<UserDbInterface>,
     authService:ReturnType<AuthServiceInterface>
 )=>{
-    const data = await userRepository.getUser(userName)
+    const data:any = await userRepository.getUser(userName)
     if(!data){
         const userData = {
             status:"failed",
@@ -69,7 +69,7 @@ export const userSignIn = async(
         }
         return userData
     }
-    if(data.isBlocked){
+    if(data?.isBlocked){
         const userData = {
             status:"failed",
             message:"User is blocked",

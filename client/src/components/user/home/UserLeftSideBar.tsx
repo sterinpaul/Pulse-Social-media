@@ -22,13 +22,12 @@ import {
 } from "@heroicons/react/24/outline";
 
 
-
 import { getUserbySearch } from '../../../api/apiConnections/userConnection';
 import FollowList from './FollowList';
 import { useNavigate } from 'react-router-dom';
 import { clearNotifications } from '../../../redux/userRedux/userSlice';
 import ChatBoxContainer from './chat/ChatBoxContainer';
-
+import { clearReceivedMessages } from '../../../redux/userRedux/chatSlice';
 
 interface userProfile{
   _id:string,
@@ -50,20 +49,41 @@ interface UserLeftBarInterface{
 
 const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpen,chatOpen,setChatOpen})=>{
   const {userName,darkMode} = useSelector((store:{user:{userName:string,userId:string,darkMode:boolean,profilePic:string}})=>store.user)
+  const receivedMessages = useSelector((store:{chat:{receivedMessages:[]}})=>store.chat.receivedMessages)
+  // const uniqueMessages = receivedMessages.map((data:any)=>data)
+
+  const uniqueArray = receivedMessages.reduce((accumulator:any, currentObject:any) => {
+    // Check if the current object's "id" property already exists in the accumulator
+    const exists = accumulator.some((obj:any) => obj.id === currentObject.id)
+  
+    // If it doesn't exist, add it to the accumulator
+    if (!exists) {
+      accumulator.push(currentObject)
+    }
+    return accumulator
+  }, [])
+  
+  
+
   const [searchText,setSearchText] = useState('')
   const [searchedUser,setSearchedUser] = useState<userProfile[]>([])
+  const [videoDisplay, setVideoDisplay] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   // const socket = useRef<Socket | null>(null)
 
   
   const chatContainerHandler = ()=>{
+    if(videoDisplay){
+      setVideoDisplay(false)
+    }
     setChatOpen(!chatOpen)
     setSearchText('')
     setSearchedUser([])
     if(chatOpen){
       dispatch(clearNotifications())
     }
+    dispatch(clearReceivedMessages())
   }
 
   const handleOpen = () => {
@@ -104,11 +124,14 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
             <ChatBubbleLeftRightIcon className="h-5 w-5" />
           </ListItemPrefix>
           Chat
-          <ListItemSuffix>
-            <Chip value={2} size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
-          </ListItemSuffix>
+            <ListItemSuffix>
+            {uniqueArray?.length ? (
+              <Chip value={uniqueArray?.length} size="sm" variant="ghost" color="blue-gray" className="rounded-full h-6" />
+              ) : <div className='h-6'></div>
+            }
+            </ListItemSuffix>
         </ListItem>
-        <ChatBoxContainer chatOpen={chatOpen} chatContainerHandler={chatContainerHandler} />
+        <ChatBoxContainer chatOpen={chatOpen} chatContainerHandler={chatContainerHandler} videoDisplay={videoDisplay} setVideoDisplay={setVideoDisplay} />
         
         <ListItem onClick={handleOpen}>
           <ListItemPrefix>

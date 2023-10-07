@@ -60,7 +60,7 @@ const userSignIn = (userName, password, userRepository, authService) => __awaite
         };
         return userData;
     }
-    if (data.isBlocked) {
+    if (data === null || data === void 0 ? void 0 : data.isBlocked) {
         const userData = {
             status: "failed",
             message: "User is blocked",

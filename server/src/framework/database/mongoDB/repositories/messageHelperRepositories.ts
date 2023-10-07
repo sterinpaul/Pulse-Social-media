@@ -61,6 +61,15 @@ export const messageRepositoryMongoDB = ()=>{
                   }
                 },
                 {
+                  $match: {
+                    "result.members": {
+                      $in: [
+                        userID
+                      ]
+                    }
+                  }
+                },
+                {
                   $unwind: {
                     path: "$result.members"
                   }

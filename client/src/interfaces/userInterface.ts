@@ -28,6 +28,7 @@ export interface userProfile{
     createdAt?: string,
     updatedAt?: string,
     posts?: object[]
+    chatId?:string
 }
 
 export interface chattedUsers{

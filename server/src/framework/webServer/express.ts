@@ -9,7 +9,8 @@ const expressConfig = (app:Application)=>{
 
     // Enabling CORS
     const enableCors = {
-        origin: [configKeys.CLIENT_URL],
+        // origin: [configKeys.CLIENT_URL],
+        origin: '*',
         exposeHeaders: ['Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy']
     }
 

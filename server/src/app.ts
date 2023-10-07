@@ -6,15 +6,16 @@ import serverConfig from './framework/webServer/server';
 import expressConfig from './framework/webServer/express';
 import {v2 as cloudinary} from 'cloudinary';
 import {Server} from 'socket.io';
+import {ExpressPeerServer} from 'peer'
 import socketConfig from './framework/webSocket/socket'
 import { configKeys } from './config';
 // import errorHandler from './framework/webserver/middlewares/errorHandler';
 // import AppError from './utilities/appError';
 
 
-
-const app:Application = express();
-const server = http.createServer(app);
+const app:Application = express()
+const server = http.createServer(app)
+// const is = require('socket.io')(server)
 
 // Socket CORS config
 const io = new Server(server,{
@@ -26,6 +27,7 @@ const io = new Server(server,{
 
 // Socket.io connection
 socketConfig(io)
+
 
 // MongoDB connection
 connectDB()

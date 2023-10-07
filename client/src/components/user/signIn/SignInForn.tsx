@@ -75,7 +75,7 @@ const SignInForm = ()=>{
         .required('Required'),
       password: Yup.string()
         .max(20, 'Must be less than 20 characters')
-        .min(1,'Must be 8 characters or more')
+        .min(8,'Must be 8 characters or more')
         .required('Required')
     }),
     onSubmit: async(values) => {
@@ -174,7 +174,7 @@ const SignInForm = ()=>{
               >
 
                 <Typography variant="h1" color="white" className="font-kaushan">
-                  Pulse
+                  Pulz
                 </Typography>
 
               </CardHeader>

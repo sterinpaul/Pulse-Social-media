@@ -137,7 +137,7 @@
 //         .email('Invalid email address')
 //         .required('Required'),
 //       password: Yup.string()
-//         .min(1,'Must be 8 characters or more')
+//         .min(8,'Must be 8 characters or more')
 //         .required('Required'),
 //       rePassword: Yup.string()
 //         .oneOf([Yup.ref('password'), ''], 'Password not match')
