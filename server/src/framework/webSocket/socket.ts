@@ -13,6 +13,7 @@ const socketConfig = (
 )=>{
 
     io.on('connection',(socket)=>{
+
         socket.emit('me',socket.id)
         // Socket.IO connection event: This function is executed when a new client connects to the server.
         socket.on('add-new-user',(newUserId:string)=>{
@@ -34,22 +35,18 @@ const socketConfig = (
             }
         })
 
-        socket.on('join-room',(roomId,userId)=>{
-            console.log('roomId and userId',roomId,userId)
-            socket.join(roomId)
-            socket.to(userId).emit('user-connected',roomId)
+        // socket.on('join-room',(roomId,userId)=>{
+        //     console.log('roomId and userId',roomId,userId)
+        //     socket.join(roomId)
+        //     socket.to(roomId).broadcast.emit('user-connected',userId)
+        // })
 
-            socket.on('disconnect',()=>{
-                socket.to(roomId).emit('user-disconnected',userId)
-            })
+        socket.on('call-user',(data)=>{
+            io.to(data.userToCall).emit('call-user',{signal:data.signalData,from:data.from,name:data.name})
         })
 
-        socket.on('call-user',({targetUserId, callerUserId,offer})=>{
-            io.to(targetUserId).emit('incoming-call',{callerUserId,offer})
-        })
-
-        socket.on('answer-call',({callerUserId,answer})=>{
-            io.to(callerUserId).emit('call-accepted',{callerUserId,answer})
+        socket.on('answer-call',(data)=>{
+            io.to(data.to).emit('call-accepted',data.signal)
         })
 
         socket.on('disconnect',()=>{

@@ -14,8 +14,8 @@ import { setOnlineUsers, setChatList, setReceivedMessages } from "../../../../re
 import { io, Socket } from 'socket.io-client'
 import InputEmoji from "react-input-emoji"
 import moment from 'moment'
-import VideoCall from "./VideoCall"
 // import { useNavigate } from "react-router-dom"
+import VideoCall from "./VideoCall"
 
 
 import {
@@ -28,12 +28,10 @@ import {
 
 interface chatBoxInterface {
   chatOpen: boolean,
-  chatContainerHandler: () => void,
-  videoDisplay:boolean,
-  setVideoDisplay:(value:boolean)=>void
+  chatContainerHandler: () => void
 }
 
-const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerHandler, videoDisplay, setVideoDisplay }) => {
+const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerHandler }) => {
 
   const { userId, profilePic } = useSelector((store: { user: { userName: string, userId: string, darkMode: boolean, profilePic: string } }) => store.user)
   const { onlineUsers, receivedMessages } = useSelector((store: { chat: { onlineUsers: [], receivedMessages: [] } }) => store.chat)
@@ -50,7 +48,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
   const [commentText, setCommentText] = useState('')
   // const navigate = useNavigate()
   const socket = useRef<Socket | null>(null)
-  // const [videoDisplay, setVideoDisplay] = useState(false)
+  const [videoDisplay, setVideoDisplay] = useState(false)
 
 
   const getChatList = async () => {
@@ -75,7 +73,8 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
       socket.current.emit('add-new-user', userId)
       socket.current.on('get-users', (users) => {
         dispatch(setOnlineUsers(users))
-      })
+      }
+      )
     }
 
     socket.current.on('connect', () => {
@@ -87,11 +86,11 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
       console.log('Connection error:', error)
     })
 
-    // return () => {
-    //   if (socket?.current) {
-    //     socket.current.disconnect()
-    //   }
-    // }
+    return () => {
+      if (socket?.current) {
+        socket.current.disconnect()
+      }
+    }
   }, [userId])
 
 
@@ -256,7 +255,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
     <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[96vh] flex'>
       {videoDisplay ? (
         <>
-          <VideoCall chatUserName={chatUserName} chatUserId={chatUserId} />
+        <VideoCall chatUserName={chatUserName} />
         </>
       ) : (
         <>
@@ -280,7 +279,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
               </List>
           </div>
       
-        <div className='w-full bg-blue-gray-100 h-[96vh] flex flex-col justify-between'>
+      <div className='w-full bg-blue-gray-100 h-[96vh] flex flex-col justify-between'>
           {chatUserName.length ? <div className='pl-4 bg-blue-gray-200 flex items-center justify-between'>
             <div className='flex items-center gap-4'>
               <div className='p-2'>

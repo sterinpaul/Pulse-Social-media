@@ -17,7 +17,6 @@ const config_1 = require("./config");
 // import AppError from './utilities/appError';
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
-// const is = require('socket.io')(server)
 // Socket CORS config
 const io = new socket_io_1.Server(server, {
     cors: {

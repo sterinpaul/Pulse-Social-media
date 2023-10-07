@@ -1,63 +1,71 @@
 import { Button } from "@material-tailwind/react"
 import Peer from "peerjs"; // You need to import 'MediaConnection' from PeerJS.
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 // import { useParams } from "react-router-dom"
-import { io, Socket } from 'socket.io-client'
-import { socketURL } from "../../../../api/baseURL";
+// import {io} from 'socket.io-client'
 
-const VideoCall = ({chatUserName,chatUserId}:{chatUserName:string,chatUserId:string})=>{
+const VideoCall = ({chatUserName}:{chatUserName:string})=>{
     // const {userName} = useParams()
     // const ROOM_ID = chatUserName
     
     const peers:any = {}
     
-    console.log('userId in video call',chatUserName,chatUserId)
-    const [myPeer,setMyPeer] = useState<Peer | null>(null)
+    console.log('userId in video call',chatUserName)
+    // const [myPeer,setMyPeer] = useState<Peer | null>(null)
     // const [conn, setConn] = useState<Peer.DataConnection | null>(null);
-    const [stream, setStream] = useState<MediaStream | null>(null);
+    // const [stream, setStream] = useState<MediaStream | null>(null);
     const myVideo = useRef<HTMLVideoElement>(null)
     const userVideo = useRef<HTMLVideoElement>(null)
-    let socket = useRef<Socket | null>(null)
-    // const streamRef = useRef<MediaStream | null>(null); // Store the stream reference
+    // const socketRef = useRef<Socket | null>(null)
+    const streamRef = useRef<MediaStream | null>(null); // Store the stream reference
     // const peerRef = useRef<Peer | null>(null)
+
+    const peer = new Peer(chatUserName)
    
     
     const stopMediaStream = () => {
-        if (stream) {
-            stream.getTracks().forEach((track) => {
-                track.stop()
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => {
+            track.stop()
+          })
+        }
+    }
+    
+    const addVideoStream = (video:React.RefObject<HTMLVideoElement>,stream:MediaStream)=>{
+        if(video.current){
+            video.current.srcObject = stream
+            video.current.addEventListener('loadedmetadata', () => {
+                video.current?.play()
             })
         }
     }
     
-    socket.current = io(socketURL, { transports: ['websocket'] })
 
     useEffect(()=>{
-        const peer = new Peer(chatUserId)
-        setMyPeer(peer)
+        peer.on('open',()=>{
+            // setMyPeer(peer)
+        })
 
         navigator.mediaDevices.getUserMedia({
             video:true,
             audio:true
         }).then((stream)=>{
-            setStream(stream)
+            // setStream(stream)
             if(myVideo.current){
-                // streamRef.current = stream
+                streamRef.current = stream
                 myVideo.current.srcObject = stream
             }
-            myPeer?.on('call',(call)=>{
+            peer.on('call',(call: any)=>{
                 call.answer(stream)
 
                 call.on('stream',(userVideoStream: MediaStream)=>{
-                    if(userVideo.current) {
-                        userVideo.current.srcObject = userVideoStream
-                    }
+                    addVideoStream(userVideo, userVideoStream)    
                 })
                 
                 call.on('close',()=>{
                     userVideo.current?.remove()
                 })
-
+                
                 peers[call.peer] = call
             })
         })
@@ -71,28 +79,25 @@ const VideoCall = ({chatUserName,chatUserId}:{chatUserName:string,chatUserId:str
         if(chatUserName){
             // Get the user's video stream
             navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true,
+              video: true,
+              audio: true,
             }).then((stream) => {
-
-                socket.current?.emit('join-room',({stream,chatUserId}))
-
               // Add your video stream to your own video element
                 if(myVideo.current) {
                     myVideo.current.srcObject = stream
                 }
               
               // Create a call to the remote user
-                const call = myPeer?.call(chatUserName, stream)
+                const call = peer.call(chatUserName, stream)
               
               // Listen for the remote user's stream and add it to their video element
-            //   if (call) {
-                call?.on('stream', (userVideoStream) => {
+              if (call) {
+                call.on('stream', (userVideoStream) => {
                     if(userVideo.current) {
                         userVideo.current.srcObject = userVideoStream
                     }
                 })
-            //   }
+              }
             }).catch((error) => {
               // Handle getUserMedia error
               console.error('Error accessing camera and microphone:', error)
@@ -114,14 +119,12 @@ const VideoCall = ({chatUserName,chatUserId}:{chatUserName:string,chatUserId:str
                 }
             
                 // Answer the incoming call
-                myPeer?.on('call', (call) => {
+                peer.on('call', (call) => {
                   call.answer(stream)
             
                   // Listen for the remote user's stream and add it to their video element
                   call.on('stream', (userVideoStream) => {
-                    if(userVideo.current) {
-                        userVideo.current.srcObject = userVideoStream
-                    }
+                    addVideoStream(userVideo, userVideoStream)
                   })
                 })
             }).catch((error) => {

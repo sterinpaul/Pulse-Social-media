@@ -6,7 +6,6 @@ import serverConfig from './framework/webServer/server';
 import expressConfig from './framework/webServer/express';
 import {v2 as cloudinary} from 'cloudinary';
 import {Server} from 'socket.io';
-import {ExpressPeerServer} from 'peer'
 import socketConfig from './framework/webSocket/socket'
 import { configKeys } from './config';
 // import errorHandler from './framework/webserver/middlewares/errorHandler';
@@ -15,7 +14,6 @@ import { configKeys } from './config';
 
 const app:Application = express()
 const server = http.createServer(app)
-// const is = require('socket.io')(server)
 
 // Socket CORS config
 const io = new Server(server,{
