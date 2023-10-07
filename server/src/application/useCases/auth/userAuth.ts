@@ -133,12 +133,13 @@ export const userGoogleRegistration = async(
         userName:string,
         email:string,
         password:string,
-        mobile:string,
+        mobile:string
     },
     userRepository:ReturnType<UserDbInterface>,
     authService:ReturnType<AuthServiceInterface>
     )=>{
         const isUserNameExist = await userRepository.getUserByUsername(user.userName)
+    
     
         if(isUserNameExist){
             const userData = {

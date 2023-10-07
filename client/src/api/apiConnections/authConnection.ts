@@ -33,8 +33,7 @@ interface GoogleSignInValues{
     firstName? : string,
     lastName? : string,
     userName? : string,
-    email? : string,
-    mobile? : string
+    email? : string
 }
 
 export const signUp = async (values:SignupFormValues):Promise<object> =>{

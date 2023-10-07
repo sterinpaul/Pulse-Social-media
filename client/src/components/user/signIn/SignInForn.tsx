@@ -56,7 +56,7 @@ const SignInForm = ()=>{
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [userName,setUserName] = useState('')
-  const [userDetails,setUserDetails] = useState<userDataForGoogle>({firstName:'',lastName:'',userName:'',email:'',mobile:''})
+  const [userDetails,setUserDetails] = useState<userDataForGoogle>({firstName:'',lastName:'',userName:'',email:''})
   const [userNameStatus,setUserNameStatus] = useState(false)
   const handleOpen = () =>{
     setUserNameError(false)
@@ -109,8 +109,7 @@ const SignInForm = ()=>{
         firstName : data._tokenResponse.firstName,
         lastName : data._tokenResponse.lastName,
         userName :'',
-        email : data._tokenResponse.email,
-        mobile : data.user.phoneNumber
+        email : data._tokenResponse.email
         // profilePic : data._tokenResponse.photoUrl
       }
       setUserDetails(userData)

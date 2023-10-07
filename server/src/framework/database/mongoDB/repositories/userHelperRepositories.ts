@@ -105,7 +105,8 @@ export const userRepositoryMongoDB = ()=>{
           }
         ]
       )
-      if(userProfile.length){
+      
+      if(userProfile?.length){
         return userProfile[0]
       }else{
         const user = await User.findOne({userName})

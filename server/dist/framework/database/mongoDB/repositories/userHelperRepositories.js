@@ -107,7 +107,7 @@ const userRepositoryMongoDB = () => {
                 }
             }
         ]);
-        if (userProfile.length) {
+        if (userProfile === null || userProfile === void 0 ? void 0 : userProfile.length) {
             return userProfile[0];
         }
         else {

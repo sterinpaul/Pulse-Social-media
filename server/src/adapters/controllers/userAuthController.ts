@@ -45,7 +45,7 @@ const authControllers = (
 
     const googleRegister = asyncHandler(async(req:Request,res:Response)=>{
         const {firstName,lastName,userName,email,password,mobile} = req.body
-
+        
         const user = {
             firstName,
             lastName,
