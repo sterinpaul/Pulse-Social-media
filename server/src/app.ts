@@ -8,6 +8,7 @@ import {v2 as cloudinary} from 'cloudinary';
 import {Server} from 'socket.io';
 import socketConfig from './framework/webSocket/socket'
 import { configKeys } from './config';
+import {PeerServer} from 'peer'
 // import errorHandler from './framework/webserver/middlewares/errorHandler';
 // import AppError from './utilities/appError';
 
@@ -18,13 +19,17 @@ const server = http.createServer(app)
 // Socket CORS config
 const io = new Server(server,{
     cors:{
-        origin: configKeys.SOCKET_SERVER,
+        origin: [configKeys.CLIENT_URL],
         methods:['GET','POST']
     }
 })
 
 // Socket.io connection
 socketConfig(io)
+
+// Peer connection
+// const peerServer = PeerServer({port:3001,path:'myapp'})
+// app.use("/peerjs", peerServer)
 
 
 // MongoDB connection

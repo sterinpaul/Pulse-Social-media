@@ -8,7 +8,7 @@ export default defineConfig({
   define:{
     'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
     'process.env.BASE_URL': JSON.stringify(process.env.BASE_URL),
-    'process.env.SERVER_URL': JSON.stringify(process.env.SERVER_URL)
+    'process.env.SOCKET_URL': JSON.stringify(process.env.SOCKET_URL)
   },
   // optimizeDeps: {
   //   exclude: ['simple-peer'],

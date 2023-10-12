@@ -2,6 +2,7 @@ import axios from 'axios';
 import { BASEURL } from './baseURL';
 
 const baseURL = axios.create({
+    // baseURL : process.env.BASE_URL
     baseURL : BASEURL
 })
 
@@ -9,10 +10,14 @@ baseURL.interceptors.request.use(
     config=>{
         const token = localStorage.getItem("token")
         const userName = localStorage.getItem("userName")
+
+        const adminToken = localStorage.getItem("admin-token")
         
         if(token){
             config.headers["Authorization"] = `Bearer ${token}`
             config.headers["x-user"] = userName
+        }else if(adminToken){
+            config.headers["Authorization"] = `Bearer ${adminToken}`
         }else{
             delete config.headers["Authorization"]
             delete config.headers["x-user"]

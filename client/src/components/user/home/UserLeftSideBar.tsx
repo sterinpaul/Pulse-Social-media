@@ -17,8 +17,8 @@ import {
   NewspaperIcon,
   ChatBubbleLeftRightIcon,
   MagnifyingGlassIcon,
-  PhotoIcon,
-  VideoCameraIcon
+  // PhotoIcon,
+  // VideoCameraIcon
 } from "@heroicons/react/24/outline";
 
 
@@ -150,18 +150,6 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
             )}
           </DialogBody>
         </Dialog>
-        <ListItem>
-          <ListItemPrefix>
-            <PhotoIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Images
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <VideoCameraIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Videos
-        </ListItem>
       </List>
       
     </Card>

@@ -1,5 +1,5 @@
 import baseURL from "../api";
-// import headers from "../socketAPI";
+
 
 export const createNewChat = async(senderId:string,receiverId:string)=>{
     try{

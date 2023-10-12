@@ -15,17 +15,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.messageRepositoryMongoDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const messageModel_1 = __importDefault(require("../models/messageModel"));
+const chatModel_1 = __importDefault(require("../models/chatModel"));
 const messageRepositoryMongoDB = () => {
-    const createMessage = (chatId, senderId, message) => __awaiter(void 0, void 0, void 0, function* () {
+    const createMessage = (chatId, senderId, receiverId, message, imgURL) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const newMessage = new messageModel_1.default({
-                chatId,
-                senderId,
-                message
-            });
-            const response = yield newMessage.save();
-            if (response)
-                return response;
+            if (chatId) {
+                const newMessage = new messageModel_1.default({
+                    chatId,
+                    senderId,
+                    message,
+                    imgURL
+                });
+                const response = yield newMessage.save();
+                if (response)
+                    return response;
+            }
+            else {
+                const senderID = new mongoose_1.default.Types.ObjectId(senderId);
+                const receiverID = new mongoose_1.default.Types.ObjectId(receiverId);
+                const newChat = new chatModel_1.default({
+                    members: [senderID, receiverID]
+                });
+                const response = yield newChat.save();
+                if (response) {
+                    const newMessage = new messageModel_1.default({
+                        chatId: response === null || response === void 0 ? void 0 : response._id,
+                        senderId,
+                        message,
+                        imgURL
+                    });
+                    const newResponse = yield newMessage.save();
+                    if (newResponse)
+                        return newResponse;
+                }
+            }
         }
         catch (error) {
             console.log(error);

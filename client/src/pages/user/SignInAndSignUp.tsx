@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SignInForm from "../../components/user/signIn/SignInForn";
-// import SignUpForm from "../../components/user/signUp/SignUpForm";
+import SignUpForm from "../../components/user/signUp/SignUpForm";
 
 import {
   Card
@@ -22,7 +22,7 @@ import {
             </>
              : 
             <>
-            {/* <SignUpForm/> */}
+            <SignUpForm/>
             <button className="mt-2">
               Already have an account ?
               <span onClick={()=>setSignIn(!signIn)} className="ml-1 text-blue-500 transition-colors hover:text-blue-700">Sign in</span>

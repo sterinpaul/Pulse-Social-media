@@ -2,8 +2,8 @@ import { messageRepositoryMongoDB } from "../../framework/database/mongoDB/repos
 
 export const messageDbRepository = (repository:ReturnType<messageRepositoryMongoDB>)=>{
 
-    const createSingleMessage = async(chatId:string,senderId:string,message:string)=>{
-        return await repository.createMessage(chatId,senderId,message)
+    const createSingleMessage = async(chatId:string,senderId:string,receiverId:string,message:string,imgURL:string)=>{
+        return await repository.createMessage(chatId,senderId,receiverId,message,imgURL)
     }
 
     const getChats = async(userId:string)=>{

@@ -7,7 +7,7 @@ interface SignupFormValues{
     userName:string,
     email:string,
     password:string,
-    mobile:string
+    mobile?:string
 }
 
 interface SignupFormResponse{
@@ -19,6 +19,11 @@ interface SignupFormResponse{
 
 interface SigninFormValues{
     userName:string,
+    password:string
+}
+
+interface AdminSigninFormValues{
+    adminEmail:string,
     password:string
 }
 
@@ -70,6 +75,17 @@ export const signInWithGoogle = async(email:string) =>{
 export const updateUserNameForGoogle = async(userData:GoogleSignInValues)=>{
     try{
         const response = await baseURL.post('/auth/googlereg',userData)
+        return response?.data
+    }catch(error){
+        console.log(error)
+    }
+}
+
+
+
+export const adminSignIn = async(adminData:AdminSigninFormValues)=>{
+    try{
+        const response = await baseURL.post('/adminauth/adminsignin',adminData)
         return response?.data
     }catch(error){
         console.log(error)

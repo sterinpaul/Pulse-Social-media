@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.messageDbRepository = void 0;
 const messageDbRepository = (repository) => {
-    const createSingleMessage = (chatId, senderId, message) => __awaiter(void 0, void 0, void 0, function* () {
-        return yield repository.createMessage(chatId, senderId, message);
+    const createSingleMessage = (chatId, senderId, receiverId, message, imgURL) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.createMessage(chatId, senderId, receiverId, message, imgURL);
     });
     const getChats = (userId) => __awaiter(void 0, void 0, void 0, function* () {
         return yield repository.getAllChats(userId);

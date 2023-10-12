@@ -10,10 +10,22 @@ const messageControllers = (
     messageDbService:messageRepositoryMongoDB
 )=>{
     const messageDbRepository = messageDbInterface(messageDbService())
-
     const createSingleMessage = asyncHandler(async(req:Request,res:Response)=>{
-        const {chatId,senderId,message} = req.body
-        const response = await createMessage(chatId,senderId,message,messageDbRepository)
+        const {chatId,senderId,receiverId,message,imgURL} = req.body    
+        const response = await createMessage(chatId,senderId,receiverId,message,imgURL,messageDbRepository)
+        if(response){
+            const chatMessageData = {
+                status:true,
+                data:response
+            }
+            res.json(chatMessageData)
+        }
+    })
+
+    const createSingleImgMessage = asyncHandler(async(req:Request,res:Response)=>{
+        const {chatId,senderId,receiverId,message} = req.body
+        const imgURL = req.file?.path?.split("/chat-")[1] as string
+        const response = await createMessage(chatId,senderId,receiverId,message,imgURL,messageDbRepository)
         if(response){
             const chatMessageData = {
                 status:true,
@@ -50,6 +62,7 @@ const messageControllers = (
 
     return {
         createSingleMessage,
+        createSingleImgMessage,
         getChats,
         getUserMessages
     }

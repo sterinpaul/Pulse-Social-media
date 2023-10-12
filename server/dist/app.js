@@ -20,12 +20,15 @@ const server = http_1.default.createServer(app);
 // Socket CORS config
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: config_1.configKeys.SOCKET_SERVER,
+        origin: [config_1.configKeys.CLIENT_URL],
         methods: ['GET', 'POST']
     }
 });
 // Socket.io connection
 (0, socket_1.default)(io);
+// Peer connection
+// const peerServer = PeerServer({port:3001,path:'myapp'})
+// app.use("/peerjs", peerServer)
 // MongoDB connection
 (0, connection_1.default)();
 // Middleware configuration

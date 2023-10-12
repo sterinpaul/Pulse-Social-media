@@ -1,44 +1,55 @@
-import { List, Avatar, Dialog } from "@material-tailwind/react"
+import { List, Avatar, Dialog, Button } from "@material-tailwind/react"
 import SingleChat from "./SingleChat"
 import { SetStateAction, useEffect, useRef, useState } from "react"
 import { chattedUsers } from "../../../../interfaces/userInterface"
-import { CLOUDINARY_PROFILE_PHOTO_URL, PROFILE_PHOTO, socketURL } from "../../../../api/baseURL"
+import { CLOUDINARY_CHAT_URL, CLOUDINARY_PROFILE_PHOTO_URL, PROFILE_PHOTO, SOCKET_URL } from "../../../../api/baseURL"
 import { getUserbySearch } from "../../../../api/apiConnections/userConnection"
-import { createSingleMessage, getUserMessages } from "../../../../api/apiConnections/messageConnection"
-import { createNewChat } from "../../../../api/apiConnections/chatConnection"
+import { createSingleImgMessage, createSingleMessage, getUserMessages } from "../../../../api/apiConnections/messageConnection"
+// import { createNewChat } from "../../../../api/apiConnections/chatConnection"
 import { messageInterface } from "../../../../interfaces/messageInterface"
 import { getAllChats } from "../../../../api/apiConnections/messageConnection"
 // import { getAllChats } from "../../../../api/apiConnections/chatConnection"
 import { useSelector, useDispatch } from "react-redux";
-import { setOnlineUsers, setChatList, setReceivedMessages } from "../../../../redux/userRedux/chatSlice"
+import { setOnlineUsers, setChatList, setReceivedMessages, setUserChatId } from "../../../../redux/userRedux/chatSlice"
 import { io, Socket } from 'socket.io-client'
 import InputEmoji from "react-input-emoji"
 import moment from 'moment'
-// import { useNavigate } from "react-router-dom"
-import VideoCall from "./VideoCall"
+import {v4 as uuid} from 'uuid'
+import {toast} from 'react-toastify'
+
+// import VideoCall from "./VideoCall"
 
 
 import {
   VideoCameraIcon,
   // PaperAirplaneIcon,
   EllipsisVerticalIcon,
+  PhotoIcon,
   // VideoCameraSlashIcon
 } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom"
+
 
 
 interface chatBoxInterface {
   chatOpen: boolean,
-  chatContainerHandler: () => void
+  chatContainerHandler: () => void,
+  videoDisplay:boolean,
+  setVideoDisplay:(value:boolean)=>void
 }
 
-const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerHandler }) => {
+const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerHandler}) => {
 
-  const { userId, profilePic } = useSelector((store: { user: { userName: string, userId: string, darkMode: boolean, profilePic: string } }) => store.user)
+  const { userName,userId, profilePic } = useSelector((store: { user: { userName: string, userId: string, darkMode: boolean, profilePic: string } }) => store.user)
   const { onlineUsers, receivedMessages } = useSelector((store: { chat: { onlineUsers: [], receivedMessages: [] } }) => store.chat)
   const [allChatUsers, setAllChatUsers] = useState<chattedUsers[]>([])
   const [sendMessage, setSendMessage] = useState({})
   const [searchText, setSearchText] = useState('')
   const [chats, setChats] = useState<messageInterface[]>([])
+
+  const [imgChat,setImgChat] = useState<File | null>(null)
+  const [imgDialogOpen,setImgDialogOpen] = useState(false)
+
   const scroll = useRef<HTMLDivElement>(null)
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const dispatch = useDispatch()
@@ -46,10 +57,12 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
   const [chatUserId, setChatUserId] = useState('')
   const [chatUserPic, setChatUserPic] = useState('')
   const [commentText, setCommentText] = useState('')
-  // const navigate = useNavigate()
   const socket = useRef<Socket | null>(null)
-  const [videoDisplay, setVideoDisplay] = useState(false)
 
+  const dialogOpen = ()=>{
+    if(imgChat)setImgChat(null)
+    setImgDialogOpen(!imgDialogOpen)
+  }
 
   const getChatList = async () => {
     try {
@@ -68,13 +81,12 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
   }, [sendMessage, receivedMessages, onlineUsers])
 
   useEffect(() => {
-    socket.current = io(socketURL, { transports: ['websocket'] })
+    socket.current = io(SOCKET_URL, { transports: ['websocket'] })
     if (userId.length) {
       socket.current.emit('add-new-user', userId)
       socket.current.on('get-users', (users) => {
         dispatch(setOnlineUsers(users))
-      }
-      )
+      })
     }
 
     socket.current.on('connect', () => {
@@ -99,12 +111,12 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
       if (data && chatUserId === data.senderId) {
         setChats((chat) => [...chat, data])
       }
+
       let exists = receivedMessages.some((obj: any) => obj.chatId === data.chatId)
 
       if (!exists) {
         dispatch(setReceivedMessages(data))
       }
-
       scroll.current?.scrollIntoView({ behavior: 'smooth' })
     }
 
@@ -137,29 +149,45 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
 
       textAreaRef?.current?.focus()
       setChatUserId(data._id)
+      dispatch(setUserChatId(data._id))
       setChatUserName(data.userName)
       setChatUserPic(data.profilePic)
     }
   }
 
   const sendAMessage = async () => {
+    if (commentText.trim().length && chatUserName.length) {
 
-    if (commentText.trim().length) {
-      if (chats?.length) {
-        const response: { status: boolean, data: messageInterface } = await createSingleMessage(chats[0]?.chatId, userId, commentText)
-        if (response?.status) {
-          setChats([...chats, response?.data])
-          setSendMessage({ _id: response?.data?._id, senderId: userId, chatId: chats[0]?.chatId, message: commentText, receiverId: chatUserId })
-        }
-      } else {
-        const response: { status: boolean, data: { _id: string } } = await createNewChat(userId, chatUserId)
-        if (response?.status) {
-          const messageResponse: { status: boolean, data: any } = await createSingleMessage(response.data?._id, userId, commentText)
-          setChats([messageResponse?.data])
-          setSendMessage({ _id: messageResponse?.data?._id, senderId: userId, chatId: response.data?._id, message: commentText, receiverId: chatUserId })
-        }
+      const response: { status: boolean, data: messageInterface } = await createSingleMessage(chats[0]?.chatId, userId, chatUserId, commentText)
+      if (response?.status) {
+        setChats([...chats, response?.data])
+        setSendMessage({ _id: response.data._id, senderId: userId, chatId: response.data.chatId, message: commentText, receiverId: chatUserId,imgURL:response.data?.imgURL })
       }
       setCommentText('')
+
+      // if (chats?.length) {
+        // const response: { status: boolean, data: messageInterface } = await createSingleMessage(chats[0]?.chatId, userId, commentText)
+        // if (response?.status) {
+        //   setChats([...chats, response?.data])
+        //   setSendMessage({ _id: response?.data?._id, senderId: userId, chatId: chats[0]?.chatId, message: commentText, receiverId: chatUserId })
+        // }
+        
+      // } else {
+        // const response: { status: boolean, data: { _id: string } } = await createNewChat(userId, chatUserId)
+        // if (response?.status) {
+        //   const messageResponse: { status: boolean, data: any } = await createSingleMessage(response.data?._id, userId, commentText)
+        //   setChats([messageResponse?.data])
+        //   setSendMessage({ _id: messageResponse?.data?._id, senderId: userId, chatId: response.data?._id, message: commentText, receiverId: chatUserId })
+        // }
+      // }
+    }else if(imgChat !== null && chatUserName.length){
+      setImgDialogOpen(!imgDialogOpen)
+      const response: { status: boolean, data: messageInterface } = await createSingleImgMessage(chats[0]?.chatId, userId, chatUserId,imgChat)
+      if (response?.status) {
+        setChats([...chats, response?.data])
+        setSendMessage({ _id: response.data._id, senderId: userId, chatId: response.data.chatId, message: commentText, receiverId: chatUserId,imgURL:response.data?.imgURL })
+      }
+      setImgChat(null)
     }
     textAreaRef.current?.focus()
   }
@@ -195,41 +223,35 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
     }
   }
 
-
-  // Video chat
-  const openVideoChat = () => {
-    setVideoDisplay(true)
+  const chooseChatImg = ()=>{
+    if(chatUserName.length){
+      setImgDialogOpen(true)
+    }
   }
 
-  // const initializeVideoCall = ()=>{
-  //   setStartVideoCall(true)
-  //   navigator.mediaDevices.getUserMedia({video:true,audio:true}).then((stream:any)=>{
-  //     setStream(stream)
+  // Video chat
+  const navigate = useNavigate()
+  const openVideoChat = () => {
+    const roomId = uuid()
+    socket.current?.emit('call-started', {roomId,userName,chatUserId})
+    navigate(`/chat/${roomId}`)
+  }
 
-  //     if(myVideo?.current){
-  //       myVideo.current.srcObject = stream
-  //     }else{
-  //       console.error("myVideo.current is null")
-  //     }
+  
 
-  //   })
-  //   .catch((error:any) => {
-  //     console.error('Error accessing media devices:', error);
-  //   })
+  useEffect(()=>{
+    const videoCallReceiveHandle = (data:{userName:string,roomId:string})=>{
 
-  //   socket.current?.on('me',(id:any)=>{
-  //     setMe(id)
-  //   })
-
-  //   socket.current?.on('call-user',(data:any)=>{
-  //     setReceivingCall(true)
-  //     setCaller(data.from)
-  //     setName(data.name)
-  //     setCallerSignal(data.signal)
-  //   })
-
-  //   setCallEnded(false)
-  // }
+      toast.success(`${data.userName} is calling...`, {
+        autoClose:10000,
+        onClick:()=>navigate(`/chat/${data.roomId}`)
+      })
+    }
+    socket.current?.on('call-received',videoCallReceiveHandle)
+    return ()=>{
+      socket.current?.off('call-received',videoCallReceiveHandle)
+    }
+  },[])
 
 
   //   const endCall = ()=>{
@@ -253,11 +275,11 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
 
   return (
     <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[96vh] flex'>
-      {videoDisplay ? (
+      {/* {videoDisplay ? (
         <>
-        <VideoCall chatUserName={chatUserName} />
+          <VideoCall chatUserName={chatUserName} chatUserId={chatUserId} setVideoDisplay={setVideoDisplay} socket={socket} />
         </>
-      ) : (
+      ) : ( */}
         <>
           <div className='w3/5'>
               <div className='p-1 flex gap-1 items-center justify-evenly h-16 bg-gray-500'>
@@ -280,6 +302,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
           </div>
       
       <div className='w-full bg-blue-gray-100 h-[96vh] flex flex-col justify-between'>
+        <div className="h-full flex flex-col overflow-y-scroll">
           {chatUserName.length ? <div className='pl-4 bg-blue-gray-200 flex items-center justify-between'>
             <div className='flex items-center gap-4'>
               <div className='p-2'>
@@ -295,18 +318,18 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
 
           </div> : null}
           <div className='overflow-y-scroll flex flex-col'>
-            {chats.length ? chats.map((data:{_id:string,senderId:string,message:string,createdAt:string},index)=>{
+            {chats.length ? chats.map((data:{_id:string,senderId:string,message?:string,imgURL?:string,createdAt:string},index)=>{
               if(data.senderId===userId){
                 return (
-                  <div key={data._id} ref={index===chats.length-1 ? scroll : null} className='rounded bg-white m-2 w-52 p-1 self-end'>
-                    <p className='text-black'>{data.message}</p>
+                  <div key={data._id} ref={index===chats.length-1 ? scroll : null} className='rounded bg-light-blue-100 m-2 w-52 p-1 self-end'>
+                    {data.message ? <p className='text-black'>{data.message}</p> : <img src={CLOUDINARY_CHAT_URL+data.imgURL} />}
                     <p className='text-xs text-right'>{moment(data.createdAt).calendar()}</p>
                   </div>
                   )
                 }else{
                   return (
-                    <div key={data._id} ref={index===chats.length-1 ? scroll : null} className='rounded bg-white m-2 w-52 p-1 self-start'>
-                      <p className='text-black'>{data.message}</p>
+                    <div key={data._id} ref={index===chats.length-1 ? scroll : null} className='rounded bg-yellow-100 m-2 w-52 p-1 self-start'>
+                      {data.message ? <p className='text-black'>{data.message}</p> : <img src={CLOUDINARY_CHAT_URL+data.imgURL} />}
                       <p className='text-xs text-right'>{moment(data.createdAt).calendar()}</p>
                     </div>
                   )
@@ -315,17 +338,36 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
             )
             : null}
           </div>
-                
+        </div>
           <div className='flex justify-around items-center p-2 bg-blue-gray-200'>
             <div className="w-16 h-12">
-            <Avatar variant="circular" alt="Profile Pic" src={profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+profilePic : PROFILE_PHOTO} />
+              <Avatar variant="circular" alt="Profile Pic" src={profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+profilePic : PROFILE_PHOTO} />
             </div>
             <InputEmoji ref={textAreaRef} onChange={setCommentText} value={commentText} cleanOnEnter onEnter={sendAMessage} placeholder="Type something" />
+            <button onClick={chooseChatImg} className="mr-2"><PhotoIcon className="w-6 h-6" /></button>
             
+            
+            <Dialog open={imgDialogOpen} handler={dialogOpen} size="xs" className="outline-none" >
+              <div className="m-2 flex flex-col justify-center items-center">
+                <form onSubmit={(e)=>{
+                  e.preventDefault()
+                  sendAMessage()
+                  }} encType="multipart/form-data">
+                  <div className="flex flex-col justify-center items-center">
+                      <label className="w-20 bg-blue-500 hover:bg-blue-600 text-white text-center py-1 rounded-lg cursor-pointer">Choose
+                          <input className="hidden" onChange={(e:any)=>setImgChat(e.target?.files?.[0])} name='profilePic' type="file" accept=".jpg,.jpeg,.png" />
+                      </label>
+                      <p className="file-label">Allowed formats: JPG, JPEG, PNG</p>
+                      <img className="max-h-96" src={imgChat ? URL.createObjectURL(imgChat) : ""} />
+                      <Button type="submit" size="sm" className=" m-2 capitalize" disabled={imgChat ? false : true}>Send</Button>
+                  </div>
+                </form>
+              </div>
+            </Dialog>
           </div>
       </div>
-      </>)
-      }
+      </>
+      {/* )} */}
 
     </Dialog>
   )

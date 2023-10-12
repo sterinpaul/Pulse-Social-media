@@ -28,6 +28,9 @@ const profileOptions = {
         }
     }
 }
+const profilePicStorage = new CloudinaryStorage(profileOptions)
+export const uploadProfilePic = multer({storage:profilePicStorage }).single('profilePic')
+
 
 const postImages = {
     cloudinary:cloudinary,
@@ -42,7 +45,22 @@ const postImages = {
     }
 }
 
-const profilePicStorage = new CloudinaryStorage(profileOptions)
 const postStorage = new CloudinaryStorage(postImages)
-export const uploadProfilePic = multer({storage:profilePicStorage }).single('profilePic')
 export const uploadPostImgVideo = multer({storage:postStorage }).single('postImgVideo')
+
+
+const chatImages = {
+    cloudinary:cloudinary,
+    params:{
+        folder: 'chatImg',
+        allowed_formats : ['jpg', 'jpeg', 'png', 'webp', 'gif', 'jfif', 'webp','gif'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' },{ quality: '60' }],
+        public_id: (req:any,file:any) => {
+            const originalname = file.originalname.split('.')
+            return `chat-${Date.now()}-${originalname[0]}`
+        }
+    }
+}
+
+const chatStorage = new CloudinaryStorage(chatImages)
+export const uploadChatImg = multer({storage:chatStorage }).single('imgChat')

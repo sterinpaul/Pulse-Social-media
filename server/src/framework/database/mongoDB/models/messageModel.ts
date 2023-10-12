@@ -10,6 +10,9 @@ const messageSchema = new Schema(
         },
         message:{
             type:String
+        },
+        imgURL:{
+            type:String
         }
     },{
         timestamps:true

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadPostImgVideo = exports.uploadProfilePic = void 0;
+exports.uploadChatImg = exports.uploadPostImgVideo = exports.uploadProfilePic = void 0;
 // const cloudinaryConfig:CloudinaryConfiguration = {
 //     cloudName:"pulse-socialmedia",
 //     apiKey:"615616133356435",
@@ -28,6 +28,8 @@ const profileOptions = {
         }
     }
 };
+const profilePicStorage = new multer_storage_cloudinary_1.CloudinaryStorage(profileOptions);
+exports.uploadProfilePic = (0, multer_1.default)({ storage: profilePicStorage }).single('profilePic');
 const postImages = {
     cloudinary: cloudinary_1.v2,
     params: {
@@ -40,7 +42,19 @@ const postImages = {
         }
     }
 };
-const profilePicStorage = new multer_storage_cloudinary_1.CloudinaryStorage(profileOptions);
 const postStorage = new multer_storage_cloudinary_1.CloudinaryStorage(postImages);
-exports.uploadProfilePic = (0, multer_1.default)({ storage: profilePicStorage }).single('profilePic');
 exports.uploadPostImgVideo = (0, multer_1.default)({ storage: postStorage }).single('postImgVideo');
+const chatImages = {
+    cloudinary: cloudinary_1.v2,
+    params: {
+        folder: 'chatImg',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'jfif', 'webp', 'gif'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }, { quality: '60' }],
+        public_id: (req, file) => {
+            const originalname = file.originalname.split('.');
+            return `chat-${Date.now()}-${originalname[0]}`;
+        }
+    }
+};
+const chatStorage = new multer_storage_cloudinary_1.CloudinaryStorage(chatImages);
+exports.uploadChatImg = (0, multer_1.default)({ storage: chatStorage }).single('imgChat');

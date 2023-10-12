@@ -27,7 +27,25 @@ const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers}
   // console.log('online',onlineUsers,status,user._id)
 
   return(
-    <ListItem onClick={()=>focusMessageInput(user)} className='rounded-none hover:bg-gray-300 focus:bg-gray-400 active:bg-gray-400 '>
+    
+    <ListItem onClick={(event)=>{
+      focusMessageInput(user)
+      const listItem = event.currentTarget;
+    
+    // Remove the 'active' class from all siblings
+    const siblings = listItem.parentElement?.children;
+    if (siblings) {
+      for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i] !== listItem) {
+          siblings[i].classList.remove("bg-gray-300")
+        }
+      }
+    }
+    
+    // Add the 'active' class to the clicked item
+    listItem.classList.add("bg-gray-300")
+
+      }} className='rounded-none hover:bg-gray-300 focus:bg-gray-400'>
       <ListItemPrefix>
         <Avatar variant="circular" alt="Profile Pic" src={user.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO} />
       </ListItemPrefix>
@@ -43,6 +61,7 @@ const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers}
         {onlineStatus ? <div className="w-2 h-2 bg-green-400 rounded-full mr-4"></div> : <></>}
       </ListItemSuffix>
     </ListItem>
+    
   )
 }
 

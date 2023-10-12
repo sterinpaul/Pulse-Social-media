@@ -1,17 +1,39 @@
 import mongoose from "mongoose"
 import Message from "../models/messageModel"
+import Chat from "../models/chatModel"
 
 export const messageRepositoryMongoDB = ()=>{
 
-    const createMessage = async(chatId:string,senderId:string,message:string)=>{
+    const createMessage = async(chatId:string,senderId:string,receiverId:string,message:string,imgURL:string)=>{
         try{
+          
+          if(chatId){
             const newMessage = new Message({
-                chatId,
-                senderId,
-                message
+              chatId,
+              senderId,
+              message,
+              imgURL
             })
             const response = await newMessage.save()
             if(response) return response
+          }else{
+            const senderID = new mongoose.Types.ObjectId(senderId)
+            const receiverID = new mongoose.Types.ObjectId(receiverId)
+            const newChat = new Chat({
+              members:[senderID,receiverID]
+            })
+            const response = await newChat.save()
+            if(response){
+              const newMessage = new Message({
+                chatId:response?._id,
+                senderId,
+                message,
+                imgURL
+              })
+              const newResponse = await newMessage.save()
+              if(newResponse) return newResponse
+            }
+          }
         }catch(error){
             console.log(error)
         }

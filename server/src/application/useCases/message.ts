@@ -3,10 +3,12 @@ import { messageDbInterface } from "../repositories/messageDbRepository";
 export const createMessage = async(
     chatId:string,
     senderId:string,
+    receiverId:string,
     message:string,
+    imgURL:string,
     messageRepository:ReturnType<messageDbInterface>
 )=>{
-    return await messageRepository.createSingleMessage(chatId,senderId,message)
+    return await messageRepository.createSingleMessage(chatId,senderId,receiverId,message,imgURL)
 }
 
 export const getAllChats = async(

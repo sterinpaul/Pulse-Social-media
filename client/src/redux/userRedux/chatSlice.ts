@@ -11,7 +11,8 @@ interface receivedMessageInterface{
 const initialState = {
     onlineUsers : [],
     chatList: [],
-    receivedMessages: [] as receivedMessageInterface[]
+    receivedMessages: [] as receivedMessageInterface[],
+    userChatId:''
 }
 
 const chatSlice = createSlice({
@@ -29,9 +30,12 @@ const chatSlice = createSlice({
         },
         clearReceivedMessages:(state)=>{
             state.receivedMessages = []
+        },
+        setUserChatId:(state,action)=>{
+            state.userChatId = action.payload
         }
     }
 })
 
-export const {setOnlineUsers,setChatList,setReceivedMessages,clearReceivedMessages} = chatSlice.actions
+export const {setOnlineUsers,setChatList,setReceivedMessages,clearReceivedMessages,setUserChatId} = chatSlice.actions
 export default chatSlice.reducer

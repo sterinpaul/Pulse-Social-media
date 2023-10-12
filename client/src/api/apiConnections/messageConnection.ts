@@ -1,9 +1,22 @@
 import baseURL from "../api";
-// import headers from "../socketAPI";
 
-export const createSingleMessage = async(chatId:string,senderId:string,message:string)=>{
+export const createSingleMessage = async(chatId:string,senderId:string,receiverId:string,message:string)=>{
     try{
-        const response = await baseURL.post('/message',{chatId,senderId,message})
+        const response = await baseURL.post('/message',{chatId,senderId,receiverId,message})
+        return response?.data
+    }catch(error){
+        console.log(error)
+    }
+}
+
+export const createSingleImgMessage = async(chatId:string,senderId:string,receiverId:string,imgChat:File)=>{
+    try{
+        const chatForm = new FormData
+        chatForm.append('chatId',chatId)
+        chatForm.append('senderId',senderId)
+        chatForm.append('receiverId',receiverId)
+        chatForm.append('imgChat',imgChat)
+        const response = await baseURL.post('/message/img',chatForm)
         return response?.data
     }catch(error){
         console.log(error)

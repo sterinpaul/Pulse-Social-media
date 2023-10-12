@@ -22,11 +22,19 @@ const socketConfig = (io) => {
                 io.to(user.socketId).emit('receive-message', data);
             }
         });
-        // socket.on('join-room',(roomId,userId)=>{
-        //     console.log('roomId and userId',roomId,userId)
-        //     socket.join(roomId)
-        //     socket.to(roomId).broadcast.emit('user-connected',userId)
-        // })
+        socket.on('call-started', (data) => {
+            const { roomId, chatUserId } = data;
+            const user = activeUsers.find((user) => user.userId === chatUserId);
+            if (user) {
+                io.to(user.socketId).emit('call-received', data);
+            }
+        });
+        socket.on('join-room', (roomId, userId) => {
+            console.log('roomId and userId', roomId, userId);
+            socket.join(roomId);
+            socket.to(roomId).emit('user-connected', userId);
+            // socket.to(userId).emit('user-connected',roomId)
+        });
         socket.on('call-user', (data) => {
             io.to(data.userToCall).emit('call-user', { signal: data.signalData, from: data.from, name: data.name });
         });

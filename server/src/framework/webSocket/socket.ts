@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+import { Server,Socket } from "socket.io";
 import {DefaultEventsMap} from 'socket.io/dist/typed-events'
 
 interface User{
@@ -12,7 +12,7 @@ const socketConfig = (
     io:Server<DefaultEventsMap>
 )=>{
 
-    io.on('connection',(socket)=>{
+    io.on('connection',(socket:Socket)=>{
 
         socket.emit('me',socket.id)
         // Socket.IO connection event: This function is executed when a new client connects to the server.
@@ -35,11 +35,20 @@ const socketConfig = (
             }
         })
 
-        // socket.on('join-room',(roomId,userId)=>{
-        //     console.log('roomId and userId',roomId,userId)
-        //     socket.join(roomId)
-        //     socket.to(roomId).broadcast.emit('user-connected',userId)
-        // })
+        socket.on('call-started', (data)=>{
+            const {roomId,chatUserId} = data
+            const user = activeUsers.find((user)=>user.userId===chatUserId)
+            if(user){
+                io.to(user.socketId).emit('call-received',data)
+            }
+        })
+
+        socket.on('join-room',(roomId,userId)=>{
+            console.log('roomId and userId',roomId,userId)
+            socket.join(roomId)
+            socket.to(roomId).emit('user-connected',userId)
+            // socket.to(userId).emit('user-connected',roomId)
+        })
 
         socket.on('call-user',(data)=>{
             io.to(data.userToCall).emit('call-user',{signal:data.signalData,from:data.from,name:data.name})

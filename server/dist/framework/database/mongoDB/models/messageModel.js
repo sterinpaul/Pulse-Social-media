@@ -10,6 +10,9 @@ const messageSchema = new mongoose_1.Schema({
     },
     message: {
         type: String
+    },
+    imgURL: {
+        type: String
     }
 }, {
     timestamps: true
