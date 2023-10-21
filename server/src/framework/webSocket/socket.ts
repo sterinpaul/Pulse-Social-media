@@ -28,10 +28,16 @@ const socketConfig = (
         socket.on('send-message',(data)=>{
             const {receiverId} = data
             const user = activeUsers.find((user)=>user.userId===receiverId)
-            console.log(`Sending message to ${receiverId}`)
             if(user){
                 io.to(user.socketId).emit('notification',data)
                 io.to(user.socketId).emit('receive-message',data)
+            }
+        })
+
+        socket.on('block-user',(userId)=>{
+            const user = activeUsers.find((user)=>user.userId===userId)
+            if(user){
+                io.to(user.socketId).emit('user-blocked')
             }
         })
 

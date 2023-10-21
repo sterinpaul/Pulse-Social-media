@@ -7,12 +7,12 @@ export interface userInterface{
 }
 
 export interface userProfile{
-    _id: string | null | undefined
+    _id: string,
     userName: string,
     firstName?: string,
     lastName?: string,
     email?: string,
-    isBlock?: boolean,
+    isBlocked: boolean,
     darkMode?: boolean,
     profilePic?: string,
     gender?: string,

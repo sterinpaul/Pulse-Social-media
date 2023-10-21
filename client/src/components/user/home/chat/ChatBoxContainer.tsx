@@ -28,6 +28,7 @@ import {
   // VideoCameraSlashIcon
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom"
+import { userSignOut } from "../../../../redux/userRedux/userSlice"
 
 
 
@@ -88,9 +89,15 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
         dispatch(setOnlineUsers(users))
       })
     }
-
+ 
     socket.current.on('connect', () => {
       console.log('Connected to Server')
+    })
+
+    socket.current.on('user-blocked',()=>{
+      dispatch(userSignOut())
+      toast.error('Blocked by Admin')
+      navigate('/')
     })
 
     // Handling the error
@@ -281,7 +288,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, chatContainerH
         </>
       ) : ( */}
         <>
-          <div className='w3/5'>
+          <div className='w-3/5'>
               <div className='p-1 flex gap-1 items-center justify-evenly h-16 bg-gray-500'>
                 <div className='w-12 h-12 rounded-full'>
                   <img className='object-cover w-full h-full rounded-full' src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+profilePic) : PROFILE_PHOTO}/>

@@ -31,12 +31,13 @@ import {
     status:string,
     message:string,
     token?:string,
-    user:{
+    user?:{
       firstName:string,
       lastName:string,
       email:string,
       mobile?:string,
-      password:string,
+      password?:string,
+      isBlocked:boolean,
       profilePic?:string,
       userName?:string,
       darkMode?:string,
@@ -127,6 +128,9 @@ const SignInForm = ()=>{
         }
         navigate('/')
         toast.success(response?.message)
+      }else if(response?.status === 'blocked'){
+        toast.error(response?.message)
+        setUserNameError(false)
       }else{
         setUserNameStatus(true)
         setUserNameError(false)

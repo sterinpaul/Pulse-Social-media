@@ -8,8 +8,11 @@ const adminRouter = ()=>{
     const router = express.Router()
     const controllers = adminControllers(adminDbRepository,adminRepositoryMongoDB)
     router.get('/',controllers.getHome)
+    router.get('/users/:status/:pageNumber',controllers.getAllUsers)
     router.get('/reports',controllers.getReportedPosts)
-    router.get('/getpost',controllers.getPost)
+    router.patch('/block-post',controllers.postBlockhandler)
+    router.patch('/block-user',controllers.userBlockhandler)
+    router.get('/search-user',controllers.getUserBySearch)
     
     return router
 }

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { CLOUDINARY_PROFILE_PHOTO_URL,PROFILE_PHOTO } from '../../../api/baseURL';
 import {
     Button,
-    List,
     ListItem,
     ListItemPrefix,
     ListItemSuffix,
@@ -38,24 +37,22 @@ const FollowList = ({user,handleOpen}:{user:{userName:string,firstName:string,la
     }
 
     return (
-        <List>
-          <ListItem>
-            <ListItemPrefix onClick={goToProfile}>
-              <Avatar variant="circular" alt="Profile Pic" src={user?.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO} />
-            </ListItemPrefix>
-            <div onClick={goToProfile}>
-              <Typography variant="h6" color="blue-gray">
-                {user?.userName}
-              </Typography>
-              <Typography variant="small" color="gray" className="font-normal">
-                {user?.firstName} {user?.lastName}
-              </Typography>
-            </div>
-            <ListItemSuffix>
-              <Button size='sm' className='w-20 capitalize' onClick={followUnfollowHandler}>{follow ? "Unfollow" : "Follow" }</Button>
-            </ListItemSuffix>
-          </ListItem>
-        </List>
+        <ListItem>
+          <ListItemPrefix onClick={goToProfile}>
+            <Avatar variant="circular" alt="Profile Pic" src={user?.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO} />
+          </ListItemPrefix>
+          <div onClick={goToProfile}>
+            <Typography variant="h6" color="blue-gray">
+              {user?.userName}
+            </Typography>
+            <Typography variant="small" color="gray" className="font-normal">
+              {user?.firstName} {user?.lastName}
+            </Typography>
+          </div>
+          <ListItemSuffix>
+            <Button size='sm' className='w-20 capitalize' onClick={followUnfollowHandler}>{follow ? "Unfollow" : "Follow" }</Button>
+          </ListItemSuffix>
+        </ListItem>
     )
 }
 

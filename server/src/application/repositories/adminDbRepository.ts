@@ -10,16 +10,24 @@ export const adminDbRepository = (repository:ReturnType<adminRepositoryMongoDB>)
         return await repository.getCount()
     }
 
-    const getReportedPosts = async()=>{
-        return await repository.getAllReported()
+    const getAllUsers = async(status:string,pageNumber:number)=>{
+        return await repository.allUsers(status,pageNumber)
     }
 
-    const getAllPost = async()=>{
-        return await repository.getPost()
+    const getReportedPosts = async(pageNumber:number)=>{
+        return await repository.getAllReported(pageNumber)
     }
 
-    const getUserBySearch = async(searchText:string)=>{
-        return await repository.userSearch(searchText)
+    const postBlock = async(postId:string,status:boolean)=>{
+        return await repository.postBlockHandler(postId,status)
+    }
+
+    const userBlock = async(userId:string,status:boolean)=>{
+        return await repository.userBlockHandler(userId,status)
+    }
+
+    const getUserBySearch = async(searchText:string,status:string,pageNumber:number)=>{
+        return await repository.userSearch(searchText,status,pageNumber)
     }
 
   
@@ -27,8 +35,10 @@ export const adminDbRepository = (repository:ReturnType<adminRepositoryMongoDB>)
     return {
         getAdminByEmail,
         getAllCount,
+        getAllUsers,
         getReportedPosts,
-        getAllPost,
+        postBlock,
+        userBlock,
         getUserBySearch
     }
 }

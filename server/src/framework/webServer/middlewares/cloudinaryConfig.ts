@@ -1,15 +1,3 @@
-// import {CloudinaryConfiguration} from 'cloudinary-react';
-
-// const cloudinaryConfig:CloudinaryConfiguration = {
-//     cloudName:"pulse-socialmedia",
-//     apiKey:"615616133356435",
-//     apiSecret:"rfWuVkJzxUhlsMJhncX4zUSWWMA",
-//     uploadPreset: "ayyzml8c",
-//     url:"https://api.cloudinary.com/v1_1/pulse-socialmedia/image/upload"
-// }
-
-// export default cloudinaryConfig
-
 
 import multer from 'multer';
 import {CloudinaryStorage } from 'multer-storage-cloudinary';

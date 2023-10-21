@@ -9,7 +9,7 @@ export const chatRepositoryMongoDB = ()=>{
             const senderID = new mongoose.Types.ObjectId(senderId)
             const receiverID = new mongoose.Types.ObjectId(receiverId)
             const chatExists = await Chat.find(
-                {members:{$all:[senderID,receiverID]}}
+              {members:{$all:[senderID,receiverID]}}
             )
             
             if(chatExists.length){

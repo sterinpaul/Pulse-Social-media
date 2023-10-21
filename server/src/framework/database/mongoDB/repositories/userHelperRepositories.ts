@@ -380,6 +380,7 @@ export const userRepositoryMongoDB = ()=>{
     }
 
     const userNameUpdate = async(userName:string,newUserName:string)=>{
+      newUserName = newUserName.toLowerCase()
       const userExist = await User.findOne({userName:newUserName})
       if(userExist){
         return false
@@ -406,6 +407,7 @@ export const userRepositoryMongoDB = ()=>{
       city:string,
       bio:string
     )=>{
+      userName = userName.toLowerCase()
       const response = await User.updateOne({userName},{$set:{firstName,lastName,gender,city,bio}})
       if(response.modifiedCount){
         return true

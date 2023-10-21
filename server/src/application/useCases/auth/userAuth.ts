@@ -15,6 +15,7 @@ export const userSignUp = async(
     authService:ReturnType<AuthServiceInterface>
 )=>{
     user.email = user.email.toLowerCase()
+    user.userName = user.userName.toLowerCase()
     const isEmailExist = await userRepository.getUserByEmail(user.email)
     if(isEmailExist){
         const userData = {
@@ -59,6 +60,7 @@ export const userSignIn = async(
     userRepository:ReturnType<UserDbInterface>,
     authService:ReturnType<AuthServiceInterface>
 )=>{
+    userName = userName.toLowerCase()
     const data:any = await userRepository.getUser(userName)
     if(!data){
         const userData = {
@@ -105,8 +107,16 @@ export const userGoogleSignIn = async(
     authService:ReturnType<AuthServiceInterface>
 )=>{
     const userByEmail = await userRepository.getUserByEmail(email)
+    
+    if(userByEmail?.isBlocked){
+        const userData = {
+            status:"blocked",
+            message:"User is blocked"
+        }
+        return userData
+    }
 
-    if(userByEmail){
+    if(userByEmail?.isBlocked===false){
         const jwtToken = await authService.generateToken(userByEmail._id?.toString())
         userByEmail.password = '';
         const userData = {
@@ -123,7 +133,6 @@ export const userGoogleSignIn = async(
         }
         return userData
     }
-    
 }
 
 export const userGoogleRegistration = async(
@@ -139,7 +148,6 @@ export const userGoogleRegistration = async(
     authService:ReturnType<AuthServiceInterface>
     )=>{
         const isUserNameExist = await userRepository.getUserByUsername(user.userName)
-    
     
         if(isUserNameExist){
             const userData = {

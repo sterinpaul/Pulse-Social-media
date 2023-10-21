@@ -144,10 +144,12 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
           <Input onChange={searchUser} value={searchText} icon={<MagnifyingGlassIcon className="h-5 w-5" />} label="Search" />
         </div>
           <DialogBody>
+            <List className='h-72 overflow-y-scroll'>
             {searchedUser?.map((user)=>{
                 return <FollowList user={user} handleOpen={handleOpen} key={user._id}/>
               }
             )}
+            </List>
           </DialogBody>
         </Dialog>
       </List>

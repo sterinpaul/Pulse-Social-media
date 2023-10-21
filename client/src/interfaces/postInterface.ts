@@ -5,7 +5,7 @@ export interface postData{
     listed:boolean,
     liked:string[],
     postedUser:string,
-    profilePic:string,
+    profilePic?:string,
     createdAt:string,
     updatedAt:string,
     reports:[{
