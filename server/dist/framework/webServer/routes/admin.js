@@ -11,8 +11,11 @@ const adminRouter = () => {
     const router = express_1.default.Router();
     const controllers = (0, adminController_1.default)(adminDbRepository_1.adminDbRepository, adminHelperRepositories_1.adminRepositoryMongoDB);
     router.get('/', controllers.getHome);
+    router.get('/users/:status/:pageNumber', controllers.getAllUsers);
     router.get('/reports', controllers.getReportedPosts);
-    router.get('/getpost', controllers.getPost);
+    router.patch('/block-post', controllers.postBlockhandler);
+    router.patch('/block-user', controllers.userBlockhandler);
+    router.get('/search-user', controllers.getUserBySearch);
     return router;
 };
 exports.default = adminRouter;

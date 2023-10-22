@@ -1,18 +1,9 @@
 "use strict";
-// import {CloudinaryConfiguration} from 'cloudinary-react';
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadChatImg = exports.uploadPostImgVideo = exports.uploadProfilePic = void 0;
-// const cloudinaryConfig:CloudinaryConfiguration = {
-//     cloudName:"pulse-socialmedia",
-//     apiKey:"615616133356435",
-//     apiSecret:"rfWuVkJzxUhlsMJhncX4zUSWWMA",
-//     uploadPreset: "ayyzml8c",
-//     url:"https://api.cloudinary.com/v1_1/pulse-socialmedia/image/upload"
-// }
-// export default cloudinaryConfig
 const multer_1 = __importDefault(require("multer"));
 const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 const cloudinary_1 = require("cloudinary");

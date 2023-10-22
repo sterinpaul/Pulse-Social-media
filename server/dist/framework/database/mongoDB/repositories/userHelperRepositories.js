@@ -372,6 +372,7 @@ const userRepositoryMongoDB = () => {
         return yield userModel_1.default.find({ $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }, { userName: { $regex: regex } }] }, { firstName: 1, lastName: 1, userName: 1, profilePic: 1, followers: 1 }).limit(10);
     });
     const userNameUpdate = (userName, newUserName) => __awaiter(void 0, void 0, void 0, function* () {
+        newUserName = newUserName.toLowerCase();
         const userExist = yield userModel_1.default.findOne({ userName: newUserName });
         if (userExist) {
             return false;
@@ -391,6 +392,7 @@ const userRepositoryMongoDB = () => {
         }
     });
     const userProfileUpdate = (userName, firstName, lastName, gender, city, bio) => __awaiter(void 0, void 0, void 0, function* () {
+        userName = userName.toLowerCase();
         const response = yield userModel_1.default.updateOne({ userName }, { $set: { firstName, lastName, gender, city, bio } });
         if (response.modifiedCount) {
             return true;

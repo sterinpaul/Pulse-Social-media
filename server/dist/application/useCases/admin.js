@@ -9,26 +9,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUser = exports.reportedPosts = exports.getUsersAndPostsCount = exports.getAllPosts = void 0;
-const getAllPosts = (adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield adminRepository.getAllPost();
-    if (data)
-        return data;
-});
-exports.getAllPosts = getAllPosts;
+exports.searchUser = exports.singleUserBlock = exports.singlePostBlock = exports.reportedPosts = exports.allUsers = exports.getUsersAndPostsCount = void 0;
 const getUsersAndPostsCount = (adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
     const data = yield adminRepository.getAllCount();
     if (data)
         return data;
 });
 exports.getUsersAndPostsCount = getUsersAndPostsCount;
-const reportedPosts = (adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield adminRepository.getReportedPosts();
+const allUsers = (status, pageNumber = 0, adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield adminRepository.getAllUsers(status, pageNumber);
+    if (data)
+        return data;
+});
+exports.allUsers = allUsers;
+const reportedPosts = (pageNumber, adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield adminRepository.getReportedPosts(pageNumber);
     if (data)
         return data;
 });
 exports.reportedPosts = reportedPosts;
-const searchUser = (searchText, adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield adminRepository.getUserBySearch(searchText);
+const singlePostBlock = (postId, status, adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield adminRepository.postBlock(postId, status);
+    if (data)
+        return data;
+});
+exports.singlePostBlock = singlePostBlock;
+const singleUserBlock = (userId, status, adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield adminRepository.userBlock(userId, status);
+    if (data)
+        return data;
+});
+exports.singleUserBlock = singleUserBlock;
+const searchUser = (searchText, status, pageNumber, adminRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield adminRepository.getUserBySearch(searchText, status, pageNumber);
 });
 exports.searchUser = searchUser;

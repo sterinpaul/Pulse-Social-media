@@ -12,123 +12,127 @@ export const adminRepositoryMongoDB = ()=>{
 
     
     const getCount = async()=>{
-      const totalUsers = await User.countDocuments()
-
-      const totalPosts = await Post.countDocuments({
-        'reports': { $exists: true, $not: { $size: 0 } }
-      })
-
-      const usersReport = await User.aggregate(
-        [
-          {
-            $match: {
-              isBlocked: false
-            }
-          },
-          {
-            $project: {
-              month: {
-                $month: "$createdAt"
+      try{
+        const [totalUsers,totalPosts,usersReport,postsReport] = await Promise.all([
+          User.countDocuments(),
+          Post.countDocuments({
+            'reports': { $exists: true, $not: { $size: 0 } }
+          }),
+          User.aggregate(
+            [
+              {
+                $match: {
+                  isBlocked: false
+                }
+              },
+              {
+                $project: {
+                  month: {
+                    $month: "$createdAt"
+                  }
+                }
+              },
+              {
+                $group: {
+                  _id: "$month",
+                  count: {
+                    $sum: 1
+                  }
+                }
+              },
+              {
+                $sort: {
+                  _id: 1
+                }
+              },
+              {
+                $project: {
+                  _id: 0,
+                  month: {
+                    $arrayElemAt: [
+                      [
+                        "",
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ],
+                      "$_id"
+                    ]
+                  },
+                  count: 1
+                }
               }
-            }
-          },
-          {
-            $group: {
-              _id: "$month",
-              count: {
-                $sum: 1
-              }
-            }
-          },
-          {
-            $sort: {
-              _id: 1
-            }
-          },
-          {
-            $project: {
-              _id: 0,
-              month: {
-                $arrayElemAt: [
-                  [
-                    "",
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ],
-                  "$_id"
-                ]
+            ]
+          ),
+          Post.aggregate(
+            [
+              {
+                $match: {
+                  listed: true,
+                },
               },
-              count: 1
-            }
-          }
-        ]
-      )
-      const postsReport = await Post.aggregate(
-        [
-          {
-            $match: {
-              listed: true,
-            },
-          },
-          {
-            $project: {
-              month: {
-                $month: "$createdAt",
+              {
+                $project: {
+                  month: {
+                    $month: "$createdAt",
+                  },
+                },
               },
-            },
-          },
-          {
-            $group: {
-              _id: "$month",
-              count: {
-                $sum: 1,
+              {
+                $group: {
+                  _id: "$month",
+                  count: {
+                    $sum: 1,
+                  },
+                },
               },
-            },
-          },
-          {
-            $sort: {
-              _id: 1,
-            },
-          },
-          {
-            $project: {
-              _id: 0,
-              month: {
-                $arrayElemAt: [
-                  [
-                    "",
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ],
-                  "$_id",
-                ],
+              {
+                $sort: {
+                  _id: 1,
+                },
               },
-              count: 1,
-            },
-          },
-        ]
-      )
-      return {totalUsers,totalPosts,usersReport,postsReport}
+              {
+                $project: {
+                  _id: 0,
+                  month: {
+                    $arrayElemAt: [
+                      [
+                        "",
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ],
+                      "$_id",
+                    ],
+                  },
+                  count: 1,
+                },
+              },
+            ]
+          )]
+        )
+        return {totalUsers,totalPosts,usersReport,postsReport}
+      }catch(error){
+        console.log('Error fetching data: ',error)
+      }
     }
 
 

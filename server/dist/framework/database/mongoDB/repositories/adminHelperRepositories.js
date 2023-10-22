@@ -20,28 +20,170 @@ const adminRepositoryMongoDB = () => {
     const getAdminByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
         return yield adminModel_1.default.findOne({ email });
     });
-    const getPost = () => __awaiter(void 0, void 0, void 0, function* () {
-        return yield userModel_1.default.find();
-    });
     const getCount = () => __awaiter(void 0, void 0, void 0, function* () {
-        const totalUsers = yield userModel_1.default.find({ isBlocked: false }).count();
-        const totalPosts = yield postModel_1.default.find({ listed: true }).count();
-        return { totalUsers, totalPosts };
+        try {
+            const [totalUsers, totalPosts, usersReport, postsReport] = yield Promise.all([
+                userModel_1.default.countDocuments(),
+                postModel_1.default.countDocuments({
+                    'reports': { $exists: true, $not: { $size: 0 } }
+                }),
+                userModel_1.default.aggregate([
+                    {
+                        $match: {
+                            isBlocked: false
+                        }
+                    },
+                    {
+                        $project: {
+                            month: {
+                                $month: "$createdAt"
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$month",
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $sort: {
+                            _id: 1
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            month: {
+                                $arrayElemAt: [
+                                    [
+                                        "",
+                                        "Jan",
+                                        "Feb",
+                                        "Mar",
+                                        "Apr",
+                                        "May",
+                                        "Jun",
+                                        "Jul",
+                                        "Aug",
+                                        "Sep",
+                                        "Oct",
+                                        "Nov",
+                                        "Dec",
+                                    ],
+                                    "$_id"
+                                ]
+                            },
+                            count: 1
+                        }
+                    }
+                ]),
+                postModel_1.default.aggregate([
+                    {
+                        $match: {
+                            listed: true,
+                        },
+                    },
+                    {
+                        $project: {
+                            month: {
+                                $month: "$createdAt",
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: "$month",
+                            count: {
+                                $sum: 1,
+                            },
+                        },
+                    },
+                    {
+                        $sort: {
+                            _id: 1,
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            month: {
+                                $arrayElemAt: [
+                                    [
+                                        "",
+                                        "Jan",
+                                        "Feb",
+                                        "Mar",
+                                        "Apr",
+                                        "May",
+                                        "Jun",
+                                        "Jul",
+                                        "Aug",
+                                        "Sep",
+                                        "Oct",
+                                        "Nov",
+                                        "Dec",
+                                    ],
+                                    "$_id",
+                                ],
+                            },
+                            count: 1,
+                        },
+                    },
+                ])
+            ]);
+            return { totalUsers, totalPosts, usersReport, postsReport };
+        }
+        catch (error) {
+            console.log('Error fetching data: ', error);
+        }
     });
-    const getAllReported = () => __awaiter(void 0, void 0, void 0, function* () {
-        const allReportedPosts = yield userModel_1.default.find({ isBlocked: false }).count();
-        console.log(allReportedPosts);
-        return allReportedPosts;
+    const allUsers = (status, pageNumber) => __awaiter(void 0, void 0, void 0, function* () {
+        if (status === 'all') {
+            const response = yield userModel_1.default.find().sort({ userName: 1 }).skip(pageNumber * 6).limit(6);
+            const count = yield userModel_1.default.countDocuments();
+            return { count, response };
+        }
+        else {
+            const response = yield userModel_1.default.find({ isBlocked: status }).sort({ userName: 1 }).skip(pageNumber * 6).limit(6);
+            const count = yield userModel_1.default.countDocuments({ isBlocked: status });
+            return { count, response };
+        }
     });
-    const userSearch = (searchText) => __awaiter(void 0, void 0, void 0, function* () {
+    const getAllReported = (pageNumber) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield postModel_1.default.find({
+            'reports': { $exists: true, $not: { $size: 0 } }
+        }).skip(pageNumber * 6).limit(6);
+        const count = yield postModel_1.default.countDocuments({
+            'reports': { $exists: true, $not: { $size: 0 } }
+        });
+        return { count, response };
+    });
+    const postBlockHandler = (postId, status) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield postModel_1.default.updateOne({ _id: postId }, { $set: { listed: !status } });
+        if (response.modifiedCount === 1)
+            return true;
+    });
+    const userBlockHandler = (userId, status) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield userModel_1.default.updateOne({ _id: userId }, { $set: { isBlocked: !status } });
+        if (response.modifiedCount === 1)
+            return true;
+    });
+    const userSearch = (searchText, status, pageNumber) => __awaiter(void 0, void 0, void 0, function* () {
         const regex = new RegExp(searchText, 'i');
-        return yield userModel_1.default.find({ $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }, { userName: { $regex: regex } }] }, { firstName: 1, lastName: 1, userName: 1, profilePic: 1, followers: 1 }).limit(10);
+        const response = yield userModel_1.default.find({ $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }, { userName: { $regex: regex } }] }, { userName: 1, profilePic: 1, email: 1, createdAt: 1, isBlocked: 1 }).skip(pageNumber * 6).limit(6);
+        const count = yield userModel_1.default.countDocuments({ $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }, { userName: { $regex: regex } }] });
+        return { count, response };
     });
     return {
         getAdminByEmail,
         getCount,
+        allUsers,
         getAllReported,
-        getPost,
+        postBlockHandler,
+        userBlockHandler,
         userSearch
     };
 };

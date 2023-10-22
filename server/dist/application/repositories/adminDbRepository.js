@@ -17,20 +17,28 @@ const adminDbRepository = (repository) => {
     const getAllCount = () => __awaiter(void 0, void 0, void 0, function* () {
         return yield repository.getCount();
     });
-    const getReportedPosts = () => __awaiter(void 0, void 0, void 0, function* () {
-        return yield repository.getAllReported();
+    const getAllUsers = (status, pageNumber) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.allUsers(status, pageNumber);
     });
-    const getAllPost = () => __awaiter(void 0, void 0, void 0, function* () {
-        return yield repository.getPost();
+    const getReportedPosts = (pageNumber) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.getAllReported(pageNumber);
     });
-    const getUserBySearch = (searchText) => __awaiter(void 0, void 0, void 0, function* () {
-        return yield repository.userSearch(searchText);
+    const postBlock = (postId, status) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.postBlockHandler(postId, status);
+    });
+    const userBlock = (userId, status) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.userBlockHandler(userId, status);
+    });
+    const getUserBySearch = (searchText, status, pageNumber) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.userSearch(searchText, status, pageNumber);
     });
     return {
         getAdminByEmail,
         getAllCount,
+        getAllUsers,
         getReportedPosts,
-        getAllPost,
+        postBlock,
+        userBlock,
         getUserBySearch
     };
 };
