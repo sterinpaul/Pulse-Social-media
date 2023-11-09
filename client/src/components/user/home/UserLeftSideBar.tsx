@@ -131,7 +131,7 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
             }
             </ListItemSuffix>
         </ListItem>
-        <ChatBoxContainer chatOpen={chatOpen} chatContainerHandler={chatContainerHandler} videoDisplay={videoDisplay} setVideoDisplay={setVideoDisplay} />
+        <ChatBoxContainer chatOpen={chatOpen} setChatOpen={setChatOpen} chatContainerHandler={chatContainerHandler} videoDisplay={videoDisplay} setVideoDisplay={setVideoDisplay} />
         
         <ListItem onClick={handleOpen}>
           <ListItemPrefix>

@@ -10,5 +10,6 @@ exports.configKeys = {
     MONGODB_URL: process.env.MONGODB_URL,
     PORT: process.env.PORT,
     JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
-    CLIENT_URL: process.env.CLIENT_URL
+    CLIENT_URL: process.env.CLIENT_URL,
+    SOCKET_SERVER: process.env.SOCKET_SERVER
 };

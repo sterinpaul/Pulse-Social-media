@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 let activeUsers = [];
 const socketConfig = (io) => {
     io.on('connection', (socket) => {
-        socket.emit('me', socket.id);
+        // socket.emit('me',socket.id)
         // Socket.IO connection event: This function is executed when a new client connects to the server.
         socket.on('add-new-user', (newUserId) => {
             // Event handler for "add-new-user" event: Adds a new user to the list of active users.
@@ -27,6 +27,30 @@ const socketConfig = (io) => {
                 io.to(user.socketId).emit('user-blocked');
             }
         });
+        socket.on('initialize-call', data => {
+            const user = activeUsers.find((user) => user.userId === data.chatUserId);
+            if (user) {
+                io.to(user.socketId).emit('offer-received', data);
+            }
+        });
+        socket.on('call-accepted', data => {
+            const user = activeUsers.find((user) => user.userId === data.userId);
+            if (user) {
+                io.to(user.socketId).emit('offer-accepted', data.peerId);
+            }
+        });
+        socket.on('another-call', id => {
+            const user = activeUsers.find((user) => user.userId === id);
+            if (user) {
+                io.to(user.socketId).emit('another-caller');
+            }
+        });
+        socket.on('cancel-call', id => {
+            const user = activeUsers.find((user) => user.userId === id);
+            if (user) {
+                io.to(user.socketId).emit('call-cancelled');
+            }
+        });
         socket.on('call-started', (data) => {
             const { roomId, chatUserId } = data;
             const user = activeUsers.find((user) => user.userId === chatUserId);
@@ -34,17 +58,19 @@ const socketConfig = (io) => {
                 io.to(user.socketId).emit('call-received', data);
             }
         });
-        socket.on('join-room', (roomId, userId) => {
-            console.log('roomId and userId', roomId, userId);
-            socket.join(roomId);
-            socket.to(roomId).emit('user-connected', userId);
-            // socket.to(userId).emit('user-connected',roomId)
-        });
-        socket.on('call-user', (data) => {
-            io.to(data.userToCall).emit('call-user', { signal: data.signalData, from: data.from, name: data.name });
-        });
-        socket.on('answer-call', (data) => {
-            io.to(data.to).emit('call-accepted', data.signal);
+        const rooms = {};
+        socket.on('join-room', roomId => {
+            if (rooms[roomId]) {
+                rooms[roomId].push(socket.id);
+            }
+            else {
+                rooms[roomId] = [socket.id];
+            }
+            const otherUser = rooms[roomId].find((id) => id !== socket.id);
+            if (otherUser) {
+                socket.emit('other-user', otherUser);
+                socket.to(otherUser).emit('user-joined', socket.id);
+            }
         });
         socket.on('disconnect', () => {
             socket.broadcast.emit('call-ended');

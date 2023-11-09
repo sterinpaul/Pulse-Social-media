@@ -4,9 +4,9 @@ import Profile from './pages/user/Profile';
 import EditProfile from './pages/user/EditProfile';
 import SignInAndSignUp from './pages/user/SignInAndSignUp';
 import { useSelector } from 'react-redux';
-import VideoCall from './components/user/home/chat/VideoCall';
 import AdminHome from './pages/admin/AdminHome';
 import AdminSignInPage from './pages/admin/AdminSignInPage';
+import VideoCall from './components/user/home/chat/VideoCall';
 
 
 function App() {
@@ -19,8 +19,8 @@ function App() {
         <Route path='/' element={reduxToken ? <Home/> : <SignInAndSignUp/>}></Route>
         <Route path='/:user' element={<Profile/>}></Route>
         <Route path='/:user/edit' element={<EditProfile/>}></Route>
-        <Route path='/chat/:roomId' element={<VideoCall/>}></Route>
         <Route path='/pulz/admin' element={reduxAdminToken ? <AdminHome/> : <AdminSignInPage/>}></Route>
+        <Route path='/videocall/:id' element={<VideoCall/>}></Route>
       </Routes>
     </BrowserRouter>
   )

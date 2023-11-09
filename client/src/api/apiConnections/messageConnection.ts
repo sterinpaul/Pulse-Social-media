@@ -16,7 +16,9 @@ export const createSingleImgMessage = async(chatId:string,senderId:string,receiv
         chatForm.append('senderId',senderId)
         chatForm.append('receiverId',receiverId)
         chatForm.append('imgChat',imgChat)
-        const response = await baseURL.post('/message/img',chatForm)
+        const response = await baseURL.post('/message/img',chatForm,{
+            headers:{'Content-Type' : 'multipart/form-data'}
+        })
         return response?.data
     }catch(error){
         console.log(error)

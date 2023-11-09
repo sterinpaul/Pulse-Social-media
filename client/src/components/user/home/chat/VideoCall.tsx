@@ -1,33 +1,66 @@
-import { useState } from 'react'
-import AgoraUIKit from "agora-react-uikit";
-import { Button } from '@material-tailwind/react';
-import { useNavigate } from 'react-router-dom';
+
+import Peer from 'peerjs'
+import { useEffect, useRef, useState } from 'react'
 
 const VideoCall = ()=>{
-    const [videoCall, setVideoCall] = useState(true);
+    const peer = useRef<Peer | null>(null)
+    const userVideoRef = useRef<HTMLVideoElement | null>(null)
+    const remoteVideoRef = useRef<HTMLVideoElement | null>(null)
+    const [myStream,setMyStream] = useState<MediaStream | null>(null)
+    const [localPeerId,setLocalPeerId] = useState('')
+    const [remotePeerId,setRemotePeerId] = useState('')
 
-    const rtcProps = {
-        appId: "d0e1c6142f1a47aa89aff774c00c7238",
-        channel: "Pulz",
-        token: "007eJxTYNi+48ZUz0Ln3wuu1Rj+MVsjeeJU1IF5iaeEtyvc5he58maSAkOKQaphspmhiVGaYaKJeWKihWViWpq5uUmygUGyuZGxRfQ39dSGQEYGG0VPZkYGCATxWRgCSnOqGBgA6DwgdA==",
+
+    useEffect(()=>{
+        peer.current = new Peer()
+        peer.current.on('open',id=>{
+            setLocalPeerId(id)
+        })
+
+        navigator.mediaDevices.getUserMedia({video:true,audio:true})
+        .then((stream)=>{
+            setMyStream(stream)
+            if(userVideoRef.current){
+                userVideoRef.current.srcObject = stream
+            }
+        })
+
+    },[])
+
+    const connectUser = ()=>{
+        const call = peer.current?.call(remotePeerId,myStream!)
+        call?.on('stream',stream=>{
+            if(remoteVideoRef.current){
+                remoteVideoRef.current.srcObject = stream
+            }
+        })
     }
 
-    const callbacks = {
-        EndCall: () => setVideoCall(false),
-    }
-    const navigate = useNavigate()
+    useEffect(()=>{
+        peer.current?.on('call',call=>{
+            call.answer(myStream!)
+            call.on('stream',stream=>{
+                if(remoteVideoRef.current){
+                    remoteVideoRef.current.srcObject = stream
+                }
+            })
+        })
+    },[])
 
-    return videoCall ? (
-        // <div style={{ display: "flex", width: "100vw", height: "100vh" }} >
-        <div className='flex w-screen h-screen justify-center'>
-          <AgoraUIKit rtcProps={rtcProps} callbacks={callbacks} />
+
+    return(
+        <div>
+            <input value={localPeerId} type="text" readOnly/> 
+            <input onChange={(e)=>setRemotePeerId(e.target.value)} type="text"/>
+
+            <div className='text-center'>
+                <button onClick={connectUser} className='bg-orange-900 rounded px-1 m-1'>Connect</button>
+            </div>
+            <div className="flex flex-col flex-wrap justify-center items-center sm:flex-row h-[90vh]">
+                <video ref={userVideoRef} className="w-full h-1/2 sm:w-1/2 sm:h-[90vh]" autoPlay playsInline muted />
+                <video ref={remoteVideoRef} className="w-full h-1/2 sm:w-1/2 sm:h-[90vh]" autoPlay playsInline />
+            </div>
         </div>
-      ) : (
-        <div className='flex items-center justify-center w-screen h-screen gap-2'>
-            <Button size="sm" onClick={() => setVideoCall(true)}>Join</Button>
-            <Button size="sm" onClick={() => navigate('/')}>Home</Button>
-        </div>
-      )
+    )
 }
-
 export default VideoCall

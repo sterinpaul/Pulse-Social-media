@@ -12,7 +12,7 @@ const initialState = {
     onlineUsers : [],
     chatList: [],
     receivedMessages: [] as receivedMessageInterface[],
-    userChatId:''
+    remoteChatId:''
 }
 
 const chatSlice = createSlice({
@@ -31,11 +31,11 @@ const chatSlice = createSlice({
         clearReceivedMessages:(state)=>{
             state.receivedMessages = []
         },
-        setUserChatId:(state,action)=>{
-            state.userChatId = action.payload
+        setRemoteChatId:(state,action)=>{
+            state.remoteChatId = action.payload
         }
     }
 })
 
-export const {setOnlineUsers,setChatList,setReceivedMessages,clearReceivedMessages,setUserChatId} = chatSlice.actions
+export const {setOnlineUsers,setChatList,setReceivedMessages,clearReceivedMessages,setRemoteChatId} = chatSlice.actions
 export default chatSlice.reducer
