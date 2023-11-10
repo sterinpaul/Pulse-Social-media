@@ -65,7 +65,7 @@ export const signIn = async (values:SigninFormValues):Promise<object> =>{
 
 export const signInWithGoogle = async(email:string) =>{
     try{
-        const response = await baseURL.get(`/auth/googlesignin?email=${email}`)
+        const response = await baseURL.get(`/auth/googlesignin/${email}`)
         return response?.data
     }catch(error){
         console.log(error)

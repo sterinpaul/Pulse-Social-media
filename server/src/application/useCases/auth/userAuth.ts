@@ -107,25 +107,25 @@ export const userGoogleSignIn = async(
     authService:ReturnType<AuthServiceInterface>
 )=>{
     const userByEmail = await userRepository.getUserByEmail(email)
-    
-    if(userByEmail?.isBlocked){
-        const userData = {
-            status:"blocked",
-            message:"User is blocked"
-        }
-        return userData
-    }
 
-    if(userByEmail?.isBlocked===false){
-        const jwtToken = await authService.generateToken(userByEmail._id?.toString())
-        userByEmail.password = '';
-        const userData = {
-            status:"success",
-            message:"Sign in Success",
-            user:userByEmail,
-            token:jwtToken
+    if(userByEmail){
+        if(userByEmail.isBlocked){
+            const userData = {
+                status:"blocked",
+                message:"User is blocked"
+            }
+            return userData
+        }else{
+            const jwtToken = await authService.generateToken(userByEmail._id?.toString())
+            userByEmail.password = '';
+            const userData = {
+                status:"success",
+                message:"Sign in Success",
+                user:userByEmail,
+                token:jwtToken
+            }
+            return userData
         }
-        return userData
     }else{
         const userData = {
             status:"failed",

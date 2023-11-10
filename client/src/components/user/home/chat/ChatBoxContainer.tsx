@@ -48,6 +48,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   const [sendMessage, setSendMessage] = useState({})
   const [searchText, setSearchText] = useState('')
   const [chats, setChats] = useState<messageInterface[]>([])
+  const [isOnline,setIsOnline] = useState(false)
 
   const [imgChat, setImgChat] = useState<File | null>(null)
   const [imgDialogOpen, setImgDialogOpen] = useState(false)
@@ -68,6 +69,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   const [videoChatHandler,setVideoChatHandler] = useState(true)
   const peer = useRef<Peer | null>(null)
   const [myStream, setMyStream] = useState<MediaStream | null>(null)
+  const [firstCaller, setFirstCaller] = useState(false)
   const userVideoRef = useRef<HTMLVideoElement | null>(null)
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null)
   
@@ -271,33 +273,15 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   const openVideoChat = async() => {
     setVideoDisplay(true)
     const streams = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    setMyStream(streams)
     if(userVideoRef.current){
       userVideoRef.current.srcObject = streams
     }
+    setMyStream(streams)
+    setFirstCaller(true)
     socket.current?.emit('initialize-call',{caller:userName,peerId,userId,chatUserId})
   }
 
-  const cancelVideoCall = ()=>{
-    if(myStream){
-      socket.current?.emit('cancel-call',chatUserId)
-      const tracks = myStream.getTracks()
-      tracks.forEach((track:any) => {
-        track.stop();
-      })
-    }
-    
-    // setMyStream(null)
-    setVideoDisplay(false)
-    setVideoChatHandler(true)
-  }
-
-  useEffect(()=>{
-    socket.current?.on('call-cancelled',()=>{
-      cancelVideoCall()
-    })
-  },[])
-
+  
   useEffect(()=>{
     if(videoChatHandler && peerId.length){
       setVideoChatHandler(false)
@@ -310,16 +294,17 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
             onClick: () => {
               setChatOpen(true)
               setVideoDisplay(true)
-  
+              setChatUserId(data.userId)
               navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream)=>{
                 setMyStream(stream)
                 if(userVideoRef.current){
                   userVideoRef.current.srcObject = stream
                 }
               
-                socket.current?.emit('call-accepted',{userId:data.userId,peerId})
+                // socket.current?.emit('call-accepted',{userId:data.userId,peerId})
   
                 const call = peer.current?.call(data.peerId,stream)
+                
                 call?.on('stream', (streamRemote) => {
                   if(remoteVideoRef.current){
                     remoteVideoRef.current.srcObject = streamRemote
@@ -330,30 +315,30 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
                 console.log('Failed to get local stream',error)
               })
             }
-          })
+          }) 
         }
       })
     }
     
-
     socket.current?.on('another-caller',()=>{
       toast.error('User is on another call')
     })
-
+    
   },[peerId])
-
-  useEffect(()=>{
-    socket.current?.on('offer-accepted',(id)=>{
-      if(myStream){
-        const call = peer.current?.call(id,myStream)
-        call?.on('stream', (streamRemote) => {
-          if(remoteVideoRef.current){
-            remoteVideoRef.current.srcObject = streamRemote
-          }
-        })
-      }
-    })
-  },[myStream])
+  
+  // useEffect(()=>{
+  //   socket.current?.on('offer-accepted',(id)=>{
+  //     if(myStream){
+  //       const call = peer.current?.call(id,myStream)
+  //       call?.on('stream', (streamRemote) => {
+  //         console.log('second',streamRemote)
+  //         if(remoteVideoRef.current){
+  //           remoteVideoRef.current.srcObject = streamRemote
+  //         }
+  //       })
+  //     }
+  //   })
+  // },[myStream])
 
 
   useEffect(()=>{
@@ -374,53 +359,45 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
     })
   },[myStream])
 
+  const removeVideoTrack = ()=>{
+    const tracks = myStream?.getTracks()
+    tracks?.forEach((track:any) => {
+      track.stop()
+    })
+    // setMyStream(null)
+    setVideoDisplay(false)
+    setVideoChatHandler(true)
+    if(firstCaller){
+      setFirstCaller(false)
+    }else{
+      setChatOpen(false)
+    }
+  }
+  
+  
+  const cancelVideoCall = ()=>{
+    if(myStream){
+      socket.current?.emit('cancel-call',chatUserId)
+      removeVideoTrack()
+    }
+  }
 
 
-  // useEffect(() => {
-  //   const videoCallReceiveHandle = (data: { userId:string, userName: string, roomId: string }) => {
-
-  //     toast.success(`${data.userName} is calling...`, {
-  //       autoClose: 10000,
-  //       onClick: () => {
-  //         dispatch(setRemoteChatId(data.userId))
-  //         navigate(`/videocall/${data.roomId}`)
-  //       }
-  //     })
-  //   }
-  //   socket.current?.on('call-received', videoCallReceiveHandle)
-  //   return () => {
-  //     socket.current?.off('call-received', videoCallReceiveHandle)
-  //   }
-  // }, [])
-
-
-
-  //   const endCall = ()=>{
-  //     setCallEnded(true)
-  //     setStartVideoCall(false)
-  //     setCallAccepted(false)
-  //     setReceivingCall(false)
-  //     setStream(undefined)
-  //     setCaller('')
-  //     setName('')
-  //     setCallerSignal(null)
-  //     connectionRef.current?.destroy()
-  //     if(stream){
-  //       const tracks = stream.getTracks()
-  //       tracks.forEach((track:any) => {
-  //         track.stop();
-  //       })
-  //     }
-  //   }
-
+  useEffect(()=>{
+    if(myStream){
+      socket.current?.on('call-cancelled',()=>{
+        removeVideoTrack()
+      })
+    }
+  },[myStream])
 
   return (
-    <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[96vh] flex focus:outline-none'>
+    <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[90vh] flex focus:outline-none'>
       {videoDisplay ? (
         <div className="mx-auto relative group">
-          <div className="flex flex-col flex-wrap justify-center sm:flex-row h-[96vh] ">
-            <video ref={userVideoRef} className="w-full h-1/2 sm:w-1/2 sm:h-[96vh]" autoPlay playsInline muted />
-            <video ref={remoteVideoRef} className="w-full h-1/2 sm:w-1/2 sm:h-[96vh]" autoPlay playsInline />
+          <div className="flex flex-col flex-wrap justify-center sm:flex-row h-[90vh] ">
+            <video ref={userVideoRef} className="w-full h-1/2 sm:w-1/2 sm:h-[90vh]" autoPlay playsInline muted />
+            <video ref={remoteVideoRef} className="w-full h-1/2 sm:w-1/2 sm:h-[90vh]" autoPlay playsInline />
           </div>
           <div className="absolute bottom-1 left-[43%] sm:left-[45%] xl:left-[47%] hidden group-hover:block">
             <button onClick={cancelVideoCall} className="px-4 py-1 bg-red-700 rounded-xl"><VideoCameraSlashIcon className='w-7 h-7 text-white' /></button>
@@ -441,14 +418,14 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
             <List className='p-0 overflow-y-scroll'>
               {allChatUsers.length ? allChatUsers.map((user: chattedUsers) => {
                 return (
-                  <SingleChat key={user._id} user={user} focusMessageInput={focusMessageInput} onlineUsers={onlineUsers} />
+                  <SingleChat key={user._id} user={user} focusMessageInput={focusMessageInput} onlineUsers={onlineUsers} setIsOnline={setIsOnline}/>
                 )
               })
                 : <></>}
             </List>
           </div>
 
-          <div className='w-full bg-blue-gray-100 h-[96vh] flex flex-col justify-between'>
+          <div className='w-full bg-blue-gray-100 flex flex-col justify-between'>
             <div className="h-full flex flex-col overflow-y-scroll">
               {chatUserName.length ? <div className='pl-4 bg-blue-gray-200 flex items-center justify-between'>
                 <div className='flex items-center gap-4'>
@@ -459,7 +436,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
                 </div>
 
                 <div>
-                  <button onClick={openVideoChat} className='m-2'><VideoCameraIcon className='w-7 h-7 text-black mr-2' /></button>
+                  {isOnline ? <button onClick={openVideoChat} className='m-2'><VideoCameraIcon className='w-7 h-7 text-black mr-2' /></button> : null}
                   <button><EllipsisVerticalIcon className='w-7 h-7 text-black mr-2' /></button>
                 </div>
 
@@ -470,14 +447,14 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
                     return (
                       <div key={data._id} ref={index === chats.length - 1 ? scroll : null} className='rounded bg-light-blue-100 m-2 w-52 p-1 self-end'>
                         {data.message ? <p className='text-black'>{data.message}</p> : <img src={CLOUDINARY_CHAT_URL + data.imgURL} />}
-                        <p className='text-xs text-right'>{moment(data.createdAt).calendar()}</p>
+                        <p className='text-xs text-right break-words'>{moment(data.createdAt).calendar()}</p>
                       </div>
                     )
                   } else {
                     return (
                       <div key={data._id} ref={index === chats.length - 1 ? scroll : null} className='rounded bg-yellow-100 m-2 w-52 p-1 self-start'>
                         {data.message ? <p className='text-black'>{data.message}</p> : <img src={CLOUDINARY_CHAT_URL + data.imgURL} />}
-                        <p className='text-xs text-right'>{moment(data.createdAt).calendar()}</p>
+                        <p className='text-xs text-right break-words'>{moment(data.createdAt).calendar()}</p>
                       </div>
                     )
                   }

@@ -38,7 +38,7 @@ const authControllers = (
     })
 
     const googleSignIn = asyncHandler(async(req:Request,res:Response)=>{
-        const email = req.query.email
+        const email = req.params.email
         const userDetails = await userGoogleSignIn(email as string,userDbRepository,authService)
         res.json(userDetails)
     })

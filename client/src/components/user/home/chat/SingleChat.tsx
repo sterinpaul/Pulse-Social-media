@@ -17,10 +17,11 @@ import { chattedUsers, onlineUsersInterface } from '../../../../interfaces/userI
 interface chatInterface{
   user:chattedUsers,
   focusMessageInput:(user:{_id:string,userName:string,profilePic:string,chatId?:string})=>void
-  onlineUsers:onlineUsersInterface[]
+  onlineUsers:onlineUsersInterface[],
+  setIsOnline:(value:boolean)=>void
 }
 
-const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers})=>{
+const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers,setIsOnline})=>{
   
   const onlineStatus = onlineUsers.some((person:{userId:string})=>person.userId===user._id)
   // const [status,setStatus] = useState(onlineStatus)
@@ -30,6 +31,7 @@ const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers}
     
     <ListItem onClick={(event)=>{
       focusMessageInput(user)
+      setIsOnline(onlineStatus)
       const listItem = event.currentTarget;
     
     // Remove the 'active' class from all siblings
@@ -45,7 +47,7 @@ const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers}
     // Add the 'active' class to the clicked item
     listItem.classList.add("bg-gray-300")
 
-      }} className='rounded-none hover:bg-gray-300 focus:bg-gray-400'>
+      }} className='rounded-none hover:bg-gray-400 focus:bg-gray-400'>
       <ListItemPrefix>
         <Avatar variant="circular" alt="Profile Pic" src={user.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO} />
       </ListItemPrefix>

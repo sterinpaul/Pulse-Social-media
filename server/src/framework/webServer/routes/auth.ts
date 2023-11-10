@@ -15,7 +15,7 @@ const authRouter = ()=>{
         )
         router.post('/signup',controllers.signUpUser)
         router.post('/signin',controllers.signInUser)
-        router.get('/googlesignin',controllers.googleSignIn)
+        router.get('/googlesignin/:email',controllers.googleSignIn)
         router.post('/googlereg',controllers.googleRegister)
 
     return router

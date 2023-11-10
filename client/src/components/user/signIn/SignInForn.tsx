@@ -113,19 +113,19 @@ const SignInForm = ()=>{
         email : data._tokenResponse.email
         // profilePic : data._tokenResponse.photoUrl
       }
+      
       setUserDetails(userData)
       const response:googleResp = await signInWithGoogle(userData?.email)
       if(response?.status === 'success'){
-        if(response?.token){
-          const user = {
-            userName:response?.user?.userName,
-            darkMode:response?.user?.darkMode,
-            profilePic:response?.user?.profilePic,
-            _id:response?.user?._id
-          }
-          dispatch(setToken(response?.token))
-          dispatch(setUser(user))
+        const user = {
+          userName:response?.user?.userName,
+          darkMode:response?.user?.darkMode,
+          profilePic:response?.user?.profilePic,
+          _id:response?.user?._id
         }
+        dispatch(setToken(response?.token))
+        dispatch(setUser(user))
+        
         navigate('/')
         toast.success(response?.message)
       }else if(response?.status === 'blocked'){
