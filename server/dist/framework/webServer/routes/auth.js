@@ -14,7 +14,7 @@ const authRouter = () => {
     const controllers = (0, userAuthController_1.default)(authServiceInterfaces_1.authServiceInterface, authServices_1.authServices, userDbRepository_1.userDbRepository, userHelperRepositories_1.userRepositoryMongoDB);
     router.post('/signup', controllers.signUpUser);
     router.post('/signin', controllers.signInUser);
-    router.get('/googlesignin', controllers.googleSignIn);
+    router.get('/googlesignin/:email', controllers.googleSignIn);
     router.post('/googlereg', controllers.googleRegister);
     return router;
 };

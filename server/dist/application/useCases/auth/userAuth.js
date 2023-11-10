@@ -95,23 +95,25 @@ exports.userSignIn = userSignIn;
 const userGoogleSignIn = (email, userRepository, authService) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
     const userByEmail = yield userRepository.getUserByEmail(email);
-    if (userByEmail === null || userByEmail === void 0 ? void 0 : userByEmail.isBlocked) {
-        const userData = {
-            status: "blocked",
-            message: "User is blocked"
-        };
-        return userData;
-    }
-    if ((userByEmail === null || userByEmail === void 0 ? void 0 : userByEmail.isBlocked) === false) {
-        const jwtToken = yield authService.generateToken((_c = userByEmail._id) === null || _c === void 0 ? void 0 : _c.toString());
-        userByEmail.password = '';
-        const userData = {
-            status: "success",
-            message: "Sign in Success",
-            user: userByEmail,
-            token: jwtToken
-        };
-        return userData;
+    if (userByEmail) {
+        if (userByEmail.isBlocked) {
+            const userData = {
+                status: "blocked",
+                message: "User is blocked"
+            };
+            return userData;
+        }
+        else {
+            const jwtToken = yield authService.generateToken((_c = userByEmail._id) === null || _c === void 0 ? void 0 : _c.toString());
+            userByEmail.password = '';
+            const userData = {
+                status: "success",
+                message: "Sign in Success",
+                user: userByEmail,
+                token: jwtToken
+            };
+            return userData;
+        }
     }
     else {
         const userData = {

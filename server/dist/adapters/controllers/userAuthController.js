@@ -37,7 +37,7 @@ const authControllers = (authServiceInterface, authServices, userDbInterface, us
         res.json(userData);
     }));
     const googleSignIn = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const email = req.query.email;
+        const email = req.params.email;
         const userDetails = yield (0, userAuth_1.userGoogleSignIn)(email, userDbRepository, authService);
         res.json(userDetails);
     }));
