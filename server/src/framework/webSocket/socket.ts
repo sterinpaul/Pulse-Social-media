@@ -46,13 +46,6 @@ const socketConfig = (
             }
         })
 
-        // socket.on('call-accepted',data=>{
-        //     const user = activeUsers.find((user)=>user.userId===data.userId)
-        //     if(user){
-        //         io.to(user.socketId).emit('offer-accepted',data.peerId)
-        //     }
-        // })
-
         socket.on('another-call',id=>{
             const user = activeUsers.find((user)=>user.userId===id)
             if(user){
@@ -67,28 +60,12 @@ const socketConfig = (
             }
         })
 
-        // socket.on('call-started', (data)=>{
-        //     const {roomId,chatUserId} = data
-        //     const user = activeUsers.find((user)=>user.userId===chatUserId)
-        //     if(user){
-        //         io.to(user.socketId).emit('call-received',data)
-        //     }
-        // })
-
-        // const rooms:any = {}
-
-        // socket.on('join-room',roomId=>{
-        //     if(rooms[roomId]){
-        //         rooms[roomId].push(socket.id)
-        //     }else{
-        //         rooms[roomId] = [socket.id]
-        //     }
-        //     const otherUser = rooms[roomId].find((id: string)=>id !== socket.id)
-        //     if(otherUser){
-        //         socket.emit('other-user',otherUser)
-        //         socket.to(otherUser).emit('user-joined',socket.id)
-        //     }
-        // })
+        socket.on('reject-call',id=>{
+            const user = activeUsers.find((user)=>user.userId===id)
+            if(user){
+                io.to(user.socketId).emit('call-rejected')
+            }
+        })
     
 
         socket.on('disconnect',()=>{

@@ -76,6 +76,8 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
   const chatContainerHandler = ()=>{
     if(videoDisplay){
       setVideoDisplay(false)
+    }else{
+      dispatch(clearReceivedMessages())
     }
     setChatOpen(!chatOpen)
     setSearchText('')
@@ -83,7 +85,6 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
     if(chatOpen){
       dispatch(clearNotifications())
     }
-    dispatch(clearReceivedMessages())
   }
 
   const handleOpen = () => {
@@ -119,7 +120,7 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
           </ListItemPrefix>
           My Posts
         </ListItem>
-        <ListItem onClick={chatContainerHandler}>
+        <ListItem onClick={()=>setChatOpen(true)}>
           <ListItemPrefix>
             <ChatBubbleLeftRightIcon className="h-5 w-5" />
           </ListItemPrefix>

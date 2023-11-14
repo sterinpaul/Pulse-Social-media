@@ -24,8 +24,6 @@ interface chatInterface{
 const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers,setIsOnline})=>{
   
   const onlineStatus = onlineUsers.some((person:{userId:string})=>person.userId===user._id)
-  // const [status,setStatus] = useState(onlineStatus)
-  // console.log('online',onlineUsers,status,user._id)
 
   return(
     
@@ -47,7 +45,7 @@ const SingleChat:React.FC<chatInterface> = ({user,focusMessageInput,onlineUsers,
     // Add the 'active' class to the clicked item
     listItem.classList.add("bg-gray-300")
 
-      }} className='rounded-none hover:bg-gray-400 focus:bg-gray-400'>
+      }} className='pl-4 rounded-none hover:bg-gray-400 focus:bg-gray-400'>
       <ListItemPrefix>
         <Avatar variant="circular" alt="Profile Pic" src={user.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO} />
       </ListItemPrefix>

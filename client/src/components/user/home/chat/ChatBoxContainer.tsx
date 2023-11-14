@@ -5,16 +5,13 @@ import { chattedUsers } from "../../../../interfaces/userInterface"
 import { CLOUDINARY_CHAT_URL, CLOUDINARY_PROFILE_PHOTO_URL, PROFILE_PHOTO, SOCKET_URL } from "../../../../api/baseURL"
 import { getUserbySearch } from "../../../../api/apiConnections/userConnection"
 import { createSingleImgMessage, createSingleMessage, getUserMessages } from "../../../../api/apiConnections/messageConnection"
-// import { createNewChat } from "../../../../api/apiConnections/chatConnection"
 import { messageInterface } from "../../../../interfaces/messageInterface"
 import { getAllChats } from "../../../../api/apiConnections/messageConnection"
-// import { getAllChats } from "../../../../api/apiConnections/chatConnection"
 import { useSelector, useDispatch } from "react-redux";
 import { setOnlineUsers, setChatList, setReceivedMessages, setRemoteChatId } from "../../../../redux/userRedux/chatSlice"
 import { io, Socket } from 'socket.io-client'
 import InputEmoji from "react-input-emoji"
 import moment from 'moment'
-// import { v4 as uuid } from 'uuid'
 import { toast } from 'react-toastify'
 import Peer from 'peerjs'
 
@@ -22,7 +19,7 @@ import Peer from 'peerjs'
 import {
   VideoCameraIcon,
   VideoCameraSlashIcon,
-  // PaperAirplaneIcon,
+  ArrowLeftIcon,
   EllipsisVerticalIcon,
   PhotoIcon
 } from "@heroicons/react/24/outline";
@@ -43,12 +40,14 @@ interface chatBoxInterface {
 const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, chatContainerHandler, videoDisplay, setVideoDisplay }) => {
 
   const { userName, userId, profilePic } = useSelector((store: { user: { userName: string, userId: string, darkMode: boolean, profilePic: string } }) => store.user)
-  const { onlineUsers, receivedMessages } = useSelector((store: { chat: { onlineUsers: [], receivedMessages: [] } }) => store.chat)
+  const { onlineUsers, receivedMessages, chatList } = useSelector((store: { chat: { onlineUsers: [], receivedMessages: [], chatList:[] } }) => store.chat)
   const [allChatUsers, setAllChatUsers] = useState<chattedUsers[]>([])
   const [sendMessage, setSendMessage] = useState({})
   const [searchText, setSearchText] = useState('')
   const [chats, setChats] = useState<messageInterface[]>([])
   const [isOnline,setIsOnline] = useState(false)
+
+  const [chatListViewStatus,setChatListViewStatus] = useState(true)
 
   const [imgChat, setImgChat] = useState<File | null>(null)
   const [imgDialogOpen, setImgDialogOpen] = useState(false)
@@ -63,15 +62,21 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   const navigate = useNavigate()
 
   const socket = useRef<Socket | null>(null)
-
   
   const [peerId,setPeerId] = useState('')
-  const [videoChatHandler,setVideoChatHandler] = useState(true)
   const peer = useRef<Peer | null>(null)
   const [myStream, setMyStream] = useState<MediaStream | null>(null)
   const [firstCaller, setFirstCaller] = useState(false)
   const userVideoRef = useRef<HTMLVideoElement | null>(null)
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null)
+
+  const [videoCallReceivedData,setVideoCallReceivedData] = useState({caller:'',peerId:'',userId:'',profilePic:'',chatUserId:''})
+  const [videoCallFromOthers,setVideoCallFromOthers] = useState(false)
+  const [otherUserBusy,setOtherUserBusy] = useState(false)
+
+  const videoCallFromOthersHandler = ()=>{
+    setVideoCallFromOthers(open=>!open)
+  }
   
 
   const dialogOpen = () => {
@@ -132,7 +137,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
   useEffect(()=>{
     peer.current = new Peer()
-    peer.current.on('open', (id: string) => {
+    peer.current?.on('open', (id: string) => {
       setPeerId(id)
       console.log('My peer ID is: ' + id)
     })
@@ -150,7 +155,9 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
       if (!exists) {
         dispatch(setReceivedMessages(data))
       }
-      scroll.current?.scrollIntoView({ behavior: 'smooth' })
+      setTimeout(()=>{
+        scroll.current?.scrollIntoView({ behavior: 'smooth' })
+      },0)
     }
 
     socket.current?.on('receive-message', receiveMessageHandler)
@@ -169,8 +176,8 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
   const focusMessageInput = async (data: { _id: string, userName: string, profilePic: string, chatId?: string }) => {
     setSearchText('')
-    scroll.current?.scrollIntoView({ behavior: 'smooth' })
-    if (textAreaRef.current) {
+    if(data.userName !== chatUserName){
+    
       if (data?.chatId !== undefined) {
         const response = await getUserMessages(data.chatId)
         if (response?.status) {
@@ -180,12 +187,16 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
         setChats([])
       }
 
-      textAreaRef?.current?.focus()
       setChatUserId(data._id)
       dispatch(setRemoteChatId(data._id))
       setChatUserName(data.userName)
       setChatUserPic(data.profilePic)
+      setTimeout(()=>{
+        scroll.current?.scrollIntoView({ behavior: 'smooth' })
+      },0)
     }
+    textAreaRef.current?.focus()
+    setChatListViewStatus(false)
   }
 
   const sendAMessage = async () => {
@@ -198,21 +209,6 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
       }
       setCommentText('')
 
-      // if (chats?.length) {
-      // const response: { status: boolean, data: messageInterface } = await createSingleMessage(chats[0]?.chatId, userId, commentText)
-      // if (response?.status) {
-      //   setChats([...chats, response?.data])
-      //   setSendMessage({ _id: response?.data?._id, senderId: userId, chatId: chats[0]?.chatId, message: commentText, receiverId: chatUserId })
-      // }
-
-      // } else {
-      // const response: { status: boolean, data: { _id: string } } = await createNewChat(userId, chatUserId)
-      // if (response?.status) {
-      //   const messageResponse: { status: boolean, data: any } = await createSingleMessage(response.data?._id, userId, commentText)
-      //   setChats([messageResponse?.data])
-      //   setSendMessage({ _id: messageResponse?.data?._id, senderId: userId, chatId: response.data?._id, message: commentText, receiverId: chatUserId })
-      // }
-      // }
     } else if (imgChat !== null && chatUserName.length) {
       setImgDialogOpen(!imgDialogOpen)
       const response: { status: boolean, data: messageInterface } = await createSingleImgMessage(chats[0]?.chatId, userId, chatUserId, imgChat)
@@ -227,13 +223,12 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
   const searchUserForChat = async (event: { target: { value: SetStateAction<string> } }) => {
     setSearchText(event.target.value)
-    if (event?.target?.value?.toString().trim().length) {
+    if (event.target?.value?.toString().trim().length) {
       const userData = await getUserbySearch(event.target.value as string)
-      const previousChatUsers = allChatUsers
-
+      
       if (userData.length) {
         // Create a Map to store the unique objects by userName
-        const uniqueMap = new Map<string, typeof userData[0]>();
+        const uniqueMap = new Map()
 
         // Add objects from array a to the Map
         userData.forEach((item: { userName: string }) => {
@@ -241,18 +236,14 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
         })
 
         // Add objects from array b to the Map (overwrite duplicates based on userName)
-        allChatUsers.forEach((item: { userName: string }) => {
+        chatList.forEach((item: { userName: string }) => {
           uniqueMap.set(item.userName, item)
         })
 
-        // const uniqueObjects = Array.from(uniqueMap.values())
-
-        // setSearchedUser(Array.from(uniqueMap.values()))
         setAllChatUsers(Array.from(uniqueMap.values()))
-      } else {
-        setAllChatUsers(previousChatUsers)
-        setAllChatUsers([])
       }
+    }else{
+      setAllChatUsers(chatList)
     }
   }
 
@@ -264,12 +255,6 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
   // Video chat
 
-  // const openVideo = ()=>{
-  //   const roomId = uuid()
-  //   socket.current?.emit('call-started',{roomId,userName,chatUserId})
-  //   navigate(`/videocall/${roomId}`)
-  // }
-
   const openVideoChat = async() => {
     setVideoDisplay(true)
     const streams = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -278,44 +263,52 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
     }
     setMyStream(streams)
     setFirstCaller(true)
-    socket.current?.emit('initialize-call',{caller:userName,peerId,userId,chatUserId})
+    socket.current?.emit('initialize-call',{caller:userName,peerId,userId,profilePic,chatUserId})
   }
 
+  const acceptVideoCall = (data:typeof videoCallReceivedData)=>{
+    if(!chatOpen){
+      setChatOpen(true)
+    }
+    setVideoDisplay(true)
+    setChatUserId(data.userId)
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream)=>{
+      setMyStream(stream)
+      if(userVideoRef.current){
+        userVideoRef.current.srcObject = stream
+      }
+
+      const call = peer.current?.call(data.peerId,stream)
+      
+      call?.on('stream', (streamRemote) => {
+        if(remoteVideoRef.current){
+          remoteVideoRef.current.srcObject = streamRemote
+        }
+      })
+      
+    }).catch((error)=>{
+      console.log('Failed to get local stream',error)
+    })
+  }
   
   useEffect(()=>{
-    if(videoChatHandler && peerId.length){
-      setVideoChatHandler(false)
+    if(peerId.length){
       socket.current?.on('offer-received',data=>{
-        if(videoDisplay){
-          socket.current?.emit('another-call',data.userId)
+        setVideoCallReceivedData(data)
+        if(chatOpen){
+          if(videoDisplay){
+            socket.current?.emit('another-call',data.userId)
+          }else{
+            videoCallFromOthersHandler()
+          }
         }else{
           toast.success(`${data.caller} is calling...`, {
             autoClose: 10000,
             onClick: () => {
-              setChatOpen(true)
-              setVideoDisplay(true)
-              setChatUserId(data.userId)
-              navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream)=>{
-                setMyStream(stream)
-                if(userVideoRef.current){
-                  userVideoRef.current.srcObject = stream
-                }
-              
-                // socket.current?.emit('call-accepted',{userId:data.userId,peerId})
-  
-                const call = peer.current?.call(data.peerId,stream)
-                
-                call?.on('stream', (streamRemote) => {
-                  if(remoteVideoRef.current){
-                    remoteVideoRef.current.srcObject = streamRemote
-                  }
-                })
-                
-              }).catch((error)=>{
-                console.log('Failed to get local stream',error)
-              })
-            }
-          }) 
+              acceptVideoCall(data)
+            },
+            closeOnClick:true
+          })
         }
       })
     }
@@ -324,7 +317,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
       toast.error('User is on another call')
     })
     
-  },[peerId])
+  },[peerId,chatOpen])
   
   // useEffect(()=>{
   //   socket.current?.on('offer-accepted',(id)=>{
@@ -364,9 +357,8 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
     tracks?.forEach((track:any) => {
       track.stop()
     })
-    // setMyStream(null)
+    setMyStream(null)
     setVideoDisplay(false)
-    setVideoChatHandler(true)
     if(firstCaller){
       setFirstCaller(false)
     }else{
@@ -391,6 +383,40 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
     }
   },[myStream])
 
+  useEffect(()=>{
+    socket.current?.on('call-rejected',()=>{
+      setOtherUserBusy(true)
+      videoCallFromOthersHandler()
+    })
+  },[])
+
+
+  // useEffect(() => {
+  //   const mediaQuery = window.matchMedia('(max-width: 540px)')
+
+  //   const handleMediaQueryChange = (event: { matches: boolean | ((prevState: boolean) => boolean) }) => {
+  //     if(event.matches === false){
+  //       setChatListViewStatus(true)
+  //     }
+  //   }
+
+  //   mediaQuery.addEventListener('change',handleMediaQueryChange)
+
+  //   // Cleanup the listener when the component unmounts
+  //   return () => {
+  //     mediaQuery.removeEventListener('change',handleMediaQueryChange)
+  //   }
+  // }, [])
+
+  const goBackToChatList = ()=>{
+    setChatListViewStatus(true)
+  }
+  const rejectVideoCall = ()=>{
+    videoCallFromOthersHandler()
+    socket.current?.emit('reject-call',{caller:videoCallReceivedData?.userId})
+  }
+
+
   return (
     <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[90vh] flex focus:outline-none'>
       {videoDisplay ? (
@@ -405,17 +431,17 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
         </div>
       ) : (
         <>
-          <div className='w-3/5'>
-            <div className='p-1 flex gap-1 items-center justify-evenly h-16 bg-gray-500'>
+          <div className={`sm:w-full sm:block lg:w-96 lg:block md:w-72 md:block ${chatListViewStatus ? 'w-full' : 'hidden'}`}>
+            <div className='p-2 pl-4 flex gap-4 items-center h-16 bg-gray-500'>
               <div className='w-12 h-12 rounded-full'>
                 <img className='object-cover w-full h-full rounded-full' src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL + profilePic) : PROFILE_PHOTO} />
               </div>
               <div>
-                <input className='bg-gray-100 focus:outline-none p-1 px-4 w-100 rounded text-black' onChange={searchUserForChat} value={searchText} type="text" maxLength={20} placeholder='Search' />
+                <input className='w-4/5 bg-gray-100 focus:outline-none p-1 px-4 w-100 rounded text-black' onChange={searchUserForChat} value={searchText} type="text" maxLength={20} placeholder='Search' />
               </div>
             </div>
 
-            <List className='p-0 overflow-y-scroll'>
+            <List className='p-0 overflow-y-scroll h-[calc(100vh-8.5rem)]'>
               {allChatUsers.length ? allChatUsers.map((user: chattedUsers) => {
                 return (
                   <SingleChat key={user._id} user={user} focusMessageInput={focusMessageInput} onlineUsers={onlineUsers} setIsOnline={setIsOnline}/>
@@ -425,10 +451,13 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
             </List>
           </div>
 
-          <div className='w-full bg-blue-gray-100 flex flex-col justify-between'>
-            <div className="h-full flex flex-col overflow-y-scroll">
+          <div className={`${chatListViewStatus ? 'hidden': null} w-full h-full bg-blue-gray-100 sm:flex flex-col justify-between`}>
+            <div className="h-[calc(90vh-4.3rem)] flex flex-col overflow-y-scroll">
               {chatUserName.length ? <div className='pl-4 bg-blue-gray-200 flex items-center justify-between'>
                 <div className='flex items-center gap-4'>
+
+                <button onClick={goBackToChatList} className="sm:hidden block rounded-full p-2 bg-blue-gray-300"><ArrowLeftIcon className="w-5 h-5 text-black" /></button>
+
                   <div className='p-2'>
                     <Avatar variant="circular" alt="Profile Pic" src={chatUserPic?.length ? CLOUDINARY_PROFILE_PHOTO_URL + chatUserPic : PROFILE_PHOTO} />
                   </div>
@@ -485,6 +514,34 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
                   
                 </div>
               </Dialog>
+
+              <Dialog open={videoCallFromOthers} handler={videoCallFromOthersHandler} size="xs" className="outline-none" >
+                <div className="m-2 flex flex-col justify-center items-center gap-2">
+                  {otherUserBusy ? (
+                  <>
+                    <Avatar variant="circular" alt="Profile Pic" src={chatUserPic.length ? (CLOUDINARY_PROFILE_PHOTO_URL+chatUserPic) : PROFILE_PHOTO}/>
+                    <p><span className="text-blue-800 text-lg font-bold uppercase">{chatUserName}</span>{` is busy`}</p>
+                    <div>
+                      <Button size="sm" className="m-2 capitalize" onClick={()=>{
+                        videoCallFromOthersHandler()
+                        setOtherUserBusy(false)
+                      }}>Cancel</Button>
+                    </div>
+                  </>
+                  ) : (
+                    <>
+                    <Avatar variant="circular" alt="Profile Pic" src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+profilePic) : PROFILE_PHOTO}/>
+                    <p><span className="text-blue-800 text-lg font-bold uppercase">{videoCallReceivedData?.caller}</span>{` is calling...`}</p>
+                    <div>
+                      <Button size="sm" className="m-2 capitalize" onClick={()=>acceptVideoCall(videoCallReceivedData)}>Accept</Button>
+                      <Button size="sm" className="m-2 capitalize" onClick={rejectVideoCall}>Reject</Button>
+                    </div>
+                  </>
+                  )}
+                  
+                </div>
+              </Dialog>
+
             </div>
           </div>
         </>
