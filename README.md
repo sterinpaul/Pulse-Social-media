@@ -10,4 +10,7 @@ Frontend
 React Vite TypeScript Material Tailwind Axios(for API calls) React Router (for client-side routing) Socket.io (for real-time updates) Peer js (for Video call).
 
 Backend
-Node.js Express.js MongoDB TypeScript Clean Architecture
+Node.js Express.js MongoDB TypeScript Clean Architecture.
+
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
