@@ -3,6 +3,7 @@ export interface postData{
     description:string,
     imgVideoURL:string,
     listed:boolean,
+    isVideo:boolean,
     liked:string[],
     postedUser:string,
     profilePic?:string,

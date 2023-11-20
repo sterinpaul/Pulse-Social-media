@@ -21,10 +21,17 @@ const postControllers = (postDbInterface, postDbService) => {
         res.json(response);
     }));
     const addPost = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const postedUser = req.headers['x-user'];
-        const cloudinaryPost = (_b = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path) === null || _b === void 0 ? void 0 : _b.split("/post-")[1];
-        const postResponse = yield (0, post_1.addNewPost)(postedUser, req.body.description, cloudinaryPost, postDbRepository);
+        const cloudinaryPost = (_b = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path) === null || _b === void 0 ? void 0 : _b.split("/upload/")[1];
+        let isVideo;
+        if ((_d = (_c = req.file) === null || _c === void 0 ? void 0 : _c.mimetype) === null || _d === void 0 ? void 0 : _d.startsWith('video/')) {
+            isVideo = true;
+        }
+        else {
+            isVideo = false;
+        }
+        const postResponse = yield (0, post_1.addNewPost)(postedUser, req.body.description, cloudinaryPost, isVideo, postDbRepository);
         res.json(postResponse);
     }));
     const unlikePost = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,7 +54,6 @@ const postControllers = (postDbInterface, postDbService) => {
     const addComment = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const commentedUser = req.headers['x-user'];
         const { comment, postId, commentId, replyToUser } = req.body;
-        console.log(req.body);
         const response = yield (0, post_1.addCommentToPost)(comment, commentedUser, postId, commentId, replyToUser, postDbRepository);
         if (response === null || response === void 0 ? void 0 : response.postId) {
             res.json({ comment: true, response });

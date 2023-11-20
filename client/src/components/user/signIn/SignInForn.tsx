@@ -214,7 +214,7 @@ const SignInForm = ()=>{
                     color="blue"
                     className="flex items-center gap-3"
                     >
-                    <img src="https://www.material-tailwind.com/icons/google.svg" alt="metamask" className="h-6 w-6" />
+                    <img src='https://www.google.com/images/hpp/ic_wahlberg_product_core_48.png8.png' alt="google" className="h-6 w-6" />
                       Sign in with Google
                     </Button>
                 </div>

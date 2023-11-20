@@ -30,6 +30,10 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         return await repository.getUserByNameMailMobile(userData)
     }
 
+    const getUserNotifications = async(userData:string)=>{
+        return await repository.getNotifications(userData)
+    }
+
     const getAllPost = async(userName:string)=>{
         return await repository.getPost(userName)
     }
@@ -65,9 +69,16 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         gender:string,
         city:string,
         bio:string
-        )=>{
-            return repository.userProfileUpdate(userName,firstName,lastName,gender,city,bio)
-        }
+    )=>{
+        return repository.userProfileUpdate(userName,firstName,lastName,gender,city,bio)
+    }
+
+    const removeNotification = async(
+        userName:string,
+        id:string
+    )=>{
+        return repository.removeUserNotification(userName,id)
+    }
 
     return {
         addUser,
@@ -75,6 +86,7 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         getUserByEmail,
         getUserByUsername,
         getUserByMobile,
+        getUserNotifications,
         getAllPost,
         postProfilePicture,
         followUnfollowHandler,
@@ -82,7 +94,8 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         getSavedPosts,
         getUserBySearch,
         updateUserName,
-        updateUserProfile
+        updateUserProfile,
+        removeNotification
     }
 }
 export type UserDbInterface = typeof userDbRepository

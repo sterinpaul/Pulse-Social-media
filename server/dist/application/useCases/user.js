@@ -9,13 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userProfileUpdate = exports.userNameUpdate = exports.searchUser = exports.getSavedPosts = exports.postSaveHandler = exports.followUnfollowUser = exports.postProfilePic = exports.getUserProfile = exports.getAllPosts = void 0;
+exports.removeUserNotification = exports.userProfileUpdate = exports.userNameUpdate = exports.searchUser = exports.getSavedPosts = exports.postSaveHandler = exports.followUnfollowUser = exports.postProfilePic = exports.getUserProfile = exports.getNotificationData = exports.getAllPosts = void 0;
 const getAllPosts = (userName, userRepository) => __awaiter(void 0, void 0, void 0, function* () {
     const data = yield userRepository.getAllPost(userName);
     if (data)
         return data;
 });
 exports.getAllPosts = getAllPosts;
+const getNotificationData = (userName, userRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield userRepository.getUserNotifications(userName);
+});
+exports.getNotificationData = getNotificationData;
 const getUserProfile = (userName, userRepository) => __awaiter(void 0, void 0, void 0, function* () {
     const data = yield userRepository.getUserByUsername(userName);
     if (data) {
@@ -55,3 +59,7 @@ const userProfileUpdate = (userName, firstName, lastName, gender, city, bio, use
     return userRepository.updateUserProfile(userName, firstName, lastName, gender, city, bio);
 });
 exports.userProfileUpdate = userProfileUpdate;
+const removeUserNotification = (userName, id, userRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    return userRepository.removeNotification(userName, id);
+});
+exports.removeUserNotification = removeUserNotification;

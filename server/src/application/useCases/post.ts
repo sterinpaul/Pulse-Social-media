@@ -20,12 +20,14 @@ export const addNewPost = async(
     postedUser: string,
     description: string,
     imgVideoURL: string,
+    isVideo:boolean,
     postRepository:ReturnType<postDbInterface>
 )=>{
     const post = {
         postedUser,
         description,
-        imgVideoURL
+        imgVideoURL,
+        isVideo
     }
 
     const data = await postRepository.addPost(post)

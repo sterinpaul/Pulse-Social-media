@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
 const getTokenFromLocal = ()=>{
     const token = localStorage.getItem("token")
     if(token){
@@ -30,58 +31,25 @@ const getUserIdFromLocal = ()=>{
 }
 
 interface initial{
-    
-        token?:string,
-        userName?: string,
-        darkMode?: boolean,
-        profilePic?: string,
-        userId?:string,
-        notifications?:[]
-        // firstName?: string,
-        // lastName?: string,
-        // email?: string,
-        // mobile?: string,
-        // isBlocked?: boolean,
-        // gender?: string,
-        // city?: string,
-        // bio?:string,
-        // savedPosts?:object[],
-        // blockedByUsers?: object[],
-        // blockedUsers?: object[],
-        // followRequested?: object[],
-        // followRequests?: object[],
-        // followers?: object[],
-        // following?: object[],
-        // createdAt?: string,
-        // updatedAt?: string
-
+    token?:string,
+    userName?: string,
+    darkMode?: boolean,
+    profilePic?: string,
+    userId?:string,
+    follow?:boolean,
+    followNotification:{},
+    notifications?:[]
 }
 
 const initialState:initial = {
-        token: getTokenFromLocal(),
-        userName: getUserNameFromLocal(),
-        darkMode: getDarkModeFromLocal(),
-        profilePic: getProfilePicFromLocal(),
-        userId: getUserIdFromLocal(),
-        notifications:[]
-        // firstName: "",
-        // lastName: "",
-        // email: "",
-        // mobile?: "",
-        // isBlocked: false,
-        // gender: "",
-        // city: "",
-        // bio:"",
-        // savedPosts: [],
-        // blockedByUsers: [],
-        // blockedUsers: [],
-        // followRequested: [],
-        // followRequests: [],
-        // followers: [],
-        // following: [],
-        // createdAt: "",
-        // updatedAt: ""
-    // }
+    token: getTokenFromLocal(),
+    userName: getUserNameFromLocal(),
+    darkMode: getDarkModeFromLocal(),
+    profilePic: getProfilePicFromLocal(),
+    userId: getUserIdFromLocal(),
+    follow:false,
+    followNotification:{},
+    notifications:[]
 }
 
 const userSlice = createSlice({
@@ -125,6 +93,15 @@ const userSlice = createSlice({
             localStorage.removeItem('darkMode')
             localStorage.removeItem('profilePic')
         },
+        setNotifications:(state,action)=>{
+            state.notifications = action.payload
+        },
+        setFollow:(state,action)=>{
+            state.follow = action.payload
+        },
+        setFollowNotification:(state,action)=>{
+            state.followNotification = action.payload
+        },
         clearOpenedNotification:(state,action)=>{
             state.notifications?.splice(action.payload.index,1)
         },
@@ -134,5 +111,18 @@ const userSlice = createSlice({
     }
 })
 
-export const {changeMode,setToken,setUserName,setUser,changePhoto,userSignOut,clearOpenedNotification,clearNotifications} = userSlice.actions
+export const {
+    changeMode,
+    setToken,
+    setUserName,
+    setUser,
+    changePhoto,
+    userSignOut,
+    setNotifications,
+    clearOpenedNotification,
+    setFollow,
+    setFollowNotification,
+    clearNotifications
+} = userSlice.actions
+
 export default userSlice.reducer

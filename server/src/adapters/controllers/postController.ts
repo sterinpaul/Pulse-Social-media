@@ -30,8 +30,14 @@ const postControllers = (
 
     const addPost = asyncHandler(async(req:Request,res:Response)=>{
         const postedUser = req.headers['x-user'] as string
-        const cloudinaryPost = req.file?.path?.split("/post-")[1] as string
-        const postResponse = await addNewPost(postedUser,req.body.description,cloudinaryPost,postDbRepository)
+        const cloudinaryPost = req.file?.path?.split("/upload/")[1] as string
+        let isVideo;
+        if(req.file?.mimetype?.startsWith('video/')){
+            isVideo = true
+        }else{
+            isVideo = false
+        }
+        const postResponse = await addNewPost(postedUser,req.body.description,cloudinaryPost,isVideo,postDbRepository)
         res.json(postResponse)
     })
 
@@ -58,7 +64,7 @@ const postControllers = (
     const addComment = asyncHandler(async(req:Request,res:Response)=>{
         const commentedUser = req.headers['x-user'] as string
         const {comment,postId,commentId,replyToUser} = req.body
-        console.log(req.body);
+        
         
         const response:any = await addCommentToPost(comment,commentedUser,postId,commentId,replyToUser,postDbRepository)
         if(response?.postId){

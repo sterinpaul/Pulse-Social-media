@@ -8,15 +8,17 @@ import {
     Avatar,
     Typography
   } from "@material-tailwind/react";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { followHandler } from '../../../api/apiConnections/userConnection';
 import { useNavigate } from 'react-router-dom';
+import { setFollowNotification } from '../../../redux/userRedux/userSlice';
 
-const FollowList = ({user,handleOpen}:{user:{userName:string,firstName:string,lastName:string,profilePic:string,followers:string[]},handleOpen:(value:boolean) => void})=>{
-    const {userName} = useSelector((store:{user:{userName:string,darkMode:boolean}})=>store.user)
-    const followersStatus = user?.followers?.includes(userName)
-    const [follow,setFollow] = useState(followersStatus)
+const FollowList = ({user,handleOpen}:{user:{_id:string,userName:string,firstName:string,lastName:string,profilePic:string,followers:string[]},handleOpen:(value:boolean) => void})=>{
+    const {userName,profilePic} = useSelector((store:{user:{userName:string,profilePic:string,darkMode:boolean}})=>store.user)
+    const followerStatus = user && user.followers && user.followers.includes(userName)
+    const [follow,setFollow] = useState(followerStatus)
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const goToProfile = ()=>{
         handleOpen(false)
@@ -24,15 +26,17 @@ const FollowList = ({user,handleOpen}:{user:{userName:string,firstName:string,la
     }
 
     const followUnfollowHandler = async()=>{
-      const response = await followHandler(user?.userName)
-      if(response && follow){
-        user?.followers?.splice(user.followers.indexOf(userName),1)
-      }else{
-        user?.followers?.push(userName)
-      }
+      const response:{followerId?:string,profilePic?:string} = await followHandler(user?.userName)
       if(response){
+        if(follow){
+          user?.followers?.splice(user.followers.indexOf(userName),1)
+        }else{
+          user?.followers?.push(userName)
+          response.followerId = user?._id
+          response.profilePic = profilePic
+          dispatch(setFollowNotification(response))
+        }
         setFollow(!follow)
-        navigate('/')
       }
     }
 

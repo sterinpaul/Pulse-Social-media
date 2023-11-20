@@ -66,6 +66,13 @@ const socketConfig = (
                 io.to(user.socketId).emit('call-rejected')
             }
         })
+
+        socket.on('follow-user',(data)=>{
+            const user = activeUsers.find((user)=>user.userId===data.followerId)
+            if(user){
+                io.to(user.socketId).emit('user-followed',data)
+            }
+        })
     
 
         socket.on('disconnect',()=>{

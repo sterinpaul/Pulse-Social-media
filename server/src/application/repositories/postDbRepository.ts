@@ -10,7 +10,8 @@ export const postDbRepository = (repository:ReturnType<postRepositoryMongoDB>)=>
     const addPost = async(post:{
         postedUser: string,
         description: string,
-        imgVideoURL: string
+        imgVideoURL: string,
+        isVideo:boolean
     })=>{
         return await repository.addPost(post)
     }

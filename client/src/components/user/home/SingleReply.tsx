@@ -16,7 +16,7 @@ interface singleReplyContainer{
 
 const SingleReply:React.FC<singleReplyContainer> = ({reply,focusTextAreaReply})=>{
     const {userName} = useSelector((store:{user:userInterface})=>store.user)
-    console.log('repl.....',reply);
+    
     
     const likeStatus = reply.liked.includes(userName)
     const [like,setLike] = useState(likeStatus)

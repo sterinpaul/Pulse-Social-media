@@ -101,10 +101,10 @@ export const chatRepositoryMongoDB = ()=>{
     }
 
     return {
-        createChat,
-        getAllChats,
-        getSingleChat,
-        getMessages
+      createChat,
+      getAllChats,
+      getSingleChat,
+      getMessages
     }
 }
 

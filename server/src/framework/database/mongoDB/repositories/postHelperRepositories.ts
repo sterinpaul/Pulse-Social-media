@@ -7,7 +7,8 @@ import User from "../models/userModel"
 interface postInterface{
   postedUser: string,
   description: string,
-  imgVideoURL: string
+  imgVideoURL: string,
+  isVideo:boolean
 }
 
 export const postRepositoryMongoDB = ()=>{
@@ -42,6 +43,7 @@ export const postRepositoryMongoDB = ()=>{
               postedUser: 1,
               description: 1,
               imgVideoURL: 1,
+              isVideo: 1,
               profilePic: "$userData.profilePic",
               liked: 1,
               createdAt: 1

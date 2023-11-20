@@ -50,6 +50,7 @@ const userSchema = new Schema(
         type:Boolean,
         default:false
     },
+    notifications:[],
     savedPosts:[],
     blockedUsers:[],
     blockedByUsers:[],

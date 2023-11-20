@@ -8,6 +8,13 @@ export const getAllPosts = async(
     if(data)return data
 }
 
+export const getNotificationData = async(
+    userName:string,
+    userRepository:ReturnType<UserDbInterface>
+)=>{
+    return await userRepository.getUserNotifications(userName)
+}
+
 export const getUserProfile = async(
     userName:string,
     userRepository:ReturnType<UserDbInterface>
@@ -78,4 +85,12 @@ export const userProfileUpdate = async(
     userRepository:ReturnType<UserDbInterface>
 )=>{
     return userRepository.updateUserProfile(userName,firstName,lastName,gender,city,bio)
+}
+
+export const removeUserNotification = async(
+    userName:string,
+    id:string,
+    userRepository:ReturnType<UserDbInterface>
+)=>{
+    return userRepository.removeNotification(userName,id)
 }

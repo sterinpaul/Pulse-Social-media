@@ -9,6 +9,7 @@ const userRouter = ()=>{
     const controllers = userControllers(userDbRepository,userRepositoryMongoDB)
     router.get('/',controllers.getHome)
     router.get('/getpost',controllers.getPost)
+    router.get('/notifications/get',controllers.getnotifications)
     router.get('/:user',controllers.getProfile)
     router.post('/updatephoto',uploadProfilePic,controllers.updateProfilePic)
     router.put('/followunfollow',controllers.followUnfollow)
@@ -17,6 +18,7 @@ const userRouter = ()=>{
     router.get('/search/user',controllers.getUserBySearch)
     router.patch('/updateusername',controllers.updateUserName)
     router.post('/updateprofile',controllers.updateUserData)
+    router.patch('/notifications/remove',controllers.removeNotification)
 
     return router
 }

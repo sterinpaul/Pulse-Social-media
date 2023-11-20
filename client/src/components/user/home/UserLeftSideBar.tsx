@@ -25,7 +25,7 @@ import {
 import { getUserbySearch } from '../../../api/apiConnections/userConnection';
 import FollowList from './FollowList';
 import { useNavigate } from 'react-router-dom';
-import { clearNotifications } from '../../../redux/userRedux/userSlice';
+// import { clearNotifications } from '../../../redux/userRedux/userSlice';
 import ChatBoxContainer from './chat/ChatBoxContainer';
 import { clearReceivedMessages } from '../../../redux/userRedux/chatSlice';
 
@@ -82,9 +82,9 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
     setChatOpen(!chatOpen)
     setSearchText('')
     setSearchedUser([])
-    if(chatOpen){
-      dispatch(clearNotifications())
-    }
+    // if(chatOpen){
+    //   dispatch(clearNotifications())
+    // }
   }
 
   const handleOpen = () => {
@@ -141,11 +141,11 @@ const UserLeftSideBar:React.FC<UserLeftBarInterface> = ({searchOpen,setSearchOpe
           Search
         </ListItem>
         <Dialog open={searchOpen} handler={handleOpen} size='xs' className='min-h-[10rem] max-h-[25rem]'>
-        <div className="p-2">
-          <Input onChange={searchUser} value={searchText} icon={<MagnifyingGlassIcon className="h-5 w-5" />} label="Search" />
-        </div>
-          <DialogBody>
-            <List className='h-72 overflow-y-scroll'>
+          <div className="p-2">
+            <Input onChange={searchUser} value={searchText} icon={<MagnifyingGlassIcon className="h-5 w-5" />} label="Search" />
+          </div>
+          <DialogBody className='h-72 overflow-y-scroll'>
+            <List className='p-0'>
             {searchedUser?.map((user)=>{
                 return <FollowList user={user} handleOpen={handleOpen} key={user._id}/>
               }

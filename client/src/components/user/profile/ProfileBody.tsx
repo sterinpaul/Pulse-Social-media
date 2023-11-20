@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { changePhoto, setUserName } from "../../../redux/userRedux/userSlice";
+import { changePhoto, setFollow, setFollowNotification, setUserName } from "../../../redux/userRedux/userSlice";
 import { updateProfilePhoto, userNameChange, updateProfileData } from "../../../api/apiConnections/userConnection";
 import { PROFILE_PHOTO, CLOUDINARY_PROFILE_PHOTO_URL } from "../../../api/baseURL";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import FollowersList from "./FollowersList";
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate } from "react-router-dom";
 
 import {
     Tabs,
@@ -36,49 +37,44 @@ import {
     ArrowPathIcon
 } from "@heroicons/react/24/solid";
 
-import { useNavigate } from "react-router-dom";
 
-//   interface profile{
-//     _id:string,
-//     userName: string,
-//     firstName?: string,
-//     lastName?: string,
-//     email?: string,
-//     mobile: string,
-//     isBlock?: boolean,
-//     darkMode?: boolean,
-//     profilePic: string,
-//     gender?: string,
-//     city?: string,
-//     bio?:string,
-//     blockedByUsers?: [],
-//     blockedUsers?: [],
-//     followRequested?: [],
-//     followRequests?: [],
-//     followers?: string[],
-//     following?: string[],
-//     savedPosts?: object[],
-//     createdAt?: string,
-//     updatedAt?: string,
-//     posts: postData[]
-// }
+
+interface profile{
+    _id?:string,
+    userName: string,
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    mobile?: string,
+    isBlocked?: boolean,
+    darkMode?: boolean,
+    profilePic: string,
+    gender?: string,
+    city?: string,
+    bio?:string,
+    followRequested?: [],
+    followRequests?: [],
+    followers?: string[],
+    following?: string[],
+    savedPosts?: string[],
+    createdAt?: string,
+    updatedAt?: string,
+    posts?: postData[]
+}
 
 interface ProfileBodyProps {
-    profileData: any,
+    profileData: profile,
     saved: postData[]
 }
 
 const ProfileBody: React.FC<ProfileBodyProps> = ({ profileData, saved }) => {
     const [open, setOpen] = useState(false)
     const [followOpen, setFollowOpen] = useState(false)
-    // const [openProfile, setOpenProfile] = useState(false)
-    const { userName, profilePic, darkMode } = useSelector((store: { user: { userName: string, profilePic: string, darkMode: boolean } }) => store.user)
+    const { userName, profilePic, darkMode, follow } = useSelector((store: { user: { userName: string, profilePic: string, darkMode: boolean, follow: boolean} }) => store.user)
     const dispatch = useDispatch()
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null)
     const [submitState, setSubmitState] = useState(true)
     const [profileImg, setProfileImg] = useState(profilePic)
-    const followersStatus = profileData?.followers?.includes(userName)
-    const [follow, setFollow] = useState(followersStatus)
     const [folowFollowing, setFolowFollowing] = useState('')
     const [openProfileEdit, setOpenProfileEdit] = useState(false)
     const [userChangeStatus, setUserChangeStatus] = useState(false)
@@ -90,9 +86,7 @@ const ProfileBody: React.FC<ProfileBodyProps> = ({ profileData, saved }) => {
         setUserChangeStatus(false)
         setOpenProfileEdit((cur) => !cur)
     }
-
-    // const handleOpenProfile = () => setOpenProfile(!openProfile)
-
+    
     const handleOpenImg = () => {
         setProfilePhoto(null)
         setOpen(!open)
@@ -125,13 +119,18 @@ const ProfileBody: React.FC<ProfileBodyProps> = ({ profileData, saved }) => {
     }
 
     const followUnfollow = async () => {
-        const response = await followHandler(profileData?.userName)
-        if (response && follow) {
-            profileData?.followers?.splice(profileData.followers.indexOf(userName), 1)
-        } else {
-            profileData?.followers?.push(userName)
+        const response:{followerId?:string,profilePic?:string} = await followHandler(profileData?.userName)
+        if (response) {
+            if(follow){
+                profileData?.followers?.splice(profileData.followers.indexOf(userName), 1)
+            }else{
+                profileData?.followers?.push(userName)
+                response.followerId = profileData?._id
+                response.profilePic = profilePic
+                dispatch(setFollowNotification(response))
+            }
+            dispatch(setFollow(!follow))
         }
-        setFollow(!follow)
     }
 
     const followOpenHandle = (value: string) => {
@@ -221,13 +220,13 @@ const ProfileBody: React.FC<ProfileBodyProps> = ({ profileData, saved }) => {
 
 
 
-                        {/* Showing  Followers & Following List */}
+                        {/* Showing Followers & Following List */}
 
                         <div className="ml-auto mr-auto flex flex-col justify-around gap-4">
                             <h1 className="text-3xl capitalize">{profileData?.firstName} {profileData?.lastName}</h1>
                             <div className="flex gap-4">
-                                <button onClick={() => followOpenHandle('Followers')}><span className="text-light-blue-800">{profileData?.followers?.length}</span><span className="text-blue-gray-800"> followers</span></button>
-                                <button onClick={() => followOpenHandle('Following')}><span className="text-light-blue-800">{profileData?.following?.length}</span><span className="text-blue-gray-800"> following</span></button>
+                                {profileData?.followers?.length ? <button onClick={() => followOpenHandle('Followers')}><span className="text-light-blue-800">{profileData?.followers?.length}</span><span className="text-blue-gray-800"> followers</span></button> : <p className="text-blue-gray-800">No followers</p>}
+                                {profileData?.following?.length ? <button onClick={() => followOpenHandle('Following')}><span className="text-light-blue-800">{profileData?.following?.length}</span><span className="text-blue-gray-800"> following</span></button> : <p className="text-blue-gray-800">No following</p>}
                             </div>
 
                             <Dialog open={followOpen} handler={followOpenHandle} size='xs' className="w-100 h-100 max-h-[25rem] overflow-scroll">
@@ -248,7 +247,7 @@ const ProfileBody: React.FC<ProfileBodyProps> = ({ profileData, saved }) => {
                             <div><span className="text-blue-gray-800">Total posts : </span><span className="text-light-blue-800">{profileData?.posts?.length}</span></div>
                         </div>
                         <div className="ml-auto mr-auto">
-                            {userName === profileData?.userName ? <Button size="sm" onClick={handleProfileEditOpen} className="py-1 text-[.8rem] font-thin rounded-full capitalize">Edit Profile</Button> : follow ? <Button onClick={followUnfollow} size="sm" className="py-1 text-[.8rem] font-thin rounded-full capitalize w-20">Unfollow</Button> : <Button onClick={followUnfollow} size="sm" className="py-1 text-[.8rem] font-thin rounded-full capitalize w-20">Follow</Button>}
+                            {userName === profileData?.userName ? <Button size="sm" onClick={handleProfileEditOpen} className="py-1 text-[.8rem] font-thin rounded-full capitalize">Edit Profile</Button> : <Button onClick={followUnfollow} size="sm" className="py-1 text-[.8rem] font-thin rounded-full capitalize w-20">{follow ? 'Unfollow' : 'Follow'}</Button>}
 
 
 
@@ -372,19 +371,34 @@ const ProfileBody: React.FC<ProfileBodyProps> = ({ profileData, saved }) => {
                             </TabsHeader>
                             {/* <TabsBody className="grid grid-cols-3 grid-rows-auto m-1 gap-1"> */}
                             <TabsBody style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px,1fr))', gridGap: '5px', gridAutoFlow: 'dense' }}>
-                                {profileData?.posts ? (profileData?.posts?.map((post: postData) => {
+                                {profileData?.posts ? (profileData.posts.map((post: postData) => {
                                     post.profilePic = profilePic
-                                    return (
-                                        <TabPanel key={post._id} value='Images' className="p-0 w-full h-full max-h-72">
-                                            <SinglePostPhoto post={post} />
-                                        </TabPanel>)
+                                    if(post.isVideo){
+                                        return
+                                    }else{
+                                        return (
+                                            <TabPanel key={post._id} value='Images' className="p-0 w-full h-full max-h-72">
+                                                <SinglePostPhoto post={post} />
+                                            </TabPanel>
+                                        )
+                                    }
                                 })) : <></>}
                             </TabsBody>
                             <TabsBody style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px,1fr))', gridGap: '5px', gridAutoFlow: 'dense' }}>
-                                <TabPanel value='Videos'>
-                                    Videos
-                                </TabPanel>
+                                {profileData?.posts ? (profileData.posts.map((post: postData) => {
+                                    post.profilePic = profilePic
+                                    if(post.isVideo){
+                                        return (
+                                            <TabPanel key={post._id} value='Videos' className="p-0 w-full h-full max-h-72">
+                                                <SinglePostPhoto post={post} />
+                                            </TabPanel>
+                                        )
+                                    }else{
+                                        return
+                                    }
+                                })) : <></>}
                             </TabsBody>
+                            
                             <TabsBody style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px,1fr))', gridGap: '5px', gridAutoFlow: 'dense' }}>
                                 {saved.length ? (saved.map((post: postData) => {
                                     return (

@@ -20,12 +20,12 @@ import {
   VideoCameraIcon,
   VideoCameraSlashIcon,
   ArrowLeftIcon,
-  EllipsisVerticalIcon,
-  PhotoIcon
+  PhotoIcon,
+  EllipsisVerticalIcon
 } from "@heroicons/react/24/outline";
 
 import { useNavigate } from "react-router-dom"
-import { userSignOut } from "../../../../redux/userRedux/userSlice"
+import { setFollowNotification, setNotifications, userSignOut } from "../../../../redux/userRedux/userSlice"
 
 
 
@@ -39,7 +39,7 @@ interface chatBoxInterface {
 
 const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, chatContainerHandler, videoDisplay, setVideoDisplay }) => {
 
-  const { userName, userId, profilePic } = useSelector((store: { user: { userName: string, userId: string, darkMode: boolean, profilePic: string } }) => store.user)
+  const { userName, userId, profilePic, notifications, followNotification } = useSelector((store: { user: { userName: string, userId: string, darkMode: boolean, profilePic: string, notifications: [],followNotification: {user:string,viewed:boolean} } }) => store.user)
   const { onlineUsers, receivedMessages, chatList } = useSelector((store: { chat: { onlineUsers: [], receivedMessages: [], chatList:[] } }) => store.chat)
   const [allChatUsers, setAllChatUsers] = useState<chattedUsers[]>([])
   const [sendMessage, setSendMessage] = useState({})
@@ -73,6 +73,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   const [videoCallReceivedData,setVideoCallReceivedData] = useState({caller:'',peerId:'',userId:'',profilePic:'',chatUserId:''})
   const [videoCallFromOthers,setVideoCallFromOthers] = useState(false)
   const [otherUserBusy,setOtherUserBusy] = useState(false)
+
 
   const videoCallFromOthersHandler = ()=>{
     setVideoCallFromOthers(open=>!open)
@@ -133,8 +134,22 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
     }
   }, [userId])
 
+  // Real time notification
+  useEffect(()=>{
+    if(followNotification?.user){
+      socket.current?.emit('follow-user',followNotification)
+      dispatch(setFollowNotification({}))
+    }
+  },[followNotification])
+
+  useEffect(()=>{
+    socket.current?.on('user-followed',(data)=>{
+      dispatch(setNotifications([data,...notifications]))
+    })
+  },[notifications])
 
 
+  // WebRTC Peer initiallisation
   useEffect(()=>{
     peer.current = new Peer()
     peer.current?.on('open', (id: string) => {
@@ -418,7 +433,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
 
   return (
-    <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[90vh] flex focus:outline-none'>
+    <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[90svh] flex focus:outline-none'>
       {videoDisplay ? (
         <div className="mx-auto relative group">
           <div className="flex flex-col flex-wrap justify-center sm:flex-row h-[90vh] ">
@@ -433,12 +448,13 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
         <>
           <div className={`sm:w-full sm:block lg:w-96 lg:block md:w-72 md:block ${chatListViewStatus ? 'w-full' : 'hidden'}`}>
             <div className='p-2 pl-4 flex gap-4 items-center h-16 bg-gray-500'>
-              <div className='w-12 h-12 rounded-full'>
-                <img className='object-cover w-full h-full rounded-full' src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL + profilePic) : PROFILE_PHOTO} />
-              </div>
+
+              <Avatar variant="circular" alt="Profile Pic" src={profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL + profilePic) : PROFILE_PHOTO} />
+              
               <div>
-                <input className='w-4/5 bg-gray-100 focus:outline-none p-1 px-4 w-100 rounded text-black' onChange={searchUserForChat} value={searchText} type="text" maxLength={20} placeholder='Search' />
+                <input className='sm:w-[98%] w-[60vw] bg-gray-100 focus:outline-none p-1 rounded text-black' onChange={searchUserForChat} value={searchText} type="text" maxLength={20} placeholder='Search' />
               </div>
+              <button><EllipsisVerticalIcon className='h-7 text-black' /></button>
             </div>
 
             <List className='p-0 overflow-y-scroll h-[calc(100vh-8.5rem)]'>
@@ -466,7 +482,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
                 <div>
                   {isOnline ? <button onClick={openVideoChat} className='m-2'><VideoCameraIcon className='w-7 h-7 text-black mr-2' /></button> : null}
-                  <button><EllipsisVerticalIcon className='w-7 h-7 text-black mr-2' /></button>
+                  {/* <button><EllipsisVerticalIcon className='w-7 h-7 text-black mr-2' /></button> */}
                 </div>
 
               </div> : null}

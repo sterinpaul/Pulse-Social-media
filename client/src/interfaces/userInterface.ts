@@ -3,6 +3,7 @@ export interface userInterface{
     userId:string,
     darkMode:boolean,
     profilePic:string,
+    notifications:[NotificationInterface],
     savedPosts:string[]
 }
 
@@ -12,19 +13,19 @@ export interface userProfile{
     firstName?: string,
     lastName?: string,
     email?: string,
+    mobile?:string,
     isBlocked: boolean,
     darkMode?: boolean,
     profilePic?: string,
     gender?: string,
     city?: string,
     bio?:string,
-    blockedByUsers?: [],
-    blockedUsers?: [],
+    notifications?:[],
     followRequested?: [],
     followRequests?: [],
     followers?: string[],
     following?: string[],
-    savedPosts:object[],
+    savedPosts:string[],
     createdAt?: string,
     updatedAt?: string,
     posts?: object[]
@@ -43,4 +44,13 @@ export interface chattedUsers{
 export interface onlineUsersInterface{
     userId:string,
     socketId:string
+}
+
+export interface NotificationInterface{
+    _id:string,
+    user:string,
+    type:string,
+    followerId?:string,
+    profilePic?:string,
+    createdAt:string
 }

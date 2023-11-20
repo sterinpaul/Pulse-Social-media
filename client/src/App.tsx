@@ -1,12 +1,12 @@
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
 import Home from './pages/user/Home';
 import Profile from './pages/user/Profile';
-import EditProfile from './pages/user/EditProfile';
 import SignInAndSignUp from './pages/user/SignInAndSignUp';
 import { useSelector } from 'react-redux';
 import AdminHome from './pages/admin/AdminHome';
 import AdminSignInPage from './pages/admin/AdminSignInPage';
 import VideoCall from './components/user/home/chat/VideoCall';
+import ErrorPage from './pages/user/ErrorPage';
 
 
 function App() {
@@ -18,9 +18,9 @@ function App() {
       <Routes>
         <Route path='/' element={reduxToken ? <Home/> : <SignInAndSignUp/>}></Route>
         <Route path='/:user' element={<Profile/>}></Route>
-        <Route path='/:user/edit' element={<EditProfile/>}></Route>
         <Route path='/pulz/admin' element={reduxAdminToken ? <AdminHome/> : <AdminSignInPage/>}></Route>
         <Route path='/videocall/:id' element={<VideoCall/>}></Route>
+        <Route path='/error/:error/:path' element={<ErrorPage/>}></Route>
       </Routes>
     </BrowserRouter>
   )

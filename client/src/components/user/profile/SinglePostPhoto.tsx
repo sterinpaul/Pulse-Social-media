@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { deleteThePost, getPostComments, reportThePost } from "../../../api/apiConnections/postConnection"
-import { CLOUDINARY_POST_URL } from "../../../api/baseURL"
+import { CLOUDINARY_POST_URL, CLOUDINARY_VIDEO_URL } from "../../../api/baseURL"
 import CommentsContainer from "../home/CommentsContainer"
 import { commentData } from "../../../interfaces/commentInterface"
 import { postData } from "../../../interfaces/postInterface"
@@ -60,10 +60,23 @@ const SinglePostPhoto:React.FC<singlePostInterface> = ({post})=>{
     return (
         <>
             <div onClick={getComments} className="w-full h-full">
-                <img className="w-full h-full object-cover" src={CLOUDINARY_POST_URL+post?.imgVideoURL} alt="Posted Image"></img>
+                {post.isVideo ? 
+                    (
+                    <video muted className="m-auto transform-none outline-none">
+                        <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mp4" />
+                        <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mpeg" />
+                        <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/ogg" />
+                        <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/wmv" />
+                        Browser does not support video
+                    </video>
+                    )
+                    : (
+                        <img className="w-full h-full object-cover" src={CLOUDINARY_POST_URL+(post.imgVideoURL)} alt="Post Image"/>
+                    )
+                }
             </div>
  
-            <CommentsContainer 
+            <CommentsContainer
             open={open}
             handleOpen={handleOpen}
             post={post}

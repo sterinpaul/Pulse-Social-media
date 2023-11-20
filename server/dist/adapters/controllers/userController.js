@@ -19,7 +19,9 @@ const userControllers = (userDbInterface, userDbService) => {
     const getHome = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const userName = req.headers['x-user'];
         const profileData = yield (0, user_1.getUserProfile)(userName, userDbRepository);
-        res.json(profileData);
+        if (profileData) {
+            res.json(profileData);
+        }
     }));
     const getPost = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const userName = req.headers['x-user'];
@@ -46,7 +48,7 @@ const userControllers = (userDbInterface, userDbService) => {
     }));
     const followUnfollow = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const userName = req.headers['x-user'];
-        const followUser = req.body.user;
+        const { followUser } = req.body;
         const response = yield (0, user_1.followUnfollowUser)(userName, followUser, userDbRepository);
         res.json(response);
     }));
@@ -79,6 +81,27 @@ const userControllers = (userDbInterface, userDbService) => {
         const response = yield (0, user_1.userProfileUpdate)(userName, firstName, lastName, gender, city, bio, userDbRepository);
         res.json({ status: response });
     }));
+    const getnotifications = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const userName = req.headers['x-user'];
+            const notificationData = yield (0, user_1.getNotificationData)(userName, userDbRepository);
+            res.json(notificationData);
+        }
+        catch (error) {
+            res.status(400).json(error);
+        }
+    }));
+    const removeNotification = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const userName = req.headers['x-user'];
+            const { id } = req.body;
+            const response = yield (0, user_1.removeUserNotification)(userName, id, userDbRepository);
+            res.json({ status: response });
+        }
+        catch (error) {
+            res.status(400).json(error);
+        }
+    }));
     return {
         getHome,
         getPost,
@@ -89,7 +112,9 @@ const userControllers = (userDbInterface, userDbService) => {
         getUserSavedPosts,
         getUserBySearch,
         updateUserName,
-        updateUserData
+        updateUserData,
+        getnotifications,
+        removeNotification
     };
 };
 exports.default = userControllers;

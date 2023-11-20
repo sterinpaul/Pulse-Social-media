@@ -29,80 +29,83 @@ const userRepositoryMongoDB = () => {
         const userProfile = yield userModel_1.default.aggregate([
             {
                 $match: {
-                    userName
-                }
+                    userName,
+                },
             },
             {
                 $lookup: {
                     from: "posts",
                     localField: "userName",
                     foreignField: "postedUser",
-                    as: "posts"
-                }
+                    as: "posts",
+                },
             },
             {
                 $unwind: {
-                    path: "$posts"
-                }
+                    path: "$posts",
+                },
             },
             {
                 $match: {
-                    "posts.listed": true
-                }
+                    "posts.listed": true,
+                },
             },
             {
                 $group: {
                     _id: "$_id",
                     firstName: {
-                        $first: "$firstName"
+                        $first: "$firstName",
                     },
                     lastName: {
-                        $first: "$lastName"
+                        $first: "$lastName",
                     },
                     userName: {
-                        $first: "$userName"
+                        $first: "$userName",
                     },
                     email: {
-                        $first: "$email"
+                        $first: "$email",
                     },
                     profilePic: {
-                        $first: "$profilePic"
+                        $first: "$profilePic",
                     },
                     mobile: {
-                        $first: "$mobile"
+                        $first: "$mobile",
                     },
                     bio: {
-                        $first: "$bio"
+                        $first: "$bio",
                     },
                     city: {
-                        $first: "$city"
+                        $first: "$city",
                     },
                     savedPosts: {
-                        $first: "$savedPosts"
+                        $first: "$savedPosts",
+                    },
+                    notifications: {
+                        $first: "$notifications",
                     },
                     blockedUsers: {
-                        $first: "$blockedUsers"
+                        $first: "$blockedUsers",
                     },
                     blockedByUsers: {
-                        $first: "$blockedByUsers"
+                        $first: "$blockedByUsers",
                     },
                     followers: {
-                        $first: "$followers"
+                        $first: "$followers",
                     },
                     following: {
-                        $first: "$following"
+                        $first: "$following",
                     },
                     followRequests: {
-                        $first: "$followRequests"
+                        $first: "$followRequests",
                     },
                     followRequested: {
-                        $first: "$followRequested"
+                        $first: "$followRequested",
                     },
                     createdAt: {
-                        $first: "$createdAt"
+                        $first: "$createdAt",
                     },
                     posts: {
-                        $push: "$posts"
+                        $push: "$posts",
                     }
                 }
             }
@@ -115,6 +118,54 @@ const userRepositoryMongoDB = () => {
             return user;
         }
     });
+    const getNotifications = (userName) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield userModel_1.default.aggregate([
+            {
+                $match: {
+                    userName
+                },
+            },
+            {
+                $unwind: {
+                    path: "$notifications",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $sort: {
+                    'notifications.createdAt': -1
+                }
+            },
+            {
+                $match: {
+                    "notifications.viewed": false,
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "notifications.user",
+                    foreignField: "userName",
+                    as: "notification",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$notification",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $project: {
+                    _id: "$notifications._id",
+                    user: "$notifications.user",
+                    type: "$notifications.type",
+                    createdAt: "$notifications.createdAt",
+                    profilePic: "$notification.profilePic",
+                },
+            },
+        ]);
+    });
     const getUserByMobile = (mobile) => __awaiter(void 0, void 0, void 0, function* () {
         return yield userModel_1.default.findOne({ mobile });
     });
@@ -125,12 +176,20 @@ const userRepositoryMongoDB = () => {
         return yield userModel_1.default.updateOne({ userName }, { $set: { profilePic } });
     });
     const followHandler = (userName, followUser) => __awaiter(void 0, void 0, void 0, function* () {
-        const session = yield userModel_1.default.startSession();
+        // const session = await User.startSession()
         try {
             const followStatus = yield userModel_1.default.findOne({ userName: followUser, followers: { $elemMatch: { $eq: userName } } });
+            let notificationData = {};
             const operations = [];
             if (followStatus === null) {
-                operations.push(userModel_1.default.updateOne({ userName }, { $addToSet: { following: followUser } }), userModel_1.default.updateOne({ userName: followUser }, { $addToSet: { followers: userName } }));
+                notificationData = {
+                    _id: new mongoose_1.default.Types.ObjectId(),
+                    user: userName,
+                    type: 'follows',
+                    viewed: false,
+                    createdAt: new Date()
+                };
+                operations.push(userModel_1.default.updateOne({ userName }, { $addToSet: { following: followUser } }), userModel_1.default.updateOne({ userName: followUser }, { $addToSet: { followers: userName } }), userModel_1.default.updateOne({ userName: followUser }, { $addToSet: { notifications: notificationData } }));
             }
             else {
                 operations.push(userModel_1.default.updateOne({ userName }, { $pull: { following: followUser } }), userModel_1.default.updateOne({ userName: followUser }, { $pull: { followers: userName } }));
@@ -138,19 +197,19 @@ const userRepositoryMongoDB = () => {
             const results = yield Promise.allSettled(operations);
             const isSuccess = results.every((result) => result.status === 'fulfilled');
             if (isSuccess) {
-                yield session.commitTransaction();
-                session.endSession();
-                return true;
+                // await session.commitTransaction()
+                // session.endSession()
+                return notificationData;
             }
             else {
-                yield session.abortTransaction();
-                session.endSession();
+                // await session.abortTransaction()
+                // session.endSession()
                 return false;
             }
         }
         catch (error) {
-            yield session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction()
+            // session.endSession()
             console.log(error);
         }
     });
@@ -214,6 +273,7 @@ const userRepositoryMongoDB = () => {
                     profilePic: "$userData.profilePic",
                     description: "$result.description",
                     listed: "$result.listed",
+                    isVideo: "$result.isVideo",
                     imgVideoURL: "$result.imgVideoURL",
                     liked: "$result.liked",
                     reports: "$result.reports",
@@ -260,6 +320,7 @@ const userRepositoryMongoDB = () => {
                         profilePic: "$result.profilePic",
                         description: "$description",
                         listed: "$listed",
+                        isVideo: "$isVideo",
                         imgVideoURL: "$imgVideoURL",
                         liked: "$liked",
                         reports: "$reports",
@@ -401,12 +462,23 @@ const userRepositoryMongoDB = () => {
             return false;
         }
     });
+    const removeUserNotification = (userName, id) => __awaiter(void 0, void 0, void 0, function* () {
+        const ID = new mongoose_1.default.Types.ObjectId(id);
+        const response = yield userModel_1.default.updateOne({ userName, 'notifications._id': ID }, { $set: { 'notifications.$.viewed': true } });
+        if (response.modifiedCount) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    });
     return {
         addUser,
         getUserByEmail,
         getUserByUserName,
         getUserByMobile,
         getUserByNameMailMobile,
+        getNotifications,
         getPost,
         postProfilePicture,
         followHandler,
@@ -414,7 +486,8 @@ const userRepositoryMongoDB = () => {
         userSavedPosts,
         userSearch,
         userNameUpdate,
-        userProfileUpdate
+        userProfileUpdate,
+        removeUserNotification
     };
 };
 exports.userRepositoryMongoDB = userRepositoryMongoDB;

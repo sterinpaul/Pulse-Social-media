@@ -18,6 +18,10 @@ const postSchema = new Schema(
         imgVideoURL:{
             type:String
         },
+        isVideo:{
+            type:Boolean,
+            required:true
+        },
         liked:[],
         reports:[],
     },

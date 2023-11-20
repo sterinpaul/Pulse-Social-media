@@ -28,6 +28,9 @@ const userDbRepository = (repository) => {
     const getUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
         return yield repository.getUserByNameMailMobile(userData);
     });
+    const getUserNotifications = (userData) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.getNotifications(userData);
+    });
     const getAllPost = (userName) => __awaiter(void 0, void 0, void 0, function* () {
         return yield repository.getPost(userName);
     });
@@ -52,12 +55,16 @@ const userDbRepository = (repository) => {
     const updateUserProfile = (userName, firstName, lastName, gender, city, bio) => __awaiter(void 0, void 0, void 0, function* () {
         return repository.userProfileUpdate(userName, firstName, lastName, gender, city, bio);
     });
+    const removeNotification = (userName, id) => __awaiter(void 0, void 0, void 0, function* () {
+        return repository.removeUserNotification(userName, id);
+    });
     return {
         addUser,
         getUser,
         getUserByEmail,
         getUserByUsername,
         getUserByMobile,
+        getUserNotifications,
         getAllPost,
         postProfilePicture,
         followUnfollowHandler,
@@ -65,7 +72,8 @@ const userDbRepository = (repository) => {
         getSavedPosts,
         getUserBySearch,
         updateUserName,
-        updateUserProfile
+        updateUserProfile,
+        removeNotification
     };
 };
 exports.userDbRepository = userDbRepository;

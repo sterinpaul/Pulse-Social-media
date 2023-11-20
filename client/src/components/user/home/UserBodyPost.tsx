@@ -4,7 +4,7 @@ import { useState } from "react";
 import moment from 'moment'
 import {HandThumbUpIcon,ChatBubbleLeftRightIcon,BookmarkIcon,EllipsisHorizontalIcon} from "@heroicons/react/24/outline";
 import {HandThumbUpIcon as HandThumbUpSolidIcon,BookmarkIcon as BookmarkIconSolid} from "@heroicons/react/20/solid";
-import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO } from "../../../api/baseURL";
+import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO, CLOUDINARY_VIDEO_URL } from "../../../api/baseURL";
 import { likePost,unlikePost } from "../../../api/apiConnections/postConnection";
 import CommentsContainer from "./CommentsContainer";
 import { postData } from "../../../interfaces/postInterface";
@@ -128,11 +128,27 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                     </Menu>
                     
                 </div>
+                
                 <div>
-                    <img className="m-auto" src={CLOUDINARY_POST_URL+(post?.imgVideoURL)} alt="post"/>
+                    {post.isVideo ? 
+                        (
+                        <video muted autoPlay controls className="m-auto transform-none outline-none">
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mp4" />
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mpeg" />
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/ogg" />
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/wmv" />
+                            Browser does not support video
+                        </video>
+                        )
+                        : (
+                            <img className="m-auto" src={CLOUDINARY_POST_URL+(post.imgVideoURL)} alt="Post Image"/>
+                        )
+                    }
                 </div>
+                
                 <div className="flex gap-5 w-fill h-16">
-                    <button className="relative" onClick={()=>likeHandler()}>{like ? <HandThumbUpSolidIcon className="h-8 w-8"/> : <HandThumbUpIcon className="h-8 w-8"/>}{post.liked.length ? <span className="absolute top-1 left-6 text-xs text-white bg-blue-gray-800 w-4 rounded-full">{post.liked.length}</span> : null}</button>
+                    <button className="relative" onClick={()=>likeHandler()}>
+                        {like ? <HandThumbUpSolidIcon className="h-8 w-8"/> : <HandThumbUpIcon className="h-8 w-8"/>}{post.liked.length ? <span className="absolute top-1 left-6 text-xs text-white bg-blue-gray-800 w-4 rounded-full">{post.liked.length}</span> : null}</button>
                     <button onClick={getComments}><ChatBubbleLeftRightIcon className="h-8 w-8"/></button>
                     {/* <button><ShareIcon className="h-8 w-8"/></button> */}
                     <button onClick={savePostHandler}>{savedPost ? <BookmarkIconSolid className="h-8 w-8"/> : <BookmarkIcon className="h-8 w-8"/>}</button>

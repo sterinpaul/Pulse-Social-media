@@ -26,80 +26,83 @@ export const userRepositoryMongoDB = ()=>{
         const userProfile =  await User.aggregate([
           {
             $match: {
-              userName
-            }
+              userName,
+            },
           },
           {
             $lookup: {
               from: "posts",
               localField: "userName",
               foreignField: "postedUser",
-              as: "posts"
-            }
+              as: "posts",
+            },
           },
           {
             $unwind: {
-              path: "$posts"
-            }
+              path: "$posts",
+            },
           },
           {
             $match: {
-              "posts.listed": true
-            }
+              "posts.listed": true,
+            },
           },
           {
             $group: {
               _id: "$_id",
               firstName: {
-                $first: "$firstName"
+                $first: "$firstName",
               },
               lastName: {
-                $first: "$lastName"
+                $first: "$lastName",
               },
               userName: {
-                $first: "$userName"
+                $first: "$userName",
               },
               email: {
-                $first: "$email"
+                $first: "$email",
               },
               profilePic: {
-                $first: "$profilePic"
+                $first: "$profilePic",
               },
               mobile: {
-                $first: "$mobile"
+                $first: "$mobile",
               },
               bio: {
-                $first: "$bio"
+                $first: "$bio",
               },
               city: {
-                $first: "$city"
+                $first: "$city",
               },
               savedPosts: {
-                $first: "$savedPosts"
+                $first: "$savedPosts",
+              },
+              notifications: {
+                $first: "$notifications",
               },
               blockedUsers: {
-                $first: "$blockedUsers"
+                $first: "$blockedUsers",
               },
               blockedByUsers: {
-                $first: "$blockedByUsers"
+                $first: "$blockedByUsers",
               },
               followers: {
-                $first: "$followers"
+                $first: "$followers",
               },
               following: {
-                $first: "$following"
+                $first: "$following",
               },
               followRequests: {
-                $first: "$followRequests"
+                $first: "$followRequests",
               },
               followRequested: {
-                $first: "$followRequested"
+                $first: "$followRequested",
               },
               createdAt: {
-                $first: "$createdAt"
+                $first: "$createdAt",
               },
               posts: {
-                $push: "$posts"
+                $push: "$posts",
               }
             }
           }
@@ -112,6 +115,55 @@ export const userRepositoryMongoDB = ()=>{
         const user = await User.findOne({userName})
         return user
       }
+    }
+
+    const getNotifications = async(userName:string)=>{
+      return await User.aggregate([
+        {
+          $match: {
+            userName
+          },
+        },
+        {
+          $unwind: {
+            path: "$notifications",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $sort:{
+            'notifications.createdAt':-1
+          }
+        },
+        {
+          $match: {
+            "notifications.viewed": false,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "notifications.user",
+            foreignField: "userName",
+            as: "notification",
+          },
+        },
+        {
+          $unwind: {
+            path: "$notification",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: "$notifications._id",
+            user: "$notifications.user",
+            type: "$notifications.type",
+            createdAt: "$notifications.createdAt",
+            profilePic: "$notification.profilePic",
+          },
+        },
+      ])
     }
 
     const getUserByMobile = async(mobile:string)=>{
@@ -127,14 +179,23 @@ export const userRepositoryMongoDB = ()=>{
     }
 
     const followHandler = async(userName:string,followUser:string)=>{
-      const session = await User.startSession()
+      // const session = await User.startSession()
       try{
         const followStatus = await User.findOne({userName:followUser,followers:{$elemMatch:{$eq:userName}}})
+        let notificationData = {};
         const operations = []
         if(followStatus===null){
+          notificationData = {
+            _id:new mongoose.Types.ObjectId(),
+            user:userName,
+            type:'follows',
+            viewed:false,
+            createdAt:new Date()
+          }
           operations.push(
             User.updateOne({userName},{$addToSet:{following:followUser}}),
-            User.updateOne({userName:followUser},{$addToSet:{followers:userName}})
+            User.updateOne({userName:followUser},{$addToSet:{followers:userName}}),
+            User.updateOne({userName:followUser},{$addToSet:{notifications:notificationData}})
           )
         }else{
           operations.push(
@@ -146,18 +207,18 @@ export const userRepositoryMongoDB = ()=>{
         const results = await Promise.allSettled(operations)
         const isSuccess = results.every((result) => result.status === 'fulfilled')
         if(isSuccess){
-          await session.commitTransaction()
-          session.endSession()
-          return true
+          // await session.commitTransaction()
+          // session.endSession()
+          return notificationData
         }else{
-          await session.abortTransaction()
-          session.endSession()
+          // await session.abortTransaction()
+          // session.endSession()
           return false
         }
 
       }catch(error){
-        await session.abortTransaction()
-        session.endSession()
+        // await session.abortTransaction()
+        // session.endSession()
         console.log(error)
       }
     }
@@ -222,6 +283,7 @@ export const userRepositoryMongoDB = ()=>{
             profilePic: "$userData.profilePic",
             description: "$result.description",
             listed: "$result.listed",
+            isVideo: "$result.isVideo",
             imgVideoURL: "$result.imgVideoURL",
             liked: "$result.liked",
             reports: "$result.reports",
@@ -267,6 +329,7 @@ export const userRepositoryMongoDB = ()=>{
               profilePic: "$result.profilePic",
               description: "$description",
               listed:"$listed",
+              isVideo: "$isVideo",
               imgVideoURL: "$imgVideoURL",
               liked: "$liked",
               reports: "$reports",
@@ -416,20 +479,32 @@ export const userRepositoryMongoDB = ()=>{
       }
     }
 
+    const removeUserNotification = async(userName:string,id:string)=>{
+      const ID = new mongoose.Types.ObjectId(id)
+      const response = await User.updateOne({userName,'notifications._id':ID},{$set:{'notifications.$.viewed':true}})
+      if(response.modifiedCount){
+        return true
+      }else{
+        return false
+      }
+    }
+
     return {
-        addUser,
-        getUserByEmail,
-        getUserByUserName,
-        getUserByMobile,
-        getUserByNameMailMobile,
-        getPost,
-        postProfilePicture,
-        followHandler,
-        postSave,
-        userSavedPosts,
-        userSearch,
-        userNameUpdate,
-        userProfileUpdate
+      addUser,
+      getUserByEmail,
+      getUserByUserName,
+      getUserByMobile,
+      getUserByNameMailMobile,
+      getNotifications,
+      getPost,
+      postProfilePicture,
+      followHandler,
+      postSave,
+      userSavedPosts,
+      userSearch,
+      userNameUpdate,
+      userProfileUpdate,
+      removeUserNotification
     }
 }
 

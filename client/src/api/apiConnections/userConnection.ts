@@ -40,9 +40,9 @@ export const updateProfilePhoto = async(profilePic:File):Promise<object>=>{
     }
 }
 
-export const followHandler = async(user:string):Promise<object>=>{
+export const followHandler = async(followUser:string):Promise<object>=>{
     try{
-        const response = await baseURL.put('/user/followUnfollow',{user})
+        const response = await baseURL.put('/user/followUnfollow',{followUser})
         return response?.data
     }catch(error:any){
         return error.response.data
@@ -88,6 +88,24 @@ export const userNameChange = async(newUserName:string)=>{
 export const updateProfileData = async(userData:object)=>{
     try{
         const response = await baseURL.post('/user/updateprofile',userData)
+        return response?.data
+    }catch(error:any){
+        return error.response.data
+    }
+}
+
+export const getUserNotifications = async()=>{
+    try{
+        const response = await baseURL.get('/user/notifications/get')
+        return response?.data
+    }catch(error:any){
+        return error.response.data
+    }
+}
+
+export const removeSingleNotification = async(id:string)=>{
+    try{
+        const response = await baseURL.patch('/user/notifications/remove',{id})
         return response?.data
     }catch(error:any){
         return error.response.data

@@ -6,12 +6,14 @@ import {
     getAllPosts,
     followUnfollowUser,
     getUserProfile,
+    getNotificationData,
     postProfilePic,
     postSaveHandler,
     getSavedPosts,
     searchUser,
     userNameUpdate,
-    userProfileUpdate
+    userProfileUpdate,
+    removeUserNotification
 } from "../../application/useCases/user";
 
 
@@ -25,7 +27,9 @@ const userControllers = (
         
         const userName = req.headers['x-user'] as string
         const profileData = await getUserProfile(userName,userDbRepository)
-        res.json(profileData)
+        if(profileData){
+            res.json(profileData)
+        }
     })
 
     const getPost = asyncHandler(async(req:Request,res:Response)=>{
@@ -56,7 +60,7 @@ const userControllers = (
 
     const followUnfollow = asyncHandler(async(req:Request,res:Response)=>{
         const userName = req.headers['x-user'] as string
-        const followUser = req.body.user
+        const {followUser} = req.body
         const response = await followUnfollowUser(userName,followUser,userDbRepository)
         res.json(response)
         
@@ -96,6 +100,27 @@ const userControllers = (
         res.json({status:response})
     })
 
+    const getnotifications = asyncHandler(async(req:Request,res:Response)=>{
+        try{
+            const userName = req.headers['x-user'] as string
+            const notificationData = await getNotificationData(userName,userDbRepository)
+            res.json(notificationData)
+        }catch(error){
+            res.status(400).json(error)
+        }
+    })
+
+    const removeNotification = asyncHandler(async(req:Request,res:Response)=>{
+        try{
+            const userName = req.headers['x-user'] as string
+            const {id} = req.body
+            const response = await removeUserNotification(userName,id,userDbRepository)
+            res.json({status:response})
+        }catch(error){
+            res.status(400).json(error)
+        }
+    })
+
     return {
         getHome,
         getPost,
@@ -106,7 +131,9 @@ const userControllers = (
         getUserSavedPosts,
         getUserBySearch,
         updateUserName,
-        updateUserData
+        updateUserData,
+        getnotifications,
+        removeNotification
     }
 }
 

@@ -48,6 +48,7 @@ const postRepositoryMongoDB = () => {
                     postedUser: 1,
                     description: 1,
                     imgVideoURL: 1,
+                    isVideo: 1,
                     profilePic: "$userData.profilePic",
                     liked: 1,
                     createdAt: 1

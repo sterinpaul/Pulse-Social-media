@@ -20,20 +20,24 @@ const profilePicStorage = new CloudinaryStorage(profileOptions)
 export const uploadProfilePic = multer({storage:profilePicStorage }).single('profilePic')
 
 
-const postImages = {
+const postImagesAndVideo = {
     cloudinary:cloudinary,
-    params:{
-        folder: 'postImgVideo',
-        allowed_formats : ['jpg', 'jpeg', 'png', 'svg', 'webp', 'gif', 'jfif', 'webp','gif','mp4','mpeg'],
-        // transformation: [{ width: 500, height: 500, crop: 'limit' }] ,
-        public_id: (req:any,file:any) => {
-            const originalname = file.originalname.split('.')
-            return `post-${Date.now()}-${originalname[0]}`
+    params:(req:any,file:any)=>{
+        return {
+            folder: file.mimetype.startsWith('image/') ? 'postImg' : 'postVideo',
+            allowed_formats : ['jpg', 'jpeg', 'png', 'svg', 'gif', 'webp','mp4', 'mpeg', 'ogg', 'wmv'],
+            resource_type: file.mimetype.startsWith('image/') ? 'image' : 'video',
+            public_id: `post-${Date.now()}-${file.originalname.split('.')[0]}`
+            // transformation: [{ width: 500, height: 500, crop: 'limit' }] ,
+            // public_id: (req:any,file:any) => {
+            //     const originalname = file.originalname.split('.')
+            //     return `post-${Date.now()}-${originalname[0]}`
+            // }
         }
     }
 }
 
-const postStorage = new CloudinaryStorage(postImages)
+const postStorage = new CloudinaryStorage(postImagesAndVideo)
 export const uploadPostImgVideo = multer({storage:postStorage }).single('postImgVideo')
 
 

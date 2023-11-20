@@ -7,7 +7,7 @@ import {
 import {EllipsisHorizontalIcon} from "@heroicons/react/24/outline";
 import { PaperAirplaneIcon } from "@heroicons/react/20/solid"
 import { postData } from "../../../interfaces/postInterface";
-import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO } from "../../../api/baseURL";
+import { CLOUDINARY_PROFILE_PHOTO_URL,CLOUDINARY_POST_URL,PROFILE_PHOTO, CLOUDINARY_VIDEO_URL } from "../../../api/baseURL";
 import { useState,useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -145,7 +145,21 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
             <div className="bg-white flex items-center justify-center flex-wrap">
                 
                 <div className="lg:w-[30rem] md:w-[24rem] sm:w-100 flex items-center justify-center ">
-                  <img className="w-100 h-100 max-h-96 object-cover" src={CLOUDINARY_POST_URL+post.imgVideoURL} alt='post'/>
+                  {/* <img className="w-100 h-100 max-h-96 object-cover" src={CLOUDINARY_POST_URL+post.imgVideoURL} alt='post'/> */}
+                  {post.isVideo ? 
+                        (
+                        <video muted controls className="m-auto transform-none outline-none">
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mp4" />
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mpeg" />
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/ogg" />
+                            <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/wmv" />
+                            Browser does not support video
+                        </video>
+                        )
+                        : (
+                            <img className="w-100 h-100 max-h-96 object-cover" src={CLOUDINARY_POST_URL+(post.imgVideoURL)} alt="Post Image"/>
+                        )
+                    }
                 </div>
 
                 {/* Comment container */}

@@ -21,11 +21,12 @@ const getAllPosts = (postRepository) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getAllPosts = getAllPosts;
-const addNewPost = (postedUser, description, imgVideoURL, postRepository) => __awaiter(void 0, void 0, void 0, function* () {
+const addNewPost = (postedUser, description, imgVideoURL, isVideo, postRepository) => __awaiter(void 0, void 0, void 0, function* () {
     const post = {
         postedUser,
         description,
-        imgVideoURL
+        imgVideoURL,
+        isVideo
     };
     const data = yield postRepository.addPost(post);
     if (data) {

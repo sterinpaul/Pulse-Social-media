@@ -21,19 +21,23 @@ const profileOptions = {
 };
 const profilePicStorage = new multer_storage_cloudinary_1.CloudinaryStorage(profileOptions);
 exports.uploadProfilePic = (0, multer_1.default)({ storage: profilePicStorage }).single('profilePic');
-const postImages = {
+const postImagesAndVideo = {
     cloudinary: cloudinary_1.v2,
-    params: {
-        folder: 'postImgVideo',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'svg', 'webp', 'gif', 'jfif', 'webp', 'gif', 'mp4', 'mpeg'],
-        // transformation: [{ width: 500, height: 500, crop: 'limit' }] ,
-        public_id: (req, file) => {
-            const originalname = file.originalname.split('.');
-            return `post-${Date.now()}-${originalname[0]}`;
-        }
+    params: (req, file) => {
+        return {
+            folder: file.mimetype.startsWith('image/') ? 'postImg' : 'postVideo',
+            allowed_formats: ['jpg', 'jpeg', 'png', 'svg', 'gif', 'webp', 'mp4', 'mpeg', 'ogg', 'wmv'],
+            resource_type: file.mimetype.startsWith('image/') ? 'image' : 'video',
+            public_id: `post-${Date.now()}-${file.originalname.split('.')[0]}`
+            // transformation: [{ width: 500, height: 500, crop: 'limit' }] ,
+            // public_id: (req:any,file:any) => {
+            //     const originalname = file.originalname.split('.')
+            //     return `post-${Date.now()}-${originalname[0]}`
+            // }
+        };
     }
 };
-const postStorage = new multer_storage_cloudinary_1.CloudinaryStorage(postImages);
+const postStorage = new multer_storage_cloudinary_1.CloudinaryStorage(postImagesAndVideo);
 exports.uploadPostImgVideo = (0, multer_1.default)({ storage: postStorage }).single('postImgVideo');
 const chatImages = {
     cloudinary: cloudinary_1.v2,

@@ -13,12 +13,12 @@ const userMiddleware = (req, res, next) => {
                 next();
             }
             else {
-                res.status(401).json({ message: "Unauthorized" });
+                res.status(400).json({ message: "Unauthorized" });
             }
         }
     }
     catch (error) {
-        res.status(401).json({ message: "Token expired" });
+        res.status(400).json({ message: "Token expired" });
     }
 };
 exports.default = userMiddleware;

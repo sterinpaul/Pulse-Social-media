@@ -1,6 +1,4 @@
 import { useSelector } from "react-redux";
-
-
 import {
   Card,
   Typography,
@@ -11,7 +9,12 @@ import { userProfile } from "../../../interfaces/userInterface";
 import { CLOUDINARY_PROFILE_PHOTO_URL, PROFILE_PHOTO } from "../../../api/baseURL";
 
 
-const UserRightSideBar = ()=>{
+interface RightSideBarProps{
+  chatOpen:boolean,
+  setChatOpen:(value:boolean)=>void
+}
+
+const UserRightSideBar:React.FC<RightSideBarProps> = ({setChatOpen})=>{
 
   const {darkMode} = useSelector((store:{user:{userName:string,userId:string,darkMode:boolean}})=>store.user)
   const {chatList} = useSelector((store:{chat:{onlineUsers:[],chatList:[]}})=>store.chat)
@@ -25,9 +28,9 @@ const UserRightSideBar = ()=>{
         </div>
         <List className="flex justify-center p-4">
 
-        {chatList?.map((user:userProfile)=>{
+        {chatList?.length ? chatList.map((user:userProfile)=>{
             return(
-                <ListItem key={user.chatId} className={`flex items-center justify-center p-2 w-52"`}>
+                <ListItem onClick={()=>setChatOpen(true)} key={user.chatId} className={`flex items-center justify-center p-2 w-52"`}>
                     <img
                       className="h-10 w-10 rounded-full object-cover"
                       src={user.profilePic ? CLOUDINARY_PROFILE_PHOTO_URL+user.profilePic : PROFILE_PHOTO}
@@ -36,7 +39,7 @@ const UserRightSideBar = ()=>{
                     <p className="ml-4 w-28">{user.firstName} {user.lastName}</p>
                 </ListItem>
             )
-        })}
+        }) : <p>No Chats yet.</p>}
         </List>
 
       </Card>

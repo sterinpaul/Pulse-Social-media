@@ -56,7 +56,7 @@ const UserBody:React.FC<UserBodyProps> = ({userData,allPosts,setAllPosts})=>{
                         
                         <div className="flex gap-2 justify-end overflow-visible p-1">
                             <div>
-                                <input ref={fileInput} accept=".jpg,.jpeg,.mp4,.mpeg,.gif,.png" name='postImgVideo' onChange={(event:any)=>setUpload(event?.target?.files[0])} className="w-0 h-0" type="file"/>
+                                <input ref={fileInput} accept=".jpg,.jpeg,.gif,.png,.svg,.webp,.ogg,.wmv,.mpeg,.mp4" name='postImgVideo' onChange={(event:any)=>setUpload(event?.target?.files[0])} className="w-0 h-0" type="file"/>
                                 <Button onClick={uploadFunction} className="rounded-full p-2 bg-gray-600 hover:bg-gray-800">
                                   {upload ? <span className="flex gap-1"><span className="font-thin text-[.5rem]">{upload.name}</span><PencilSquareIcon className="h-4 w-4"/></span> : <PhotoIcon className="h-4 w-4"/>}
                                 </Button>

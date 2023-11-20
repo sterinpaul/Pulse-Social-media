@@ -51,6 +51,12 @@ const socketConfig = (io) => {
                 io.to(user.socketId).emit('call-rejected');
             }
         });
+        socket.on('follow-user', (data) => {
+            const user = activeUsers.find((user) => user.userId === data.followerId);
+            if (user) {
+                io.to(user.socketId).emit('user-followed', data);
+            }
+        });
         socket.on('disconnect', () => {
             socket.broadcast.emit('call-ended');
             // Event handler for "disconnect" event: Removes a user from the active users list when they disconnect.

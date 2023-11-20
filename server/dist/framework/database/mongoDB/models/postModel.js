@@ -18,6 +18,10 @@ const postSchema = new mongoose_1.Schema({
     imgVideoURL: {
         type: String
     },
+    isVideo: {
+        type: Boolean,
+        required: true
+    },
     liked: [],
     reports: [],
 }, { timestamps: true });

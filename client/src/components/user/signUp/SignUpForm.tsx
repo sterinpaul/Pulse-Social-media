@@ -182,25 +182,25 @@ import {
   })
 
     return(
-      <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={formik.handleSubmit} className="w-100">
             <Typography variant="h3" color="blue" className="text-center pt-4">
               Sign Up
             </Typography>
             
-            <div className="mt-8 mb-2 w-100 max-w-screen-lg">
+            <div className="mt-8 mb-2">
               <div className="flex flex-col gap-2">
-                <div className="flex gap-1">
+                <div className="flex flex-col sm:flex-row gap-2">
                     <div>
                       <Input type="text" id="firstName" size="lg" label="First Name"
                       {...formik.getFieldProps('firstName')} />
-                      <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.firstName && formik.errors.firstName ?
+                      <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.firstName && formik.errors.firstName ?
                         formik.errors.firstName : null}</p>
                     </div>
 
                     <div>
                       <Input type="text" id="lastName" size="lg" label="Last Name"
                       {...formik.getFieldProps('lastName')} />
-                      <p className="h-6 ml-2 text-sm text-red-800">{formik.touched.lastName && formik.errors.lastName ?
+                      <p className="h-4 ml-2 text-sm text-red-800">{formik.touched.lastName && formik.errors.lastName ?
                         formik.errors.lastName : null}</p>
                     </div>
                 </div>
