@@ -434,7 +434,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
 
 
   return (
-    <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[90svh] flex focus:outline-none'>
+    <Dialog open={chatOpen} handler={chatContainerHandler} size='lg' className='overflow-hidden h-[90dvh] flex focus:outline-none'>
       {videoDisplay ? (
         <div className="mx-auto relative group">
           <div className="flex flex-col flex-wrap justify-center sm:flex-row h-[90vh] ">
