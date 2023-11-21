@@ -2,9 +2,10 @@ import { UserDbInterface } from "../repositories/userDbRepository";
 
 export const getAllPosts = async(
     userName:string,
+    skip:number,
     userRepository:ReturnType<UserDbInterface>
 )=>{
-    const data = await userRepository.getAllPost(userName)
+    const data = await userRepository.getAllPost(userName,skip)
     if(data)return data
 }
 

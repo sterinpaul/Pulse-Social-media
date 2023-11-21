@@ -9,9 +9,9 @@ export const getUserHome = async() =>{
     }
 }
 
-export const getAllPosts = async()=>{
+export const getAllPosts = async(skip:number)=>{
     try{
-        const response = await baseURL.get(`/user/getpost`)
+        const response = await baseURL.get(`/user/getpost/${skip}`)
         return response?.data
     }catch(error:any){
         return error.response.data

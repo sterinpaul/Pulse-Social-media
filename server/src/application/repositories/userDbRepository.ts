@@ -34,8 +34,8 @@ export const userDbRepository = (repository:ReturnType<userRepositoryMongoDB>)=>
         return await repository.getNotifications(userData)
     }
 
-    const getAllPost = async(userName:string)=>{
-        return await repository.getPost(userName)
+    const getAllPost = async(userName:string,skip:number)=>{
+        return await repository.getPost(userName,skip)
     }
 
     const postProfilePicture = async(userName:string,profilePic:string)=>{

@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeUserNotification = exports.userProfileUpdate = exports.userNameUpdate = exports.searchUser = exports.getSavedPosts = exports.postSaveHandler = exports.followUnfollowUser = exports.postProfilePic = exports.getUserProfile = exports.getNotificationData = exports.getAllPosts = void 0;
-const getAllPosts = (userName, userRepository) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield userRepository.getAllPost(userName);
+const getAllPosts = (userName, skip, userRepository) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield userRepository.getAllPost(userName, skip);
     if (data)
         return data;
 });

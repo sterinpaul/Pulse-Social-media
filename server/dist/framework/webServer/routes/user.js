@@ -12,7 +12,7 @@ const userRouter = () => {
     const router = express_1.default.Router();
     const controllers = (0, userController_1.default)(userDbRepository_1.userDbRepository, userHelperRepositories_1.userRepositoryMongoDB);
     router.get('/', controllers.getHome);
-    router.get('/getpost', controllers.getPost);
+    router.get('/getpost/:skip', controllers.getPost);
     router.get('/notifications/get', controllers.getnotifications);
     router.get('/:user', controllers.getProfile);
     router.post('/updatephoto', cloudinaryConfig_1.uploadProfilePic, controllers.updateProfilePic);

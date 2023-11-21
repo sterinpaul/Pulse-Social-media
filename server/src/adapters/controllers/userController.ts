@@ -34,7 +34,8 @@ const userControllers = (
 
     const getPost = asyncHandler(async(req:Request,res:Response)=>{
         const userName = req.headers['x-user'] as string
-        const response = await getAllPosts(userName,userDbRepository)
+        const skip = req.params.skip
+        const response = await getAllPosts(userName,Number(skip),userDbRepository)
         res.json(response)
     })
     

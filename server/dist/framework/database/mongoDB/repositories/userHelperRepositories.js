@@ -213,7 +213,7 @@ const userRepositoryMongoDB = () => {
             console.log(error);
         }
     });
-    const getPost = (userName) => __awaiter(void 0, void 0, void 0, function* () {
+    const getPost = (userName, skip) => __awaiter(void 0, void 0, void 0, function* () {
         const allPosts = yield userModel_1.default.aggregate([
             {
                 $match: {
@@ -287,6 +287,9 @@ const userRepositoryMongoDB = () => {
                 }
             },
             {
+                $skip: 10 * skip
+            },
+            {
                 $limit: 10
             }
         ]);
@@ -332,6 +335,9 @@ const userRepositoryMongoDB = () => {
                     $sort: {
                         createdAt: -1
                     }
+                },
+                {
+                    $skip: 10 * skip
                 },
                 {
                     $limit: 10

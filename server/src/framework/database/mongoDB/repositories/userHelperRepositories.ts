@@ -223,7 +223,7 @@ export const userRepositoryMongoDB = ()=>{
       }
     }
 
-    const getPost = async(userName:string)=>{
+    const getPost = async(userName:string,skip:number)=>{
       const allPosts = await User.aggregate([
         {
           $match: {
@@ -297,6 +297,9 @@ export const userRepositoryMongoDB = ()=>{
           }
         },
         {
+          $skip: 10*skip
+        },
+        {
           $limit: 10
         }]
       )
@@ -341,6 +344,9 @@ export const userRepositoryMongoDB = ()=>{
             $sort: {
               createdAt: -1
             }
+          },
+          {
+            $skip: 10*skip
           },
           {
             $limit: 10

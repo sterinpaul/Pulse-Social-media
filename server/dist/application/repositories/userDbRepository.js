@@ -31,8 +31,8 @@ const userDbRepository = (repository) => {
     const getUserNotifications = (userData) => __awaiter(void 0, void 0, void 0, function* () {
         return yield repository.getNotifications(userData);
     });
-    const getAllPost = (userName) => __awaiter(void 0, void 0, void 0, function* () {
-        return yield repository.getPost(userName);
+    const getAllPost = (userName, skip) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield repository.getPost(userName, skip);
     });
     const postProfilePicture = (userName, profilePic) => __awaiter(void 0, void 0, void 0, function* () {
         return yield repository.postProfilePicture(userName, profilePic);

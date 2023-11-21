@@ -26,7 +26,7 @@ const Home = ()=>{
 
     const homePageData = async()=>{
         const getHomeResponse:userInterface= await getUserHome()
-        const postResponse = await getAllPosts()
+        const postResponse = await getAllPosts(0)
         
         if(getHomeResponse){
             setUserData(getHomeResponse)

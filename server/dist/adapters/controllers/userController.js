@@ -25,7 +25,8 @@ const userControllers = (userDbInterface, userDbService) => {
     }));
     const getPost = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const userName = req.headers['x-user'];
-        const response = yield (0, user_1.getAllPosts)(userName, userDbRepository);
+        const skip = req.params.skip;
+        const response = yield (0, user_1.getAllPosts)(userName, Number(skip), userDbRepository);
         res.json(response);
     }));
     const getProfile = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

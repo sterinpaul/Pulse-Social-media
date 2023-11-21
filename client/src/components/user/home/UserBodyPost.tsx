@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import moment from 'moment'
 import {HandThumbUpIcon,ChatBubbleLeftRightIcon,BookmarkIcon,EllipsisHorizontalIcon} from "@heroicons/react/24/outline";
 import {HandThumbUpIcon as HandThumbUpSolidIcon,BookmarkIcon as BookmarkIconSolid} from "@heroicons/react/20/solid";
@@ -40,6 +40,7 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
     const [optionOpenDialog,setOptionOpenDialog] = useState(false)
     const [statusToggle,setStatusToggle] = useState('')
     const [editStatus,setEditStatus] = useState(false)
+    const videoRef = useRef<HTMLVideoElement>(null)
 
     const likeHandler = async()=>{
         if(like){
@@ -100,10 +101,39 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
     //     }
     // }
 
+    useEffect(() => {
+        const options = {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.5, // Trigger when 50% of the video is visible
+        };
+    
+        const callback: IntersectionObserverCallback = (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              videoRef.current?.play()
+            } else {
+              videoRef.current?.pause()
+            }
+          });
+        };
+    
+        const observer = new IntersectionObserver(callback, options);
+        if (videoRef.current) {
+          observer.observe(videoRef.current)
+        }
+    
+        return () => {
+          if (videoRef.current) {
+            observer.unobserve(videoRef.current)
+          }
+        }
+      }, [])
+
 
     return (
         <div className={`${darkMode ? "bg-blue-gray-200" : "bg-white"} h-max shadow-xl w-[calc(100vw-1rem)] p-4 shadow-blue-gray mt-4 rounded lg:w-[calc(100vw-33rem)]`}>
-            <div className="flex flex-col">
+            <div className="flex flex-col max-h-screen">
                 <div className="flex gap-3 items-center pb-2">
                     <div className="w-10 h-10">
                         <img className="w-full h-full rounded-full outline outline-1 outline-gray-600 object-cover" src={post?.profilePic ? (CLOUDINARY_PROFILE_PHOTO_URL+(post.profilePic)) : PROFILE_PHOTO}/>
@@ -129,10 +159,10 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                     
                 </div>
                 
-                <div>
+                <div className="overflow-hidden">
                     {post.isVideo ? 
                         (
-                        <video muted autoPlay controls className="m-auto transform-none outline-none">
+                        <video muted controls ref={videoRef} className="m-auto transform-none outline-none">
                             <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mp4" />
                             <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/mpeg" />
                             <source src={CLOUDINARY_VIDEO_URL+(post.imgVideoURL)} type="video/ogg" />
@@ -141,14 +171,14 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
                         </video>
                         )
                         : (
-                            <img className="m-auto" src={CLOUDINARY_POST_URL+(post.imgVideoURL)} alt="Post Image"/>
+                            <img className="m-auto max-h-96 object-cover" src={CLOUDINARY_POST_URL+(post.imgVideoURL)} alt="Post Image"/>
                         )
                     }
                 </div>
                 
-                <div className="flex gap-5 w-fill h-16">
+                <div className="flex gap-5 h-16 mt-1">
                     <button className="relative" onClick={()=>likeHandler()}>
-                        {like ? <HandThumbUpSolidIcon className="h-8 w-8"/> : <HandThumbUpIcon className="h-8 w-8"/>}{post.liked.length ? <span className="absolute top-1 left-6 text-xs text-white bg-blue-gray-800 w-4 rounded-full">{post.liked.length}</span> : null}</button>
+                        {like ? <HandThumbUpSolidIcon className="h-8 w-8"/> : <HandThumbUpIcon className="h-8 w-8"/>}{post.liked.length ? <span className="absolute top-1 left-6 text-xs text-white bg-blue-800 w-4 rounded-full">{post.liked.length}</span> : null}</button>
                     <button onClick={getComments}><ChatBubbleLeftRightIcon className="h-8 w-8"/></button>
                     {/* <button><ShareIcon className="h-8 w-8"/></button> */}
                     <button onClick={savePostHandler}>{savedPost ? <BookmarkIconSolid className="h-8 w-8"/> : <BookmarkIcon className="h-8 w-8"/>}</button>

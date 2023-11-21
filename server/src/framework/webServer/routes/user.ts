@@ -8,7 +8,7 @@ const userRouter = ()=>{
     const router = express.Router()
     const controllers = userControllers(userDbRepository,userRepositoryMongoDB)
     router.get('/',controllers.getHome)
-    router.get('/getpost',controllers.getPost)
+    router.get('/getpost/:skip',controllers.getPost)
     router.get('/notifications/get',controllers.getnotifications)
     router.get('/:user',controllers.getProfile)
     router.post('/updatephoto',uploadProfilePic,controllers.updateProfilePic)

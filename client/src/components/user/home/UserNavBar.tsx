@@ -220,6 +220,7 @@ function NavList({ isOpen, searchOpen, setSearchOpen, chatOpen, setChatOpen }: l
                     <div onClick={(event)=>{
                       event.stopPropagation()
                       removeNotification(notification._id)
+                      if(notifications.length < 2) notificationHandler();
                     }} className="hover:bg-gray-300 rounded-full">
                       <XMarkIcon className="w-5 h-5 "/>
                     </div>

@@ -66,7 +66,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   const [peerId,setPeerId] = useState('')
   const peer = useRef<Peer | null>(null)
   const [myStream, setMyStream] = useState<MediaStream | null>(null)
-  const [firstCaller, setFirstCaller] = useState(false)
+  // const [firstCaller, setFirstCaller] = useState(false)
   const userVideoRef = useRef<HTMLVideoElement | null>(null)
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -277,7 +277,7 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
       userVideoRef.current.srcObject = streams
     }
     setMyStream(streams)
-    setFirstCaller(true)
+    // setFirstCaller(true)
     socket.current?.emit('initialize-call',{caller:userName,peerId,userId,profilePic,chatUserId})
   }
 
@@ -368,17 +368,18 @@ const ChatBoxContainer: React.FC<chatBoxInterface> = ({ chatOpen, setChatOpen, c
   },[myStream])
 
   const removeVideoTrack = ()=>{
-    const tracks = myStream?.getTracks()
-    tracks?.forEach((track:any) => {
-      track.stop()
-    })
-    setMyStream(null)
-    setVideoDisplay(false)
-    if(firstCaller){
-      setFirstCaller(false)
-    }else{
-      setChatOpen(false)
-    }
+    // const tracks = myStream?.getTracks()
+    // tracks?.forEach((track:any) => {
+    //   track.stop()
+    // })
+    // setMyStream(null)
+    // setVideoDisplay(false)
+    // if(firstCaller){
+    //   setFirstCaller(false)
+    // }else{
+    //   setChatOpen(false)
+    // }
+    window.location.reload()
   }
   
   
