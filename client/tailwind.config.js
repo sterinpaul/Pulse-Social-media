@@ -11,6 +11,15 @@ export default withMT({
       },
       screens: {
         "3xl": "1600px"
+      },
+      keyframes: {
+        mybounce: {
+          '0%, 100%': { transform: 'translateY(-150%)'},
+          '50%': { transform: 'translateY(150%)'}
+        }
+      },
+      animation:{
+        mybounce: 'mybounce 1s ease-in-out infinite'
       }
     }
   },

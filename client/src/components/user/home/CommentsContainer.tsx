@@ -140,7 +140,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
         size="lg"
         open={open}
         handler={handleOpen}
-        className="overflow-scroll"
+        className="overflow-scroll max-h-[90vh]"
       >
             <div className="bg-white flex items-center justify-center flex-wrap">
                 
