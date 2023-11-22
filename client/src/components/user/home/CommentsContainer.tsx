@@ -144,7 +144,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
       >
             <div className="bg-white flex items-center justify-center flex-wrap">
                 
-                <div className="lg:w-[30rem] md:w-[24rem] sm:w-100 h-100 flex items-center justify-center overflow-y-scroll">
+                <div className="lg:w-[30rem] md:w-[24rem] sm:w-100 max-h-80 flex items-center justify-center overflow-y-scroll">
                   {post.isVideo ? 
                         (
                         <video muted controls className="m-auto transform-none outline-none">
@@ -199,7 +199,7 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
                     </>
                     ) : (
                     <>
-                        <div className="overflow-scroll h-44">
+                        <div className="overflow-scroll max-h-44 h-40">
                             <p>{post.description}</p>
                             {comments?.map((comment)=>{
                             return (
