@@ -42,6 +42,7 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
     const [editStatus,setEditStatus] = useState(false)
     const videoRef = useRef<HTMLVideoElement>(null)
 
+    
     const likeHandler = async()=>{
         if(like){
             await unlikePost(post._id).then(()=>post.liked.splice(post.liked.indexOf(userName),1))
@@ -118,17 +119,17 @@ const UserBodyPost:React.FC<UserBodyProps> = ({post,userData,deletePost})=>{
           });
         };
     
-        const observer = new IntersectionObserver(callback, options);
+        const videoObserver = new IntersectionObserver(callback, options)
         if (videoRef.current) {
-          observer.observe(videoRef.current)
+            videoObserver.observe(videoRef.current)
         }
     
         return () => {
           if (videoRef.current) {
-            observer.unobserve(videoRef.current)
+            videoObserver.unobserve(videoRef.current)
           }
         }
-      }, [])
+    }, [])
 
 
     return (

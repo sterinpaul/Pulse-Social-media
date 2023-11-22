@@ -1,4 +1,4 @@
-import { useState,useRef, useEffect} from "react";
+import { useState,useRef } from "react";
 import { useSelector } from "react-redux";
 import UserBodyPost from "./UserBodyPost";
 import { Button } from "@material-tailwind/react";
@@ -9,6 +9,7 @@ import { postData } from "../../../interfaces/postInterface";
 import { userInterface } from "../../../interfaces/userInterface";
 import LoadingSpinner from "../loading/LoadingSpinner";
 import { getAllPosts } from "../../../api/apiConnections/userConnection";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface UserBodyProps {
     userData: userInterface,
@@ -22,9 +23,8 @@ const UserBody:React.FC<UserBodyProps> = ({userData,allPosts,setAllPosts})=>{
     const [upload,setUpload] = useState<File | null>()
     const fileInput = useRef<HTMLInputElement | null>(null)
     const [loading,setLoading] = useState(false)
-    const [skip,setSkip] = useState(1)
-    
-    
+    const [skip,setSkip] = useState<number>(1)
+
     const uploadFunction = ()=>{
         fileInput.current?.click()
     }
@@ -46,24 +46,30 @@ const UserBody:React.FC<UserBodyProps> = ({userData,allPosts,setAllPosts})=>{
         setAllPosts(postsAfterDelete)
     }
 
-    useEffect(() => {
-        const handleScroll = async () => {
-            
-          if ((window.innerHeight + window.scrollY) === (document.body.offsetHeight)) {
-            setSkip(skip+1)
-            const response = await getAllPosts(skip)
-                if(Array.isArray(response)){
-                    setAllPosts((prevData)=>[...prevData,...response])
-                }
-            }
-        }
-        window.addEventListener('scroll', handleScroll)
-    
-        return () => {
-          window.removeEventListener('scroll', handleScroll)
-        }
-      }, [skip])
 
+    // useEffect(() => {
+    //     const handleScroll = async () => {    
+    //       if ((window.innerHeight + window.scrollY) === (document.body.offsetHeight)) {
+    //         setSkip(prev=>prev+1)
+    //         const response = await getAllPosts(skip)
+    //             if(Array.isArray(response)){
+    //                 setAllPosts((prevData)=>[...prevData,...response])
+    //             }
+    //         }
+    //     }
+    //     window.addEventListener('scroll', handleScroll)
+    //     return () => {
+    //       window.removeEventListener('scroll', handleScroll)
+    //     }
+    // }, [skip])
+
+    const getAllpostPagination = async()=>{
+        setSkip((prev)=>prev+1)
+        const response = await getAllPosts(skip)
+        if(Array.isArray(response)){
+            setAllPosts((prevData)=>[...prevData,...response])
+        }
+    }
       
       
 
@@ -95,11 +101,18 @@ const UserBody:React.FC<UserBodyProps> = ({userData,allPosts,setAllPosts})=>{
                     {loading ? <LoadingSpinner/> : null}
             </div>
 
+            <InfiniteScroll
+                dataLength={allPosts.length}
+                next={getAllpostPagination}
+                hasMore={true}
+                loader={null}
+            >
 
-            {allPosts.map((post:postData)=>{
-                return <UserBodyPost post={post} userData={userData!} deletePost={deletePost} key={post?._id}/>
-                })
-            }
+                {allPosts.map((post:postData)=>{
+                    return <UserBodyPost post={post} userData={userData!} deletePost={deletePost} key={post?._id}/>
+                    })
+                }
+            </InfiniteScroll>
 
         </div>
     )

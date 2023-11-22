@@ -140,12 +140,11 @@ const CommentsContainer:React.FC<CommentsContainerProps> = ({
         size="lg"
         open={open}
         handler={handleOpen}
-        className="overflow-scroll max-h-[90vh]"
+        className="overflow-hidden max-h-[90vh]"
       >
             <div className="bg-white flex items-center justify-center flex-wrap">
                 
-                <div className="lg:w-[30rem] md:w-[24rem] sm:w-100 flex items-center justify-center ">
-                  {/* <img className="w-100 h-100 max-h-96 object-cover" src={CLOUDINARY_POST_URL+post.imgVideoURL} alt='post'/> */}
+                <div className="lg:w-[30rem] md:w-[24rem] sm:w-100 h-100 flex items-center justify-center overflow-y-scroll">
                   {post.isVideo ? 
                         (
                         <video muted controls className="m-auto transform-none outline-none">
