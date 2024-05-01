@@ -9,8 +9,6 @@ const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const helmet_1 = __importDefault(require("helmet"));
 const config_1 = require("../../config");
-// @ts-ignore
-const proxy_protocol_1 = __importDefault(require("proxy-protocol"));
 const expressConfig = (app) => {
     // Enabling CORS
     const enableCors = {
@@ -25,7 +23,5 @@ const expressConfig = (app) => {
     app.use(express_1.default.urlencoded({ extended: true }));
     app.use((0, cookie_parser_1.default)());
     app.use((0, helmet_1.default)());
-    // checking header for ip address of client
-    app.use((0, proxy_protocol_1.default)());
 };
 exports.default = expressConfig;
