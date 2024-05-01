@@ -15,6 +15,8 @@ import {
     userProfileUpdate,
     removeUserNotification
 } from "../../application/useCases/user";
+import geoip from 'geoip-lite'
+import fetch from 'node-fetch'
 
 
 const userControllers = (
@@ -24,7 +26,15 @@ const userControllers = (
     const userDbRepository = userDbInterface(userDbService())
 
     const getHome = asyncHandler(async(req:Request,res:Response)=>{
-        
+
+        const fetchedData = await fetch(`https://ipapi.co/${req.ip}/json`)
+        const jsonData = await fetchedData.json()
+        const ip:any = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        console.log("geoip-ip",ip)
+        console.log("fetched jsonData",jsonData)
+        const location = geoip.lookup(ip)
+        console.log('geoip - location',location);
+
         const userName = req.headers['x-user'] as string
         const profileData = await getUserProfile(userName,userDbRepository)
         if(profileData){
