@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const user_1 = require("../../application/useCases/user");
 const geoip_lite_1 = __importDefault(require("geoip-lite"));
-const node_fetch_1 = __importDefault(require("node-fetch"));
+const node_fetch_1 = __importDefault(require("node-fetch").default);
 const userControllers = (userDbInterface, userDbService) => {
     const userDbRepository = userDbInterface(userDbService());
     const getHome = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
