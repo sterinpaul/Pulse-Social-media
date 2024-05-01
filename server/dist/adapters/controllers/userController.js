@@ -14,18 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const user_1 = require("../../application/useCases/user");
-const geoip_lite_1 = __importDefault(require("geoip-lite"));
-const node_fetch_1 = __importDefault(require("node-fetch").default);
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const userControllers = (userDbInterface, userDbService) => {
     const userDbRepository = userDbInterface(userDbService());
     const getHome = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const fetchedData = yield (0, node_fetch_1.default)(`https://ipapi.co/${req.ip}/json`);
         const jsonData = yield fetchedData.json();
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        console.log("geoip-ip", ip);
+        console.log("ip", ip);
         console.log("fetched jsonData", jsonData);
-        const location = geoip_lite_1.default.lookup(ip);
-        console.log('geoip - location', location);
         const userName = req.headers['x-user'];
         const profileData = yield (0, user_1.getUserProfile)(userName, userDbRepository);
         if (profileData) {
