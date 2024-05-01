@@ -4,6 +4,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet'
 import { configKeys } from '../../config';
+// @ts-ignore
+import proxyProtocol from 'proxy-protocol';
 
 const expressConfig = (app:Application)=>{
 
@@ -21,5 +23,7 @@ const expressConfig = (app:Application)=>{
     app.use(express.urlencoded({extended:true}))
     app.use(cookieParser())
     app.use(helmet())
+    // checking header for ip address of client
+    app.use(proxyProtocol());
 }
 export default expressConfig

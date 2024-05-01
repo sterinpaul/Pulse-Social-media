@@ -21,6 +21,8 @@ const userControllers = (userDbInterface, userDbService) => {
         const fetchedData = yield axios_1.default.post(`https://ipapi.co/${req.ip}/json`);
         const jsonData = fetchedData.data;
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        const newIpConf = req.headers['x-real-ip'];
+        console.log("newIpConf for testing", newIpConf);
         console.log("ip", ip);
         console.log("fetched jsonData", jsonData);
         const userName = req.headers['x-user'];
