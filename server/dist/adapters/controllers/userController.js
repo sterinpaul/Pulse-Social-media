@@ -18,13 +18,10 @@ const axios_1 = __importDefault(require("axios"));
 const userControllers = (userDbInterface, userDbService) => {
     const userDbRepository = userDbInterface(userDbService());
     const getHome = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const fetchedData = yield axios_1.default.post(`https://ipapi.co/${req.ip}/json`);
-        const jsonData = fetchedData.data;
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const newIpConf = req.headers['x-real-ip'];
-        console.log("newIpConf for testing", newIpConf);
-        console.log("ip", ip);
-        console.log("fetched jsonData", jsonData);
+        const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress;
+        const fetchedData = yield axios_1.default.post(`https://ipapi.co/${ip}/json`);
+        console.log("IP", ip);
+        console.log("fetchedIPData for testing", fetchedData.data);
         const userName = req.headers['x-user'];
         const profileData = yield (0, user_1.getUserProfile)(userName, userDbRepository);
         if (profileData) {

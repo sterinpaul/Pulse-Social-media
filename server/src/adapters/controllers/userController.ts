@@ -26,14 +26,11 @@ const userControllers = (
 
     const getHome = asyncHandler(async(req:Request,res:Response)=>{
 
-        const fetchedData = await axios.post(`https://ipapi.co/${req.ip}/json`)
-        const jsonData = fetchedData.data
-        const ip:any = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const newIpConf = req.headers['x-real-ip']
+        const ip:any = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress;
+        const fetchedData = await axios.post(`https://ipapi.co/${ip}/json`)
 
-        console.log("newIpConf for testing",newIpConf)
-        console.log("ip",ip)
-        console.log("fetched jsonData",jsonData)
+        console.log("IP",ip)
+        console.log("fetchedIPData for testing",fetchedData.data)
 
         const userName = req.headers['x-user'] as string
         const profileData = await getUserProfile(userName,userDbRepository)
