@@ -15,7 +15,7 @@ import {
     userProfileUpdate,
     removeUserNotification
 } from "../../application/useCases/user";
-import fetch from 'node-fetch'
+import axios from 'axios'
 
 
 const userControllers = (
@@ -26,8 +26,8 @@ const userControllers = (
 
     const getHome = asyncHandler(async(req:Request,res:Response)=>{
 
-        const fetchedData = await fetch(`https://ipapi.co/${req.ip}/json`)
-        const jsonData = await fetchedData.json()
+        const fetchedData = await axios.post(`https://ipapi.co/${req.ip}/json`)
+        const jsonData = fetchedData.data
         const ip:any = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         console.log("ip",ip)
         console.log("fetched jsonData",jsonData)
